@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/tutor")
 public class TutorController {
@@ -20,7 +22,7 @@ public class TutorController {
   }
 
   @PostMapping("/messages")
-  public TutorResponse message(@Valid @RequestBody TutorRequest request) {
-    return academicDataService.tutorReply(request);
+  public TutorResponse message(@Valid @RequestBody TutorRequest request, Principal principal) {
+    return academicDataService.tutorReply(principal.getName(), request);
   }
 }

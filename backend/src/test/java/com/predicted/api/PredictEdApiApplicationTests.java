@@ -5,6 +5,7 @@ import com.predicted.api.auth.AuthResponse;
 import com.predicted.api.auth.RegisterRequest;
 import com.predicted.api.common.Models.MpesaPaymentRequest;
 import com.predicted.api.common.Models.PredictionInput;
+import com.predicted.api.common.Models.TutorRequest;
 import com.predicted.api.common.Models.UpdateEnrollmentsRequest;
 import com.predicted.api.common.Models.UpdateProfileRequest;
 import com.predicted.api.persistence.PaymentAttemptRepository;
@@ -199,6 +200,49 @@ class PredictEdApiApplicationTests {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).containsEntry("score", 79);
     assertThat(response.getBody()).containsEntry("grade", "A-");
+  }
+
+  @Test
+  void aiStatusAndFallbackTutorAreAvailable() {
+    AuthResponse auth = login("alex@predicted.test", "password");
+
+    ResponseEntity<Map> status = restTemplate.exchange(
+        url("/api/ai/status"),
+        HttpMethod.GET,
+        authorized(auth.token()),
+        Map.class
+    );
+    ResponseEntity<Map> tutor = restTemplate.exchange(
+        url("/api/tutor/messages"),
+        HttpMethod.POST,
+        authorized(auth.token(), new TutorRequest("Explain vector clocks for my exam", "distributed")),
+        Map.class
+    );
+
+    assertThat(status.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(status.getBody()).containsEntry("enabled", false);
+    assertThat(status.getBody()).containsEntry("model", "fallback");
+    assertThat(tutor.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat((String) tutor.getBody().get("answer")).contains("vector clocks");
+    assertThat((Iterable<?>) tutor.getBody().get("nextSteps")).isNotEmpty();
+    assertThat((Iterable<?>) tutor.getBody().get("generatedFlashcards")).isNotEmpty();
+  }
+
+  @Test
+  void mockGenerationUsesAiServiceFallback() {
+    AuthResponse auth = login("alex@predicted.test", "password");
+
+    ResponseEntity<Map[]> mock = restTemplate.exchange(
+        url("/api/predictions/distributed/mock"),
+        HttpMethod.POST,
+        authorized(auth.token()),
+        Map[].class
+    );
+
+    assertThat(mock.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(mock.getBody()).hasSize(3);
+    assertThat(mock.getBody()[0]).containsEntry("courseId", "distributed");
+    assertThat((String) mock.getBody()[0].get("prompt")).contains("lecturer-style");
   }
 
   @Test

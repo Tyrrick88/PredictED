@@ -23,6 +23,14 @@ public final class Models {
   ) {
   }
 
+  public record AiStatus(
+      String provider,
+      String model,
+      boolean enabled,
+      String mode
+  ) {
+  }
+
   public record UserProfile(
       String id,
       String name,

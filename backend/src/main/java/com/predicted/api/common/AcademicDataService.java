@@ -1,5 +1,6 @@
 package com.predicted.api.common;
 
+import com.predicted.api.ai.AcademicAiService;
 import com.predicted.api.common.Models.CoursePrediction;
 import com.predicted.api.common.Models.CreateFeedSignalRequest;
 import com.predicted.api.common.Models.DashboardOverview;
@@ -57,12 +58,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @Transactional(readOnly = true)
 public class AcademicDataService {
 
+  private final AcademicAiService academicAiService;
   private final AppUserRepository userRepository;
   private final CourseRepository courseRepository;
   private final CourseEnrollmentRepository courseEnrollmentRepository;
@@ -74,6 +75,7 @@ public class AcademicDataService {
   private final PaymentAttemptRepository paymentAttemptRepository;
 
   public AcademicDataService(
+      AcademicAiService academicAiService,
       AppUserRepository userRepository,
       CourseRepository courseRepository,
       CourseEnrollmentRepository courseEnrollmentRepository,
@@ -84,6 +86,7 @@ public class AcademicDataService {
       ModerationItemRepository moderationItemRepository,
       PaymentAttemptRepository paymentAttemptRepository
   ) {
+    this.academicAiService = academicAiService;
     this.userRepository = userRepository;
     this.courseRepository = courseRepository;
     this.courseEnrollmentRepository = courseEnrollmentRepository;
@@ -224,48 +227,22 @@ public class AcademicDataService {
 
   public List<MockQuestion> generateMock(String courseId) {
     CoursePrediction course = requireCourse(courseId);
-    List<TopicPrediction> topics = course.topics();
-    return IntStream.range(0, Math.min(3, topics.size()))
-        .mapToObj(index -> {
-          TopicPrediction topic = topics.get(index);
-          String prompt = switch (index) {
-            case 0 -> "Explain " + topic.topic() + " using a lecturer-style worked example.";
-            case 1 -> "Compare two approaches related to " + topic.topic() + " and justify the stronger answer.";
-            default -> "Solve a short scenario involving " + topic.topic() + " and show each step.";
-          };
-          return new MockQuestion(
-              index + 1,
-              course.courseId(),
-              topic.topic(),
-              prompt,
-              index == 0 ? 12 : 8,
-              topic.recommendedAction()
-          );
-        })
-        .toList();
+    UserProfile fallbackProfile = new UserProfile(
+        "anonymous",
+        "Student",
+        "student@predicted.local",
+        "PredictED",
+        "General revision",
+        "University",
+        "STUDENT"
+    );
+    return academicAiService.generateMockQuestions(fallbackProfile, course);
   }
 
   public List<MockQuestion> generateMock(String email, String courseId) {
+    UserProfile student = profile(email);
     CoursePrediction course = requireCourse(email, courseId);
-    List<TopicPrediction> topics = course.topics();
-    return IntStream.range(0, Math.min(3, topics.size()))
-        .mapToObj(index -> {
-          TopicPrediction topic = topics.get(index);
-          String prompt = switch (index) {
-            case 0 -> "Explain " + topic.topic() + " using a lecturer-style worked example.";
-            case 1 -> "Compare two approaches related to " + topic.topic() + " and justify the stronger answer.";
-            default -> "Solve a short scenario involving " + topic.topic() + " and show each step.";
-          };
-          return new MockQuestion(
-              index + 1,
-              course.courseId(),
-              topic.topic(),
-              prompt,
-              index == 0 ? 12 : 8,
-              topic.recommendedAction()
-          );
-        })
-        .toList();
+    return academicAiService.generateMockQuestions(student, course);
   }
 
   public PlannerResponse planner(String email, int focusHours) {
@@ -292,31 +269,10 @@ public class AcademicDataService {
     return toStudyTask(studyTaskRepository.save(task));
   }
 
-  public TutorResponse tutorReply(TutorRequest request) {
-    String prompt = request.prompt().toLowerCase();
-    String answer;
-    List<String> nextSteps;
-    List<String> generatedCards;
-
-    if (prompt.contains("vector") || prompt.contains("distributed")) {
-      answer = "For vector clocks, state the rule first: each process keeps one counter per process, increments on local/send events, and merges by max on receive before incrementing. In exam answers, finish by comparing two timestamps to show causality or concurrency.";
-      nextSteps = List.of("Draw a 3-process event timeline", "Compare two vector timestamps", "Attempt one past-paper causality question");
-      generatedCards = List.of("When are two vector-clock events concurrent?", "What happens on receive in vector clocks?");
-    } else if (prompt.contains("bayes") || prompt.contains("network")) {
-      answer = "Start from the graph structure, identify parents, then apply d-separation before computing probabilities. The highest-scoring answers show both the independence reasoning and the numeric factorization.";
-      nextSteps = List.of("List parent nodes", "Mark observed evidence", "Factorize the joint probability");
-      generatedCards = List.of("What does d-separation test?", "How is a Bayesian network factorized?");
-    } else if (prompt.contains("ll") || prompt.contains("parsing") || prompt.contains("compiler")) {
-      answer = "For LL(1), calculate FIRST and FOLLOW sets, then fill the parsing table. If any cell has more than one production, the grammar is not LL(1).";
-      nextSteps = List.of("Compute FIRST sets", "Compute FOLLOW sets", "Check parsing-table conflicts");
-      generatedCards = List.of("What causes an LL(1) conflict?", "Why does FOLLOW matter for epsilon productions?");
-    } else {
-      answer = "I would study that with a 20-minute loop: define the concept, solve one lecturer-style example, then turn each mistake into a flashcard.";
-      nextSteps = List.of("Pick a course", "Solve one short question", "Review related flashcards");
-      generatedCards = List.of("What is the key definition?", "What mistake did I make last time?");
-    }
-
-    return new TutorResponse(answer, nextSteps, generatedCards);
+  public TutorResponse tutorReply(String email, TutorRequest request) {
+    UserProfile student = profile(email);
+    CoursePrediction course = tutorCourse(email, request.courseId());
+    return academicAiService.tutorReply(request, student, course);
   }
 
   public List<Flashcard> dueFlashcards(String email) {
@@ -431,6 +387,16 @@ public class AcademicDataService {
 
   private List<CourseEntity> enrolledCourseEntities(String email) {
     return enrolledCourseEntities(requireUser(email));
+  }
+
+  private CoursePrediction tutorCourse(String email, String courseId) {
+    if (courseId != null && !courseId.isBlank()) {
+      return requireCourse(email, courseId);
+    }
+    return enrolledCourseEntities(email).stream()
+        .findFirst()
+        .map(this::toCoursePrediction)
+        .orElseGet(() -> requireCourse("distributed"));
   }
 
   private List<CourseEntity> enrolledCourseEntities(AppUser user) {

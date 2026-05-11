@@ -44,6 +44,7 @@ curl http://localhost:8080/api/dashboard/overview \
 - `POST /api/auth/login`
 - `POST /api/auth/register`
 - `GET /api/auth/me`
+- `GET /api/ai/status`
 - `GET /api/profile`
 - `PUT /api/profile`
 - `PUT /api/profile/courses`
@@ -62,6 +63,29 @@ curl http://localhost:8080/api/dashboard/overview \
 - `GET /api/marketplace/notes`
 - `POST /api/payments/mpesa/stk-push`
 - `GET /api/admin/moderation` with admin token
+
+## Real AI services
+
+The tutor and mock-paper endpoints use a provider-backed AI service:
+
+- `POST /api/tutor/messages`
+- `POST /api/predictions/{courseId}/mock`
+
+Default mode is deterministic fallback so local development and tests work without an API key. To use OpenAI:
+
+```bash
+AI_PROVIDER=openai \
+OPENAI_API_KEY='sk-your-key' \
+OPENAI_MODEL=gpt-5.5 \
+mvn spring-boot:run
+```
+
+The implementation calls the OpenAI Responses API with Structured Outputs, so AI tutor replies and mock questions are parsed into typed API responses. Check the active mode with:
+
+```bash
+curl http://localhost:8080/api/ai/status \
+  -H "Authorization: Bearer $TOKEN"
+```
 
 ## Database migrations
 
