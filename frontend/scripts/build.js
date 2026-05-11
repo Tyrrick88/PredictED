@@ -3,7 +3,8 @@ const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
-const apiBase = (process.env.PREDICTED_API_BASE || "").replace(/\/+$/, "");
+const defaultApiBase = "https://predicted-production-0574.up.railway.app";
+const apiBase = (process.env.PREDICTED_API_BASE || defaultApiBase).replace(/\/+$/, "");
 
 async function build() {
   await fs.rm(dist, { recursive: true, force: true });

@@ -45,13 +45,19 @@ Create a Vercel project from this repo with:
 - Build Command: `npm run build`
 - Output Directory: `dist`
 
-After Railway gives you a public backend URL, set this Vercel environment variable:
+The frontend build defaults to the live Railway backend:
 
 ```bash
-PREDICTED_API_BASE=https://your-backend.up.railway.app
+https://predicted-production-0574.up.railway.app
 ```
 
-Redeploy Vercel after setting the variable.
+If the Railway backend domain changes later, set this Vercel environment variable to override the built-in default:
+
+```bash
+PREDICTED_API_BASE=https://your-new-backend.up.railway.app
+```
+
+Redeploy Vercel after changing the variable.
 
 ## Smoke Test
 
