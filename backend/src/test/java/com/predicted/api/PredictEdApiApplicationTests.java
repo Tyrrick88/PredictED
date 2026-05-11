@@ -2,6 +2,7 @@ package com.predicted.api;
 
 import com.predicted.api.auth.AuthRequest;
 import com.predicted.api.auth.AuthResponse;
+import com.predicted.api.auth.RegisterRequest;
 import com.predicted.api.common.Models.MpesaPaymentRequest;
 import com.predicted.api.common.Models.PredictionInput;
 import com.predicted.api.persistence.PaymentAttemptRepository;
@@ -60,6 +61,63 @@ class PredictEdApiApplicationTests {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     Map<String, Object> student = (Map<String, Object>) response.getBody().get("student");
     assertThat(student).containsEntry("name", "Alex Mwangi");
+  }
+
+  @Test
+  void newStudentCanRegisterAndUseAuthenticatedApi() {
+    RegisterRequest request = new RegisterRequest(
+        "Nia Kamau",
+        "nia.kamau@predicted.test",
+        "strongpass123",
+        "Kenyatta University",
+        "BSc. Software Engineering",
+        "Year 2, Semester 1"
+    );
+
+    ResponseEntity<AuthResponse> register = restTemplate.postForEntity(
+        url("/api/auth/register"),
+        request,
+        AuthResponse.class
+    );
+
+    assertThat(register.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(register.getBody()).isNotNull();
+    assertThat(register.getBody().token()).isNotBlank();
+    assertThat(register.getBody().user().email()).isEqualTo("nia.kamau@predicted.test");
+
+    ResponseEntity<Map> dashboard = restTemplate.exchange(
+        url("/api/dashboard/overview"),
+        HttpMethod.GET,
+        authorized(register.getBody().token()),
+        Map.class
+    );
+
+    assertThat(dashboard.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> student = (Map<String, Object>) dashboard.getBody().get("student");
+    assertThat(student).containsEntry("name", "Nia Kamau");
+    assertThat((Iterable<?>) dashboard.getBody().get("tasks")).hasSize(3);
+    assertThat(dashboard.getBody()).containsEntry("flashcardsDue", 3);
+  }
+
+  @Test
+  void duplicateRegistrationReturnsConflict() {
+    RegisterRequest request = new RegisterRequest(
+        "Duplicate Alex",
+        "alex@predicted.test",
+        "strongpass123",
+        "University of Nairobi",
+        "BSc. Computer Science",
+        "Year 3"
+    );
+
+    ResponseEntity<Map> response = restTemplate.postForEntity(
+        url("/api/auth/register"),
+        request,
+        Map.class
+    );
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    assertThat(response.getBody()).containsEntry("code", "CONFLICT");
   }
 
   @Test

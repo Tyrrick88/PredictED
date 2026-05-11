@@ -19,6 +19,11 @@ public class ApiExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error("NOT_FOUND", exception.getMessage()));
   }
 
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<Map<String, Object>> conflict(ConflictException exception) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error("CONFLICT", exception.getMessage()));
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<String, Object>> validation(MethodArgumentNotValidException exception) {
     String fields = exception.getBindingResult()
