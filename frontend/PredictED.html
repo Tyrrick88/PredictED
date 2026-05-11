@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>PredictED | Academic Revision Platform</title>
-  <link rel="icon" type="image/svg+xml" href="../PredictEDlogo/PrdictEDLogo.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/PrdictEDLogo.svg" />
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -256,7 +256,7 @@
     <div class="panel w-full max-w-md p-5 shadow-panel">
       <div class="flex items-center justify-between gap-4 border-b border-line pb-4">
         <div class="flex items-center gap-3">
-          <img class="h-12 w-12 rounded-lg border border-line bg-white object-contain p-1" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+          <img class="h-12 w-12 rounded-lg border border-line bg-white object-contain p-1" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
           <div>
             <p class="font-mono text-[11px] uppercase text-muted">Account</p>
             <h2 class="text-xl font-black text-navy" id="authTitle">Sign in</h2>
@@ -319,7 +319,7 @@
     <aside class="drawer-panel glass border-r border-line p-4">
       <div class="flex items-center justify-between gap-3 border-b border-line pb-4">
         <div class="flex min-w-0 items-center">
-          <img class="h-20 w-20 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+          <img class="h-20 w-20 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
           <span class="sr-only">PredictED, University of Nairobi</span>
         </div>
         <button class="btn btn-ghost h-10 w-10 p-0" id="closeDrawer" aria-label="Close menu">
@@ -340,7 +340,7 @@
   <div class="app-shell md:grid md:grid-cols-[280px_1fr]">
     <aside class="glass fixed left-0 top-0 z-40 hidden h-screen w-[280px] border-r border-line px-4 py-5 md:flex md:flex-col">
       <div class="flex justify-center px-2">
-        <img class="h-24 w-24 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+        <img class="h-24 w-24 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
         <span class="sr-only">PredictED AI Academic Revision</span>
       </div>
       <div class="mt-5 rounded-lg border border-line bg-white p-3 shadow-soft">
@@ -385,7 +385,7 @@
             </button>
             <div class="min-w-0">
               <div class="flex items-center md:hidden">
-                <img class="h-10 w-10 shrink-0 rounded-md border border-line bg-white object-contain p-0.5" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+                <img class="h-10 w-10 shrink-0 rounded-md border border-line bg-white object-contain p-0.5" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
               </div>
               <p class="hidden font-mono text-[11px] uppercase tracking-wide text-muted md:block" id="viewEyebrow">Dashboard</p>
               <h1 class="hidden text-2xl font-black tracking-tight text-navy md:block" id="viewTitle">Academic Command Center</h1>
@@ -961,12 +961,9 @@
                   </div>
                 </div>
                 <div class="panel p-5">
-                  <p class="font-mono text-[11px] font-bold uppercase text-muted">M-Pesa Wallet</p>
-                  <h3 class="mt-1 text-xl font-black text-navy">KES 420</h3>
-                  <button class="btn btn-ghost mt-4 w-full px-4">
-                    <span class="material-symbols-outlined">payments</span>
-                    Top Up
-                  </button>
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Payments</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Paused</h3>
+                  <span class="chip mt-4"><span class="material-symbols-outlined text-[16px]">pause_circle</span>Launch mode</span>
                 </div>
               </aside>
             </div>
@@ -1018,10 +1015,10 @@
               <section class="panel p-5 md:p-6">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Revenue Model</p>
-                    <h3 class="mt-1 text-xl font-black text-navy">Student-friendly tiers</h3>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Access Model</p>
+                    <h3 class="mt-1 text-xl font-black text-navy">Open launch library</h3>
                   </div>
-                  <span class="chip"><span class="material-symbols-outlined text-[16px]">payments</span>M-Pesa ready</span>
+                  <span class="chip"><span class="material-symbols-outlined text-[16px]">pause_circle</span>Payments paused</span>
                 </div>
                 <div class="mt-5 grid gap-3 md:grid-cols-5">
                   <div class="rounded-lg border border-line bg-white p-4">
@@ -1030,24 +1027,24 @@
                     <p class="mt-1 text-sm text-muted">Basic notes</p>
                   </div>
                   <div class="rounded-lg border border-line bg-white p-4">
-                    <p class="font-bold text-navy">Weekly Sprint</p>
-                    <p class="mt-2 text-2xl font-black">KES 50</p>
-                    <p class="mt-1 text-sm text-muted">7-day access</p>
+                    <p class="font-bold text-navy">Uploads</p>
+                    <p class="mt-2 text-2xl font-black">Review</p>
+                    <p class="mt-1 text-sm text-muted">Moderated packs</p>
                   </div>
                   <div class="rounded-lg border border-line bg-white p-4">
-                    <p class="font-bold text-navy">Monthly</p>
-                    <p class="mt-2 text-2xl font-black">KES 200</p>
-                    <p class="mt-1 text-sm text-muted">Standard plan</p>
+                    <p class="font-bold text-navy">Downloads</p>
+                    <p class="mt-2 text-2xl font-black">Open</p>
+                    <p class="mt-1 text-sm text-muted">No payment gate</p>
                   </div>
                   <div class="rounded-lg border border-line bg-white p-4">
                     <p class="font-bold text-navy">Semester</p>
-                    <p class="mt-2 text-2xl font-black">KES 600</p>
-                    <p class="mt-1 text-sm text-muted">Full term</p>
+                    <p class="mt-2 text-2xl font-black">Later</p>
+                    <p class="mt-1 text-sm text-muted">After payments</p>
                   </div>
                   <div class="rounded-lg border border-line bg-white p-4">
-                    <p class="font-bold text-navy">Premium Pro</p>
-                    <p class="mt-2 text-2xl font-black">KES 1500</p>
-                    <p class="mt-1 text-sm text-muted">Advanced AI</p>
+                    <p class="font-bold text-navy">Premium</p>
+                    <p class="mt-2 text-2xl font-black">Later</p>
+                    <p class="mt-1 text-sm text-muted">Daraja phase</p>
                   </div>
                 </div>
               </section>
@@ -1304,7 +1301,8 @@
     const viewTitle = document.getElementById("viewTitle");
     const viewEyebrow = document.getElementById("viewEyebrow");
     const circumference = 339.292;
-    const API_BASE = localStorage.getItem("predictedApiBase") || "http://localhost:8080";
+    const BUILD_API_BASE = "__PREDICTED_API_BASE__";
+    const API_BASE = configuredApiBase();
     let activeView = "dashboard";
     let focusHours = 3;
     let cardIndex = 0;
@@ -1329,6 +1327,26 @@
         .replaceAll("'", "&#039;");
     }
 
+    function configuredApiBase() {
+      const buildValue = BUILD_API_BASE.startsWith("__") ? "" : BUILD_API_BASE;
+      const localFallback = ["localhost", "127.0.0.1", ""].includes(window.location.hostname)
+        ? "http://localhost:8080"
+        : "";
+      return (
+        localStorage.getItem("predictedApiBase")
+        || window.PREDICTED_API_BASE
+        || buildValue
+        || localFallback
+      ).replace(/\/+$/, "");
+    }
+
+    function apiUrl(path) {
+      if (!API_BASE) {
+        throw new Error("Backend API URL is not configured.");
+      }
+      return `${API_BASE}${path}`;
+    }
+
     function setApiStatus(text, state = "offline") {
       const label = document.getElementById("apiStatusText");
       const iconEl = document.querySelector("#apiStatus .material-symbols-outlined");
@@ -1341,7 +1359,7 @@
     }
 
     async function loginWith(email, password) {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -1353,7 +1371,7 @@
     }
 
     async function registerWith(payload) {
-      const response = await fetch(`${API_BASE}/api/auth/register`, {
+      const response = await fetch(apiUrl("/api/auth/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -1486,7 +1504,7 @@
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
-      const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+      const response = await fetch(apiUrl(path), { ...options, headers });
       if (response.status === 401 && token === authToken) {
         clearSession();
         apiConnected = false;
@@ -1861,7 +1879,7 @@
             <span class="font-black text-ink">${escapeHtml(item.price)}</span>
             ${item.downloadable
               ? `<button class="btn btn-primary h-10 px-3 text-sm download-note" type="button" data-note-id="${escapeHtml(item.id || "")}" data-note-url="${escapeHtml(item.downloadUrl || "")}">${icon("download", "text-[18px]")}Download</button>`
-              : `<button class="btn btn-primary h-10 px-3 text-sm buy-note" type="button" data-note-id="${escapeHtml(item.id || "")}" data-note-price="${Number(item.priceKes || String(item.price).replace(/\D/g, "") || 1)}">${icon("shopping_bag", "text-[18px]")}Buy</button>`}
+              : `<button class="btn btn-ghost h-10 px-3 text-sm" type="button" disabled>${icon("lock", "text-[18px]")}Review</button>`}
           </div>
         </article>
       `).join("");
@@ -2166,7 +2184,7 @@
         return;
       }
       try {
-        const response = await fetch(`${API_BASE}${path}`, {
+        const response = await fetch(apiUrl(path), {
           headers: { Authorization: `Bearer ${authToken}` }
         });
         if (!response.ok) {
@@ -2228,27 +2246,14 @@
       await refreshWorkspace();
     }
 
-    async function initiatePayment(noteId, amountKes) {
-      try {
-        if (!apiConnected) {
-          setApiStatus("Payment demo only", "offline");
-          return;
-        }
-        const result = await apiRequest("/api/payments/mpesa/stk-push", {
-          method: "POST",
-          body: JSON.stringify({
-            phoneNumber: "254700000000",
-            amountKes,
-            reference: noteId || "notes-pack"
-          })
-        });
-        setApiStatus(result.status === "QUEUED" ? "M-Pesa queued" : "Payment started", "online");
-      } catch (error) {
-        setApiStatus("Payment failed", "offline");
-      }
-    }
-
     async function bootstrapApi() {
+      if (!API_BASE) {
+        apiConnected = false;
+        setApiStatus("Backend URL missing", "offline");
+        showAuthGate("Set PREDICTED_API_BASE in Vercel after Railway gives you a backend URL.");
+        renderDashboardPreviews(plannerBase, feedItems);
+        return;
+      }
       setApiStatus("Connecting API", "loading");
       if (!authToken) {
         apiConnected = false;
@@ -2280,12 +2285,6 @@
       const taskButton = event.target.closest(".task-complete");
       if (taskButton) {
         completeTask(taskButton.dataset.taskId);
-        return;
-      }
-
-      const buyButton = event.target.closest(".buy-note");
-      if (buyButton) {
-        initiatePayment(buyButton.dataset.noteId, Number(buyButton.dataset.notePrice || 1));
         return;
       }
 

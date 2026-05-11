@@ -1,5 +1,6 @@
 backend/target/
 backend/data/
+frontend/dist/
 .vscode/
 .idea/
 *.log

@@ -2,6 +2,7 @@ package com.predicted.api.config;
 
 import com.predicted.api.auth.JwtAuthenticationFilter;
 import com.predicted.api.persistence.AppUserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -76,9 +78,11 @@ public class SecurityConfig {
   }
 
   @Bean
-  CorsConfigurationSource corsConfigurationSource() {
+  CorsConfigurationSource corsConfigurationSource(
+      @Value("${predicted.cors.allowed-origin-patterns:*}") String allowedOriginPatterns
+  ) {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedOriginPatterns(csv(allowedOriginPatterns));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
     configuration.setExposedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_DISPOSITION));
@@ -87,5 +91,13 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  private List<String> csv(String value) {
+    List<String> values = Arrays.stream(value.split(","))
+        .map(String::trim)
+        .filter(item -> !item.isBlank())
+        .toList();
+    return values.isEmpty() ? List.of("*") : values;
   }
 }

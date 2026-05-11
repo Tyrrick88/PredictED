@@ -63,8 +63,18 @@ curl http://localhost:8080/api/dashboard/overview \
 - `GET /api/marketplace/notes`
 - `POST /api/marketplace/notes` multipart upload
 - `GET /api/marketplace/notes/{noteId}/download`
-- `POST /api/payments/mpesa/stk-push`
+- `POST /api/payments/mpesa/stk-push` mocked only; not used by the deploy frontend
 - `GET /api/admin/moderation` with admin token
+
+## Deployment status
+
+Payments are skipped for the first hosted deployment. The backend still has a queued-payment stub for tests, but the frontend no longer starts M-Pesa checkout.
+
+For split hosting:
+
+- Deploy the backend to Railway from the repo root. `railway.json` and `nixpacks.toml` build the Spring Boot app from `backend`.
+- Deploy the frontend to Vercel from the `frontend` root. Set `PREDICTED_API_BASE` in Vercel to the Railway public backend URL.
+- Set `CORS_ALLOWED_ORIGIN_PATTERNS` in Railway to the Vercel domain.
 
 ## File uploads
 
@@ -155,10 +165,11 @@ The `postgres` profile is ready for environment-backed PostgreSQL, Redis, JWT co
 
 ```bash
 SPRING_PROFILES_ACTIVE=postgres \
-DATABASE_URL=jdbc:postgresql://localhost:5432/predicted \
-DATABASE_USERNAME=predicted \
-DATABASE_PASSWORD='replace-with-production-db-password' \
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/predicted \
+SPRING_DATASOURCE_USERNAME=predicted \
+SPRING_DATASOURCE_PASSWORD='replace-with-production-db-password' \
 JWT_SECRET='replace-with-a-long-production-secret' \
+CORS_ALLOWED_ORIGIN_PATTERNS='https://your-vercel-domain.vercel.app' \
 mvn spring-boot:run
 ```
 
