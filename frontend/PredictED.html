@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>PredictED | Academic Revision Platform</title>
+  <link rel="icon" type="image/svg+xml" href="../PredictEDlogo/PrdictEDLogo.svg" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            ink: "#071e27",
+            muted: "#536471",
+            cloud: "#f6fbff",
+            panel: "#ffffff",
+            line: "#d6e5ee",
+            navy: "#111a5c",
+            cobalt: "#1d4ed8",
+            aqua: "#0f9fbc",
+            mint: "#16a34a",
+            gold: "#c97800",
+            coral: "#cf3f4f",
+            plum: "#6d3bbf",
+            wash: "#edf7fb"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            md: "0.25rem",
+            lg: "0.375rem",
+            xl: "0.5rem",
+            full: "999px"
+          },
+          boxShadow: {
+            panel: "0 12px 36px rgba(7, 30, 39, 0.08)",
+            soft: "0 8px 24px rgba(7, 30, 39, 0.06)"
+          },
+          fontFamily: {
+            sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(246, 251, 255, 0.96), rgba(237, 247, 251, 0.98)),
+        url("https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1800&q=80");
+      background-attachment: fixed;
+      background-size: cover;
+      color: #071e27;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(246, 251, 255, 0.88);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+      line-height: 1;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes drawRing {
+      from { stroke-dashoffset: 339.292; }
+      to { stroke-dashoffset: var(--dash, 88.216); }
+    }
+    @keyframes growBar {
+      from { width: 0; }
+      to { width: var(--bar, 70%); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.45; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    .app-shell { min-height: 100vh; }
+    .glass {
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d6e5ee;
+      border-radius: 0.5rem;
+      box-shadow: 0 8px 24px rgba(7, 30, 39, 0.06);
+    }
+    .soft-panel {
+      background: rgba(237, 247, 251, 0.9);
+      border: 1px solid #d6e5ee;
+      border-radius: 0.5rem;
+    }
+    .view { display: none; }
+    .view.active { display: block; animation: fadeUp 0.28s ease both; }
+    .nav-link { transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease; }
+    .nav-link:hover { transform: translateX(2px); }
+    .nav-link.active {
+      background: #111a5c;
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(17, 26, 92, 0.16);
+    }
+    .nav-link.active .material-symbols-outlined {
+      font-variation-settings: "FILL" 1, "wght" 650, "GRAD" 0, "opsz" 24;
+    }
+    nav[data-nav-container="bottom"] { display: none; }
+    .metric-card { animation: fadeUp 0.36s ease both; }
+    .metric-card:nth-child(2) { animation-delay: 0.04s; }
+    .metric-card:nth-child(3) { animation-delay: 0.08s; }
+    .metric-card:nth-child(4) { animation-delay: 0.12s; }
+    .progress-bar { width: 0; animation: growBar 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .ring-progress { animation: drawRing 1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .mobile-drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      pointer-events: none;
+    }
+    .mobile-drawer.open { pointer-events: all; }
+    .drawer-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 30, 39, 0.42);
+      opacity: 0;
+      transition: opacity 0.24s ease;
+    }
+    .mobile-drawer.open .drawer-overlay { opacity: 1; }
+    .drawer-panel {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: min(86vw, 320px);
+      transform: translateX(-100%);
+      transition: transform 0.28s ease;
+      overflow-y: auto;
+    }
+    .mobile-drawer.open .drawer-panel { transform: translateX(0); }
+    .course-row, .feed-row, .moderation-row {
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+    .course-row:hover, .feed-row:hover, .moderation-row:hover {
+      transform: translateY(-1px);
+      background: rgba(237, 247, 251, 0.78);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: 2.5rem;
+      border-radius: 0.5rem;
+      font-weight: 700;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #111a5c; color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 10px 24px rgba(29, 78, 216, 0.24); }
+    .btn-ghost { background: rgba(237, 247, 251, 0.78); color: #111a5c; border: 1px solid #d6e5ee; }
+    .btn-ghost:hover { background: #ffffff; box-shadow: 0 8px 18px rgba(7, 30, 39, 0.08); }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      border: 1px solid #d6e5ee;
+      background: #ffffff;
+      padding: 0.35rem 0.65rem;
+      font: 600 0.72rem/1.1 "JetBrains Mono", monospace;
+      color: #536471;
+      white-space: nowrap;
+    }
+    .segmented {
+      display: inline-grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.25rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d6e5ee;
+      background: #edf7fb;
+      padding: 0.25rem;
+    }
+    .segmented button {
+      border-radius: 0.375rem;
+      padding: 0.5rem 0.7rem;
+      font: 700 0.75rem/1.1 "JetBrains Mono", monospace;
+      color: #536471;
+      white-space: nowrap;
+    }
+    .segmented button.active { background: #ffffff; color: #111a5c; box-shadow: 0 4px 12px rgba(7, 30, 39, 0.08); }
+    .study-tile {
+      border-left: 4px solid var(--accent, #1d4ed8);
+    }
+    .flip-card {
+      perspective: 1200px;
+      min-height: 240px;
+    }
+    .flip-inner {
+      position: relative;
+      min-height: 240px;
+      transform-style: preserve-3d;
+      transition: transform 0.45s ease;
+    }
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .flip-back { transform: rotateY(180deg); }
+    input[type="range"] { accent-color: #111a5c; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #edf7fb; }
+    ::-webkit-scrollbar-thumb { background: #aac6d5; border-radius: 999px; }
+    @media (max-width: 767px) {
+      body { background-attachment: scroll; }
+      nav[data-nav-container="bottom"] {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: 0.25rem;
+      }
+      .segmented { width: 100%; }
+      .segmented button { padding-inline: 0.4rem; }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  <div class="mobile-drawer md:hidden" id="mobileDrawer" aria-hidden="true">
+    <button class="drawer-overlay" id="drawerOverlay" aria-label="Close menu"></button>
+    <aside class="drawer-panel glass border-r border-line p-4">
+      <div class="flex items-center justify-between gap-3 border-b border-line pb-4">
+        <div class="flex min-w-0 items-center">
+          <img class="h-20 w-20 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+          <span class="sr-only">PredictED, University of Nairobi</span>
+        </div>
+        <button class="btn btn-ghost h-10 w-10 p-0" id="closeDrawer" aria-label="Close menu">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="mt-4 flex items-center gap-3 rounded-lg border border-line bg-white p-3">
+        <img class="h-11 w-11 rounded-full object-cover" alt="Alex Mwangi profile" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80" />
+        <div class="min-w-0">
+          <p class="truncate text-sm font-bold text-ink">Alex Mwangi</p>
+          <p class="font-mono text-[11px] text-muted">BSc CS · Year 3</p>
+        </div>
+      </div>
+      <nav class="mt-4 grid gap-1" data-nav-container="mobile"></nav>
+    </aside>
+  </div>
+
+  <div class="app-shell md:grid md:grid-cols-[280px_1fr]">
+    <aside class="glass fixed left-0 top-0 z-40 hidden h-screen w-[280px] border-r border-line px-4 py-5 md:flex md:flex-col">
+      <div class="flex justify-center px-2">
+        <img class="h-24 w-24 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+        <span class="sr-only">PredictED AI Academic Revision</span>
+      </div>
+      <div class="mt-5 rounded-lg border border-line bg-white p-3 shadow-soft">
+        <div class="flex items-center gap-3">
+          <img class="h-12 w-12 rounded-full object-cover" alt="Alex Mwangi profile" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80" />
+          <div class="min-w-0">
+            <p class="truncate text-sm font-bold text-ink">Alex Mwangi</p>
+            <p class="font-mono text-[11px] text-muted">Semester 2 Finals</p>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-2 border-t border-line pt-3">
+          <div>
+            <p class="font-mono text-[10px] uppercase text-muted">Plan</p>
+            <p class="text-sm font-black text-navy">Standard</p>
+          </div>
+          <div>
+            <p class="font-mono text-[10px] uppercase text-muted">Streak</p>
+            <p class="text-sm font-black text-coral">14 days</p>
+          </div>
+        </div>
+      </div>
+      <nav class="mt-5 grid gap-1" data-nav-container="desktop"></nav>
+      <div class="mt-auto rounded-lg border border-line bg-wash p-4">
+        <div class="flex items-center gap-2 text-navy">
+          <span class="material-symbols-outlined text-[20px]">cloud_done</span>
+          <p class="font-mono text-[11px] font-bold uppercase">Offline Pack Ready</p>
+        </div>
+        <p class="mt-2 text-sm text-muted">4 courses synced for low-data revision.</p>
+        <button class="btn btn-primary mt-3 h-10 w-full text-sm" data-action="open-view" data-view="planner">
+          <span class="material-symbols-outlined text-[19px]">download</span>
+          Sync Planner
+        </button>
+      </div>
+    </aside>
+
+    <main class="min-h-screen md:col-start-2">
+      <header class="glass sticky top-0 z-30 border-b border-line px-4 py-3 md:px-8">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex min-w-0 items-center gap-3">
+            <button class="btn btn-ghost h-10 w-10 p-0 md:hidden" id="openDrawer" aria-label="Open menu">
+              <span class="material-symbols-outlined">menu</span>
+            </button>
+            <div class="min-w-0">
+              <div class="flex items-center md:hidden">
+                <img class="h-10 w-10 shrink-0 rounded-md border border-line bg-white object-contain p-0.5" alt="PredictED logo" src="../PredictEDlogo/PrdictEDLogo.svg" />
+              </div>
+              <p class="hidden font-mono text-[11px] uppercase tracking-wide text-muted md:block" id="viewEyebrow">Dashboard</p>
+              <h1 class="hidden text-2xl font-black tracking-tight text-navy md:block" id="viewTitle">Academic Command Center</h1>
+            </div>
+          </div>
+          <div class="hidden min-w-[260px] max-w-md flex-1 items-center md:flex">
+            <label class="relative w-full">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-muted">search</span>
+              <input class="w-full rounded-lg border-line bg-white py-2 pl-10 pr-4 text-sm focus:border-cobalt focus:ring-cobalt" id="globalSearch" placeholder="Search courses, notes, lecturers" type="search" />
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-ghost h-10 w-10 p-0 md:hidden" data-action="open-view" data-view="feed" aria-label="Open feed">
+              <span class="material-symbols-outlined">dynamic_feed</span>
+            </button>
+            <button class="btn btn-ghost relative h-10 w-10 p-0" data-action="open-view" data-view="feed" aria-label="Notifications">
+              <span class="material-symbols-outlined">notifications</span>
+              <span class="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-coral" style="animation:pulseDot 1.6s ease infinite"></span>
+            </button>
+            <button class="btn btn-primary hidden px-4 text-sm md:inline-flex" data-action="open-view" data-view="predictor">
+              <span class="material-symbols-outlined text-[19px]">auto_graph</span>
+              Run Prediction
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="px-4 py-5 md:px-8 md:py-8">
+        <div class="mx-auto max-w-[1440px]">
+          <section class="view active" id="view-dashboard" data-title="Academic Command Center" data-eyebrow="Dashboard">
+            <div class="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
+              <div class="panel overflow-hidden">
+                <div class="grid min-h-[310px] md:grid-cols-[1fr_320px]">
+                  <div class="p-5 md:p-7">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="chip"><span class="material-symbols-outlined text-[16px]">school</span>University of Nairobi</span>
+                      <span class="chip"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
+                      <span class="chip"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
+                    </div>
+                    <h2 class="mt-5 max-w-2xl text-3xl font-black tracking-tight text-navy md:text-5xl">Semester 2 final prep is trending to B+.</h2>
+                    <p class="mt-3 max-w-2xl text-base leading-7 text-muted">Distributed Systems and Compiler Construction are driving the risk score. The next three sessions are weighted toward past-paper patterns from lecturer history.</p>
+                    <div class="mt-6 flex flex-wrap gap-3">
+                      <button class="btn btn-primary px-4" data-action="open-view" data-view="planner">
+                        <span class="material-symbols-outlined text-[20px]">event_note</span>
+                        Today&apos;s Plan
+                      </button>
+                      <button class="btn btn-ghost px-4" data-action="open-view" data-view="tutor">
+                        <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+                        Ask AI Tutor
+                      </button>
+                    </div>
+                  </div>
+                  <div class="relative min-h-[260px] overflow-hidden bg-navy text-white md:min-h-full">
+                    <img class="absolute inset-0 h-full w-full object-cover opacity-40" alt="Students collaborating in a study space" src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80" />
+                    <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(17,26,92,0.55),rgba(17,26,92,0.92))]"></div>
+                    <div class="relative flex h-full min-h-[260px] flex-col justify-between p-5">
+                      <div class="flex items-center justify-between">
+                        <span class="font-mono text-[11px] uppercase tracking-wide text-white/75">Prediction</span>
+                        <span class="rounded-full bg-white/10 px-2.5 py-1 font-mono text-[11px] font-bold">Live</span>
+                      </div>
+                      <div class="mx-auto my-6 h-44 w-44">
+                        <svg class="h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                          <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="10"></circle>
+                          <circle class="ring-progress" cx="60" cy="60" r="54" fill="none" stroke="#34d399" stroke-linecap="round" stroke-width="10" stroke-dasharray="339.292" stroke-dashoffset="339.292" style="--dash:88.216"></circle>
+                        </svg>
+                        <div class="-mt-44 flex h-44 w-44 flex-col items-center justify-center">
+                          <span class="text-5xl font-black">74%</span>
+                          <span class="font-mono text-sm text-white/72">B+ expected</span>
+                        </div>
+                      </div>
+                      <div class="grid grid-cols-2 gap-3 border-t border-white/18 pt-4">
+                        <div>
+                          <p class="font-mono text-[10px] uppercase text-white/60">GPA Lift</p>
+                          <p class="text-xl font-black">+0.20</p>
+                        </div>
+                        <div>
+                          <p class="font-mono text-[10px] uppercase text-white/60">Focus</p>
+                          <p class="text-xl font-black text-amber-200">High</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel p-5 md:p-6">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Gamification</p>
+                    <h3 class="mt-1 text-2xl font-black text-navy">Level 24</h3>
+                  </div>
+                  <span class="material-symbols-outlined text-4xl text-gold" style="font-variation-settings:'FILL' 1">workspace_premium</span>
+                </div>
+                <div class="mt-5">
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="font-bold text-ink">Senior Scholar</span>
+                    <span class="font-mono text-muted">12,450 / 15,000 XP</span>
+                  </div>
+                  <div class="mt-2 h-2 overflow-hidden rounded-full bg-wash">
+                    <div class="progress-bar h-full rounded-full bg-gold" style="--bar:83%"></div>
+                  </div>
+                </div>
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                  <div class="border-t border-line pt-3">
+                    <p class="font-mono text-[10px] uppercase text-muted">Study Hours</p>
+                    <p class="mt-1 text-2xl font-black text-navy">128.5</p>
+                  </div>
+                  <div class="border-t border-line pt-3">
+                    <p class="font-mono text-[10px] uppercase text-muted">Cards Due</p>
+                    <p class="mt-1 text-2xl font-black text-coral">38</p>
+                  </div>
+                  <div class="border-t border-line pt-3">
+                    <p class="font-mono text-[10px] uppercase text-muted">Groups</p>
+                    <p class="mt-1 text-2xl font-black text-aqua">4</p>
+                  </div>
+                  <div class="border-t border-line pt-3">
+                    <p class="font-mono text-[10px] uppercase text-muted">Offline</p>
+                    <p class="mt-1 text-2xl font-black text-mint">4</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <article class="metric-card panel p-4">
+                <div class="flex items-center justify-between">
+                  <span class="rounded-lg bg-blue-50 p-2 text-cobalt"><span class="material-symbols-outlined">insights</span></span>
+                  <span class="font-mono text-[11px] text-mint">+8%</span>
+                </div>
+                <p class="mt-4 font-mono text-[11px] uppercase text-muted">Predictive Exam Engine</p>
+                <p class="mt-1 text-2xl font-black text-navy">12 hot topics</p>
+              </article>
+              <article class="metric-card panel p-4">
+                <div class="flex items-center justify-between">
+                  <span class="rounded-lg bg-emerald-50 p-2 text-mint"><span class="material-symbols-outlined">calendar_month</span></span>
+                  <span class="font-mono text-[11px] text-coral">3 due</span>
+                </div>
+                <p class="mt-4 font-mono text-[11px] uppercase text-muted">Smart Study Planner</p>
+                <p class="mt-1 text-2xl font-black text-navy">2h 15m today</p>
+              </article>
+              <article class="metric-card panel p-4">
+                <div class="flex items-center justify-between">
+                  <span class="rounded-lg bg-amber-50 p-2 text-gold"><span class="material-symbols-outlined">psychology</span></span>
+                  <span class="font-mono text-[11px] text-muted">AI ready</span>
+                </div>
+                <p class="mt-4 font-mono text-[11px] uppercase text-muted">Lecturer Intelligence</p>
+                <p class="mt-1 text-2xl font-black text-navy">87% pattern match</p>
+              </article>
+              <article class="metric-card panel p-4">
+                <div class="flex items-center justify-between">
+                  <span class="rounded-lg bg-rose-50 p-2 text-coral"><span class="material-symbols-outlined">groups</span></span>
+                  <span class="font-mono text-[11px] text-aqua">live</span>
+                </div>
+                <p class="mt-4 font-mono text-[11px] uppercase text-muted">Campus Intelligence</p>
+                <p class="mt-1 text-2xl font-black text-navy">9 new signals</p>
+              </article>
+            </div>
+
+            <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_0.8fr]">
+              <section class="panel p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Priority Queue</p>
+                    <h3 class="mt-1 text-xl font-black text-navy">Today&apos;s high-yield sessions</h3>
+                  </div>
+                  <button class="btn btn-ghost px-3 text-sm" data-action="open-view" data-view="planner">
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    Planner
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-3 md:grid-cols-3">
+                  <div class="study-tile soft-panel p-4" style="--accent:#cf3f4f">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="rounded-full bg-rose-50 px-2 py-1 font-mono text-[10px] font-bold text-coral">High Yield</span>
+                      <span class="font-mono text-[10px] text-muted">14:00</span>
+                    </div>
+                    <h4 class="mt-3 font-black text-navy">Distributed Systems</h4>
+                    <p class="mt-1 text-sm text-muted">Lamport timestamps and vector clocks.</p>
+                  </div>
+                  <div class="study-tile soft-panel p-4" style="--accent:#1d4ed8">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="rounded-full bg-blue-50 px-2 py-1 font-mono text-[10px] font-bold text-cobalt">Revision</span>
+                      <span class="font-mono text-[10px] text-muted">16:30</span>
+                    </div>
+                    <h4 class="mt-3 font-black text-navy">Artificial Intelligence</h4>
+                    <p class="mt-1 text-sm text-muted">Bayesian networks and independence.</p>
+                  </div>
+                  <div class="study-tile soft-panel p-4" style="--accent:#0f9fbc">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="rounded-full bg-cyan-50 px-2 py-1 font-mono text-[10px] font-bold text-aqua">Lab Prep</span>
+                      <span class="font-mono text-[10px] text-muted">19:00</span>
+                    </div>
+                    <h4 class="mt-3 font-black text-navy">Compiler Construction</h4>
+                    <p class="mt-1 text-sm text-muted">LL(1) parsing table review.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Campus Feed</p>
+                    <h3 class="mt-1 text-xl font-black text-navy">Academic signals</h3>
+                  </div>
+                  <button class="btn btn-ghost h-10 w-10 p-0" data-action="open-view" data-view="feed" aria-label="Open feed">
+                    <span class="material-symbols-outlined">dynamic_feed</span>
+                  </button>
+                </div>
+                <div class="mt-4 grid gap-2">
+                  <div class="feed-row rounded-lg border border-line bg-white p-3">
+                    <div class="flex items-start gap-3">
+                      <span class="rounded-lg bg-amber-50 p-2 text-gold"><span class="material-symbols-outlined text-[18px]">campaign</span></span>
+                      <div>
+                        <p class="text-sm font-bold text-ink">AI CAT moved to Thursday.</p>
+                        <p class="mt-1 text-xs text-muted">Class rep update · 18 min ago</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="feed-row rounded-lg border border-line bg-white p-3">
+                    <div class="flex items-start gap-3">
+                      <span class="rounded-lg bg-blue-50 p-2 text-cobalt"><span class="material-symbols-outlined text-[18px]">description</span></span>
+                      <div>
+                        <p class="text-sm font-bold text-ink">Data Mining past paper uploaded.</p>
+                        <p class="mt-1 text-xs text-muted">Marketplace · 42 min ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" id="view-predictor" data-title="Predictive Exam Engine" data-eyebrow="AI Prediction">
+            <div class="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Course Model</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Performance Predictor</h2>
+                  </div>
+                  <select id="courseSelect" class="rounded-lg border-line bg-white text-sm font-bold text-navy focus:border-cobalt focus:ring-cobalt">
+                    <option value="distributed">Distributed Systems</option>
+                    <option value="ai">Artificial Intelligence</option>
+                    <option value="compiler">Compiler Construction</option>
+                    <option value="data">Data Mining</option>
+                  </select>
+                </div>
+
+                <div class="mt-6 grid gap-5 md:grid-cols-[220px_1fr]">
+                  <div class="flex flex-col items-center justify-center rounded-lg border border-line bg-wash p-5">
+                    <div class="relative h-44 w-44">
+                      <svg class="h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#d6e5ee" stroke-width="10"></circle>
+                        <circle id="predictorRing" cx="60" cy="60" r="54" fill="none" stroke="#111a5c" stroke-linecap="round" stroke-width="10" stroke-dasharray="339.292" stroke-dashoffset="101.788"></circle>
+                      </svg>
+                      <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-5xl font-black text-navy" id="predictorScore">70%</span>
+                        <span class="font-mono text-sm text-muted" id="predictorGrade">B</span>
+                      </div>
+                    </div>
+                    <p class="mt-3 text-center font-mono text-[11px] uppercase text-muted" id="predictorRisk">Medium Risk</p>
+                  </div>
+
+                  <div class="grid gap-4">
+                    <label class="block">
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-ink">Revision test average</span>
+                        <span class="font-mono text-sm text-navy" id="revisionValue">72</span>
+                      </div>
+                      <input id="revisionRange" class="mt-2 w-full" type="range" min="30" max="100" value="72" />
+                    </label>
+                    <label class="block">
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-ink">Attendance</span>
+                        <span class="font-mono text-sm text-navy" id="attendanceValue">82</span>
+                      </div>
+                      <input id="attendanceRange" class="mt-2 w-full" type="range" min="20" max="100" value="82" />
+                    </label>
+                    <label class="block">
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-ink">Past paper coverage</span>
+                        <span class="font-mono text-sm text-navy" id="coverageValue">58</span>
+                      </div>
+                      <input id="coverageRange" class="mt-2 w-full" type="range" min="0" max="100" value="58" />
+                    </label>
+                    <label class="block">
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-ink">Assignment score</span>
+                        <span class="font-mono text-sm text-navy" id="assignmentValue">76</span>
+                      </div>
+                      <input id="assignmentRange" class="mt-2 w-full" type="range" min="20" max="100" value="76" />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-3">
+                  <button class="btn btn-primary px-4" id="generateMockBtn">
+                    <span class="material-symbols-outlined">assignment</span>
+                    Generate Mock
+                  </button>
+                  <button class="btn btn-ghost px-4" id="downloadPackBtn">
+                    <span class="material-symbols-outlined">download</span>
+                    Offline Pack
+                  </button>
+                </div>
+              </section>
+
+              <section class="grid gap-4">
+                <div class="panel p-5 md:p-6">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">Lecturer Intelligence</p>
+                      <h3 class="mt-1 text-xl font-black text-navy">Pattern matrix</h3>
+                    </div>
+                    <div class="segmented" role="tablist" aria-label="Prediction mode">
+                      <button class="mode-btn active" type="button" data-mode="exam">Exam</button>
+                      <button class="mode-btn" type="button" data-mode="cat">CAT</button>
+                      <button class="mode-btn" type="button" data-mode="mock">Mock</button>
+                    </div>
+                  </div>
+                  <div class="mt-4 overflow-hidden rounded-lg border border-line">
+                    <div class="grid grid-cols-[1fr_100px_90px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
+                      <span>Topic</span>
+                      <span>Likelihood</span>
+                      <span>Weight</span>
+                    </div>
+                    <div id="topicMatrix"></div>
+                  </div>
+                </div>
+
+                <div class="panel p-5 md:p-6">
+                  <div class="flex items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">AI Mock Generation</p>
+                      <h3 class="mt-1 text-xl font-black text-navy">Generated paper</h3>
+                    </div>
+                    <span class="chip" id="mockStatus"><span class="material-symbols-outlined text-[16px]">pending</span>Ready</span>
+                  </div>
+                  <ol class="mt-4 grid gap-3" id="mockList"></ol>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" id="view-planner" data-title="Smart Study Planner" data-eyebrow="Adaptive Revision">
+            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Schedule</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Today&apos;s adaptive plan</h2>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="btn btn-ghost h-10 w-10 p-0" id="focusMinus" aria-label="Decrease focus hours">
+                      <span class="material-symbols-outlined">remove</span>
+                    </button>
+                    <span class="rounded-lg border border-line bg-white px-3 py-2 font-mono text-sm font-bold text-navy"><span id="focusHours">3</span>h</span>
+                    <button class="btn btn-ghost h-10 w-10 p-0" id="focusPlus" aria-label="Increase focus hours">
+                      <span class="material-symbols-outlined">add</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="mt-5 grid gap-3" id="plannerList"></div>
+              </section>
+
+              <aside class="grid gap-4">
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Offline Revision System</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Synced courses</h3>
+                  <div class="mt-4 grid gap-3">
+                    <label class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white p-3">
+                      <span class="font-bold text-ink">Distributed Systems</span>
+                      <input class="rounded border-line text-navy focus:ring-cobalt" type="checkbox" checked />
+                    </label>
+                    <label class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white p-3">
+                      <span class="font-bold text-ink">AI Revision Pack</span>
+                      <input class="rounded border-line text-navy focus:ring-cobalt" type="checkbox" checked />
+                    </label>
+                    <label class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white p-3">
+                      <span class="font-bold text-ink">Compiler Labs</span>
+                      <input class="rounded border-line text-navy focus:ring-cobalt" type="checkbox" checked />
+                    </label>
+                  </div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Community Study Groups</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Live rooms</h3>
+                  <div class="mt-4 grid gap-3">
+                    <button class="btn btn-ghost justify-between px-3 text-left">
+                      <span>DS Past Paper Sprint</span>
+                      <span class="chip">12</span>
+                    </button>
+                    <button class="btn btn-ghost justify-between px-3 text-left">
+                      <span>Compiler Lab Clinic</span>
+                      <span class="chip">8</span>
+                    </button>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="view-tutor" data-title="AI Revision Assistant" data-eyebrow="AI Tutor">
+            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+              <section class="panel flex min-h-[650px] flex-col overflow-hidden">
+                <div class="border-b border-line p-5">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">Tutor Session</p>
+                      <h2 class="mt-1 text-2xl font-black text-navy">Exam-grounded support</h2>
+                    </div>
+                    <span class="chip"><span class="material-symbols-outlined text-[16px]">memory</span>Context: 4 courses</span>
+                  </div>
+                </div>
+                <div class="flex-1 space-y-4 overflow-y-auto bg-wash/70 p-4 md:p-6" id="chatMessages">
+                  <div class="max-w-[82%] rounded-lg border border-line bg-white p-4 shadow-soft">
+                    <p class="text-sm leading-6 text-ink">I mapped your weak areas to lecturer patterns. Vector clocks, Bayesian independence, and FIRST/FOLLOW sets are the best starting points.</p>
+                  </div>
+                  <div class="ml-auto max-w-[82%] rounded-lg bg-navy p-4 text-white shadow-soft">
+                    <p class="text-sm leading-6">Explain vector clocks in exam language.</p>
+                  </div>
+                  <div class="max-w-[82%] rounded-lg border border-line bg-white p-4 shadow-soft">
+                    <p class="text-sm leading-6 text-ink">A vector clock tracks causality across processes by storing one counter per process. In exam answers, show update, send, receive, and comparison rules before giving a small event timeline.</p>
+                  </div>
+                </div>
+                <form class="border-t border-line bg-white p-3 md:p-4" id="chatForm">
+                  <div class="flex gap-2">
+                    <input class="min-h-12 flex-1 rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="chatInput" placeholder="Ask about a topic, mock question, or lecturer pattern" type="text" />
+                    <button class="btn btn-primary h-12 px-4" type="submit" aria-label="Send message">
+                      <span class="material-symbols-outlined">send</span>
+                      <span class="hidden sm:inline">Send</span>
+                    </button>
+                  </div>
+                </form>
+              </section>
+
+              <aside class="grid gap-4 content-start">
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Prompt Starters</p>
+                  <div class="mt-4 grid gap-2">
+                    <button class="quick-prompt btn btn-ghost justify-start px-3 text-left text-sm" type="button">Generate a DS mock question</button>
+                    <button class="quick-prompt btn btn-ghost justify-start px-3 text-left text-sm" type="button">Quiz me on Bayesian networks</button>
+                    <button class="quick-prompt btn btn-ghost justify-start px-3 text-left text-sm" type="button">Summarize LL(1) parsing</button>
+                  </div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Tutor Memory</p>
+                  <div class="mt-4 grid gap-3">
+                    <div class="border-t border-line pt-3">
+                      <p class="font-bold text-ink">Weakest topic</p>
+                      <p class="text-sm text-muted">Vector clocks comparison</p>
+                    </div>
+                    <div class="border-t border-line pt-3">
+                      <p class="font-bold text-ink">Best format</p>
+                      <p class="text-sm text-muted">Worked examples + short recall drills</p>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="view-flashcards" data-title="Smart Flashcards" data-eyebrow="Revision">
+            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Spaced Repetition</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">High-yield card deck</h2>
+                  </div>
+                  <span class="chip" id="cardProgress">1 / 5</span>
+                </div>
+
+                <div class="flip-card mt-6" id="flashcard">
+                  <div class="flip-inner">
+                    <div class="flip-face rounded-lg border border-line bg-wash p-6 md:p-8">
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted" id="cardCourse">Distributed Systems</p>
+                      <h3 class="mt-6 text-2xl font-black leading-tight text-navy md:text-4xl" id="cardQuestion">What problem do vector clocks solve?</h3>
+                      <button class="btn btn-primary mt-8 px-4" id="flipCardBtn">
+                        <span class="material-symbols-outlined">flip</span>
+                        Reveal
+                      </button>
+                    </div>
+                    <div class="flip-face flip-back rounded-lg border border-line bg-navy p-6 text-white md:p-8">
+                      <p class="font-mono text-[11px] font-bold uppercase text-white/60">Answer</p>
+                      <p class="mt-6 text-xl leading-8" id="cardAnswer">They let distributed processes infer causal ordering without a global clock by tracking each process&apos;s event counter.</p>
+                      <button class="btn mt-8 bg-white px-4 text-navy" id="flipBackBtn">
+                        <span class="material-symbols-outlined">undo</span>
+                        Back
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                  <button class="btn btn-ghost px-4" id="cardHard">
+                    <span class="material-symbols-outlined text-coral">close</span>
+                    Hard
+                  </button>
+                  <button class="btn btn-ghost px-4" id="cardGood">
+                    <span class="material-symbols-outlined text-gold">schedule</span>
+                    Good
+                  </button>
+                  <button class="btn btn-ghost px-4" id="cardEasy">
+                    <span class="material-symbols-outlined text-mint">check</span>
+                    Easy
+                  </button>
+                </div>
+              </section>
+
+              <aside class="panel p-5">
+                <p class="font-mono text-[11px] font-bold uppercase text-muted">Deck Health</p>
+                <h3 class="mt-1 text-xl font-black text-navy">Due today</h3>
+                <div class="mt-5 grid gap-4">
+                  <div>
+                    <div class="flex justify-between text-sm">
+                      <span class="font-bold text-ink">Remembered</span>
+                      <span class="font-mono text-muted" id="rememberedCount">0</span>
+                    </div>
+                    <div class="mt-2 h-2 overflow-hidden rounded-full bg-wash">
+                      <div class="h-full rounded-full bg-mint" id="rememberedBar" style="width:0%"></div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3 border-t border-line pt-4">
+                    <div>
+                      <p class="font-mono text-[10px] uppercase text-muted">New</p>
+                      <p class="text-2xl font-black text-navy">18</p>
+                    </div>
+                    <div>
+                      <p class="font-mono text-[10px] uppercase text-muted">Review</p>
+                      <p class="text-2xl font-black text-coral">20</p>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="view-feed" data-title="Campus Intelligence Feed" data-eyebrow="Community">
+            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Signals</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Campus intelligence</h2>
+                  </div>
+                  <button class="btn btn-primary px-4" id="postSignalBtn">
+                    <span class="material-symbols-outlined">add</span>
+                    Signal
+                  </button>
+                </div>
+                <div class="mt-5 grid gap-3" id="feedList"></div>
+              </section>
+              <aside class="grid gap-4 content-start">
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Trending</p>
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="chip">#DistributedSystems</span>
+                    <span class="chip">#PastPapers</span>
+                    <span class="chip">#CATMoved</span>
+                    <span class="chip">#CompilerLab</span>
+                  </div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">M-Pesa Wallet</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">KES 420</h3>
+                  <button class="btn btn-ghost mt-4 w-full px-4">
+                    <span class="material-symbols-outlined">payments</span>
+                    Top Up
+                  </button>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="view-marketplace" data-title="Notes Marketplace" data-eyebrow="Marketplace">
+            <div class="grid gap-4">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Student Notes</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Verified academic packs</h2>
+                  </div>
+                  <button class="btn btn-primary px-4">
+                    <span class="material-symbols-outlined">upload</span>
+                    Upload Notes
+                  </button>
+                </div>
+                <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4" id="marketplaceList"></div>
+              </section>
+
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Revenue Model</p>
+                    <h3 class="mt-1 text-xl font-black text-navy">Student-friendly tiers</h3>
+                  </div>
+                  <span class="chip"><span class="material-symbols-outlined text-[16px]">payments</span>M-Pesa ready</span>
+                </div>
+                <div class="mt-5 grid gap-3 md:grid-cols-5">
+                  <div class="rounded-lg border border-line bg-white p-4">
+                    <p class="font-bold text-navy">Free</p>
+                    <p class="mt-2 text-2xl font-black">KES 0</p>
+                    <p class="mt-1 text-sm text-muted">Basic notes</p>
+                  </div>
+                  <div class="rounded-lg border border-line bg-white p-4">
+                    <p class="font-bold text-navy">Weekly Sprint</p>
+                    <p class="mt-2 text-2xl font-black">KES 50</p>
+                    <p class="mt-1 text-sm text-muted">7-day access</p>
+                  </div>
+                  <div class="rounded-lg border border-line bg-white p-4">
+                    <p class="font-bold text-navy">Monthly</p>
+                    <p class="mt-2 text-2xl font-black">KES 200</p>
+                    <p class="mt-1 text-sm text-muted">Standard plan</p>
+                  </div>
+                  <div class="rounded-lg border border-line bg-white p-4">
+                    <p class="font-bold text-navy">Semester</p>
+                    <p class="mt-2 text-2xl font-black">KES 600</p>
+                    <p class="mt-1 text-sm text-muted">Full term</p>
+                  </div>
+                  <div class="rounded-lg border border-line bg-white p-4">
+                    <p class="font-bold text-navy">Premium Pro</p>
+                    <p class="mt-2 text-2xl font-black">KES 1500</p>
+                    <p class="mt-1 text-sm text-muted">Advanced AI</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" id="view-admin" data-title="Admin & Moderation" data-eyebrow="Operations">
+            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Moderation Dashboard</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Review queue</h2>
+                  </div>
+                  <span class="chip"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>Admin</span>
+                </div>
+                <div class="mt-5 overflow-hidden rounded-lg border border-line">
+                  <div class="grid grid-cols-[1fr_130px_120px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
+                    <span>Item</span>
+                    <span>Type</span>
+                    <span>Status</span>
+                  </div>
+                  <div id="moderationList"></div>
+                </div>
+              </section>
+              <aside class="grid gap-4 content-start">
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">System Health</p>
+                  <div class="mt-4 grid gap-3">
+                    <div class="flex items-center justify-between border-t border-line pt-3">
+                      <span class="font-bold text-ink">Spring Boot API</span>
+                      <span class="chip text-mint">OK</span>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-line pt-3">
+                      <span class="font-bold text-ink">PostgreSQL</span>
+                      <span class="chip text-mint">OK</span>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-line pt-3">
+                      <span class="font-bold text-ink">AI Microservice</span>
+                      <span class="chip text-gold">Busy</span>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-line pt-3">
+                      <span class="font-bold text-ink">Redis Cache</span>
+                      <span class="chip text-mint">OK</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Launch Roadmap</p>
+                  <div class="mt-4 grid gap-3">
+                    <div class="border-l-4 border-mint pl-3">
+                      <p class="font-bold text-navy">Phase 1</p>
+                      <p class="text-sm text-muted">MVP with 3 Kenyan universities</p>
+                    </div>
+                    <div class="border-l-4 border-cobalt pl-3">
+                      <p class="font-bold text-navy">Phase 2</p>
+                      <p class="text-sm text-muted">Mobile, offline, community</p>
+                    </div>
+                    <div class="border-l-4 border-gold pl-3">
+                      <p class="font-bold text-navy">Phase 3</p>
+                      <p class="text-sm text-muted">GPA prediction, voice tutor</p>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="glass fixed bottom-0 left-0 right-0 z-30 border-t border-line px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 md:hidden" data-nav-container="bottom"></nav>
+
+  <script>
+    const navItems = [
+      { id: "dashboard", label: "Dashboard", short: "Home", icon: "grid_view" },
+      { id: "predictor", label: "Exam Predictor", short: "Predict", icon: "insights" },
+      { id: "planner", label: "Study Planner", short: "Plan", icon: "event_note" },
+      { id: "tutor", label: "AI Tutor", short: "Tutor", icon: "auto_awesome" },
+      { id: "flashcards", label: "Flashcards", short: "Cards", icon: "quiz" },
+      { id: "feed", label: "Campus Feed", short: "Feed", icon: "dynamic_feed" },
+      { id: "marketplace", label: "Marketplace", short: "Market", icon: "storefront" },
+      { id: "admin", label: "Admin", short: "Admin", icon: "admin_panel_settings" }
+    ];
+
+    const courseTopics = {
+      distributed: {
+        label: "Distributed Systems",
+        topics: [
+          ["Vector clocks", 91, "High"],
+          ["Lamport timestamps", 88, "High"],
+          ["Mutual exclusion", 76, "Medium"],
+          ["Replication consistency", 69, "Medium"]
+        ]
+      },
+      ai: {
+        label: "Artificial Intelligence",
+        topics: [
+          ["Bayesian networks", 90, "High"],
+          ["A* search", 82, "High"],
+          ["Constraint satisfaction", 74, "Medium"],
+          ["Minimax pruning", 66, "Medium"]
+        ]
+      },
+      compiler: {
+        label: "Compiler Construction",
+        topics: [
+          ["FIRST/FOLLOW sets", 93, "High"],
+          ["LL(1) parsing table", 86, "High"],
+          ["Lexical analysis", 72, "Medium"],
+          ["Intermediate code", 61, "Medium"]
+        ]
+      },
+      data: {
+        label: "Data Mining",
+        topics: [
+          ["Association rules", 87, "High"],
+          ["Decision trees", 82, "High"],
+          ["Clustering metrics", 78, "Medium"],
+          ["Naive Bayes", 70, "Medium"]
+        ]
+      }
+    };
+
+    const plannerBase = [
+      { time: "14:00", tag: "High Yield", course: "Distributed Systems", task: "Practice vector clocks with 3-process timelines.", accent: "#cf3f4f", minutes: 35 },
+      { time: "16:30", tag: "Revision", course: "Artificial Intelligence", task: "Drill Bayesian independence and d-separation.", accent: "#1d4ed8", minutes: 45 },
+      { time: "19:00", tag: "Lab Prep", course: "Compiler Construction", task: "Build LL(1) table from grammar exercises.", accent: "#0f9fbc", minutes: 55 },
+      { time: "21:00", tag: "Flashcards", course: "Data Mining", task: "Review association rule confidence and lift.", accent: "#c97800", minutes: 25 }
+    ];
+
+    const cards = [
+      {
+        course: "Distributed Systems",
+        question: "What problem do vector clocks solve?",
+        answer: "They let distributed processes infer causal ordering without a global clock by tracking each process's event counter."
+      },
+      {
+        course: "Artificial Intelligence",
+        question: "When are two variables conditionally independent in a Bayesian network?",
+        answer: "They are conditionally independent when the observed evidence blocks every active path between them under d-separation rules."
+      },
+      {
+        course: "Compiler Construction",
+        question: "What makes a grammar LL(1)?",
+        answer: "A grammar is LL(1) when one token of lookahead always selects exactly one production for each nonterminal."
+      },
+      {
+        course: "Data Mining",
+        question: "What does lift measure in association rules?",
+        answer: "Lift compares observed co-occurrence to expected co-occurrence; values above 1 indicate a positive association."
+      },
+      {
+        course: "Algorithms",
+        question: "Why is A* optimal with an admissible heuristic?",
+        answer: "An admissible heuristic never overestimates remaining cost, so A* expands paths in an order that preserves the cheapest solution."
+      }
+    ];
+
+    const feedItems = [
+      { icon: "campaign", color: "text-gold", title: "AI CAT moved to Thursday", meta: "Class rep · 18 min ago", body: "Venue changed to LT2. Lecturer confirmed question scope stays the same." },
+      { icon: "description", color: "text-cobalt", title: "Data Mining past paper uploaded", meta: "Marketplace · 42 min ago", body: "Includes 2023 marking guide and lecturer annotations." },
+      { icon: "groups", color: "text-aqua", title: "Compiler lab sprint opened", meta: "Study Group · 1 hr ago", body: "8 students joined the FIRST/FOLLOW debugging room." },
+      { icon: "verified", color: "text-mint", title: "Distributed Systems pattern verified", meta: "Predictive Engine · 2 hrs ago", body: "Vector-clock questions appeared in 4 of 5 recent exams." }
+    ];
+
+    const marketplaceItems = [
+      { title: "Distributed Systems Final Pack", author: "Brian O.", price: "KES 80", rating: "4.9", tag: "Verified" },
+      { title: "AI CAT Revision Notes", author: "Mary W.", price: "KES 45", rating: "4.7", tag: "Hot" },
+      { title: "Compiler Lab Walkthroughs", author: "CS Club", price: "KES 120", rating: "4.8", tag: "Bundle" },
+      { title: "Data Mining Past Papers", author: "Amina K.", price: "KES 60", rating: "4.6", tag: "New" }
+    ];
+
+    const moderationItems = [
+      { item: "Distributed Systems Final Pack", type: "Notes", status: "Review" },
+      { item: "CAT moved to Thursday", type: "Feed", status: "Approved" },
+      { item: "Compiler Lab Walkthroughs", type: "Marketplace", status: "Review" },
+      { item: "DS Past Paper Sprint", type: "Group", status: "Approved" }
+    ];
+
+    const drawer = document.getElementById("mobileDrawer");
+    const viewTitle = document.getElementById("viewTitle");
+    const viewEyebrow = document.getElementById("viewEyebrow");
+    const circumference = 339.292;
+    let activeView = "dashboard";
+    let focusHours = 3;
+    let cardIndex = 0;
+    let remembered = 0;
+
+    function icon(name, classes = "") {
+      return `<span class="material-symbols-outlined ${classes}">${name}</span>`;
+    }
+
+    function renderNavigation() {
+      document.querySelectorAll("[data-nav-container]").forEach(container => {
+        const type = container.dataset.navContainer;
+        const items = type === "bottom" ? navItems.slice(0, 5) : navItems;
+        container.innerHTML = items.map((item, index) => {
+          const base = type === "bottom"
+            ? "nav-link flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-muted"
+            : "nav-link flex items-center gap-3 rounded-lg px-3 py-3 text-muted";
+          const text = type === "bottom"
+            ? `<span class="max-w-full truncate font-mono text-[10px] font-bold">${item.short}</span>`
+            : `<span class="font-mono text-sm font-bold">${item.label}</span>`;
+          return `<button class="${base}${item.id === activeView ? " active" : ""}" data-view="${item.id}" data-action="open-view" type="button" style="animation:slideIn .22s ease both;animation-delay:${index * 0.025}s">${icon(item.icon, type === "bottom" ? "text-[22px]" : "text-[21px]")}${text}</button>`;
+        }).join("");
+      });
+    }
+
+    function openView(id) {
+      const target = document.getElementById(`view-${id}`);
+      if (!target) return;
+      activeView = id;
+      document.querySelectorAll(".view").forEach(view => view.classList.remove("active"));
+      target.classList.add("active");
+      viewTitle.textContent = target.dataset.title || "PredictED";
+      viewEyebrow.textContent = target.dataset.eyebrow || "Workspace";
+      renderNavigation();
+      closeDrawer();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function openDrawer() {
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function gradeFor(score) {
+      if (score >= 80) return "A";
+      if (score >= 75) return "A-";
+      if (score >= 70) return "B+";
+      if (score >= 65) return "B";
+      if (score >= 60) return "B-";
+      if (score >= 55) return "C+";
+      return "C";
+    }
+
+    function updatePredictor() {
+      const revision = Number(document.getElementById("revisionRange").value);
+      const attendance = Number(document.getElementById("attendanceRange").value);
+      const coverage = Number(document.getElementById("coverageRange").value);
+      const assignment = Number(document.getElementById("assignmentRange").value);
+      const score = Math.round((revision * 0.36) + (attendance * 0.16) + (coverage * 0.28) + (assignment * 0.20));
+      const ring = document.getElementById("predictorRing");
+      const dash = circumference * (1 - score / 100);
+
+      document.getElementById("revisionValue").textContent = revision;
+      document.getElementById("attendanceValue").textContent = attendance;
+      document.getElementById("coverageValue").textContent = coverage;
+      document.getElementById("assignmentValue").textContent = assignment;
+      document.getElementById("predictorScore").textContent = `${score}%`;
+      document.getElementById("predictorGrade").textContent = gradeFor(score);
+      document.getElementById("predictorRisk").textContent = score >= 75 ? "Low Risk" : score >= 65 ? "Medium Risk" : "High Risk";
+      ring.style.strokeDashoffset = dash;
+      ring.style.stroke = score >= 75 ? "#16a34a" : score >= 65 ? "#c97800" : "#cf3f4f";
+    }
+
+    function renderTopics() {
+      const course = courseTopics[document.getElementById("courseSelect").value];
+      document.getElementById("topicMatrix").innerHTML = course.topics.map(topic => {
+        const tone = topic[1] >= 85 ? "text-coral" : topic[1] >= 75 ? "text-gold" : "text-aqua";
+        return `<div class="course-row grid grid-cols-[1fr_100px_90px] items-center border-t border-line px-4 py-3">
+          <span class="font-bold text-ink">${topic[0]}</span>
+          <span class="font-mono text-sm font-bold ${tone}">${topic[1]}%</span>
+          <span class="font-mono text-xs text-muted">${topic[2]}</span>
+        </div>`;
+      }).join("");
+      renderMockList(false);
+    }
+
+    function renderMockList(generated) {
+      const course = courseTopics[document.getElementById("courseSelect").value];
+      const questions = course.topics.slice(0, 3).map((topic, index) => {
+        const verbs = ["Explain", "Compare", "Solve"];
+        return `${verbs[index]} ${topic[0].toLowerCase()} using a lecturer-style example.`;
+      });
+      document.getElementById("mockList").innerHTML = questions.map((question, index) => `
+        <li class="rounded-lg border border-line bg-white p-3">
+          <div class="flex items-start gap-3">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-wash font-mono text-xs font-bold text-navy">${index + 1}</span>
+            <p class="text-sm font-semibold leading-6 text-ink">${question}</p>
+          </div>
+        </li>
+      `).join("");
+      document.getElementById("mockStatus").innerHTML = generated
+        ? `${icon("done", "text-[16px]")}Generated`
+        : `${icon("pending", "text-[16px]")}Ready`;
+    }
+
+    function renderPlanner() {
+      const visible = Math.min(plannerBase.length, Math.max(2, focusHours + 1));
+      document.getElementById("focusHours").textContent = focusHours;
+      document.getElementById("plannerList").innerHTML = plannerBase.slice(0, visible).map((item, index) => `
+        <article class="study-tile rounded-lg border border-line bg-white p-4 shadow-soft" style="--accent:${item.accent};animation:fadeUp .24s ease both;animation-delay:${index * 0.035}s">
+          <div class="grid gap-3 md:grid-cols-[96px_1fr_auto] md:items-center">
+            <div>
+              <p class="font-mono text-[11px] uppercase text-muted">${item.time}</p>
+              <p class="mt-1 text-sm font-black text-navy">${item.minutes} min</p>
+            </div>
+            <div>
+              <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${item.tag}</span>
+              <h3 class="mt-2 text-lg font-black text-navy">${item.course}</h3>
+              <p class="mt-1 text-sm text-muted">${item.task}</p>
+            </div>
+            <button class="btn btn-ghost h-10 px-3 text-sm" type="button">
+              ${icon("check_circle", "text-[18px] text-mint")}
+              Done
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function appendMessage(text, sender = "user") {
+      const wrap = document.createElement("div");
+      wrap.className = sender === "user"
+        ? "ml-auto max-w-[82%] rounded-lg bg-navy p-4 text-white shadow-soft"
+        : "max-w-[82%] rounded-lg border border-line bg-white p-4 shadow-soft";
+      wrap.innerHTML = `<p class="text-sm leading-6 ${sender === "user" ? "" : "text-ink"}">${text}</p>`;
+      const messages = document.getElementById("chatMessages");
+      messages.appendChild(wrap);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function tutorReply(prompt) {
+      const lower = prompt.toLowerCase();
+      if (lower.includes("vector") || lower.includes("distributed")) {
+        return "For vector clocks, write the update rules first: increment before local/send events, merge with max on receive, then increment. Finish with a short comparison table for concurrent vs causal events.";
+      }
+      if (lower.includes("bayes") || lower.includes("network")) {
+        return "For Bayesian networks, start from the graph. State parent relationships, apply d-separation, then compute probability by multiplying each node conditioned on its parents.";
+      }
+      if (lower.includes("ll") || lower.includes("parsing") || lower.includes("compiler")) {
+        return "For LL(1), calculate FIRST and FOLLOW sets, fill the parsing table, then check for conflicts. No conflicts means the parser can choose one production with one lookahead token.";
+      }
+      if (lower.includes("mock") || lower.includes("question")) {
+        return "Mock question: Explain how lecturer-specific prediction can rank high-yield topics. Include data sources, confidence scoring, and one limitation of the model.";
+      }
+      return "I would turn that into a 20-minute loop: define the concept, solve one past-paper item, then make three flashcards from the mistakes.";
+    }
+
+    function renderCard() {
+      const current = cards[cardIndex];
+      document.getElementById("flashcard").classList.remove("flipped");
+      document.getElementById("cardCourse").textContent = current.course;
+      document.getElementById("cardQuestion").textContent = current.question;
+      document.getElementById("cardAnswer").textContent = current.answer;
+      document.getElementById("cardProgress").textContent = `${cardIndex + 1} / ${cards.length}`;
+    }
+
+    function nextCard(rememberedDelta) {
+      remembered = Math.min(cards.length, remembered + rememberedDelta);
+      cardIndex = (cardIndex + 1) % cards.length;
+      const percent = Math.round((remembered / cards.length) * 100);
+      document.getElementById("rememberedCount").textContent = remembered;
+      document.getElementById("rememberedBar").style.width = `${percent}%`;
+      renderCard();
+    }
+
+    function renderFeed() {
+      document.getElementById("feedList").innerHTML = feedItems.map(item => `
+        <article class="feed-row rounded-lg border border-line bg-white p-4">
+          <div class="flex items-start gap-3">
+            <span class="rounded-lg bg-wash p-2 ${item.color}">${icon(item.icon, "text-[20px]")}</span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <h3 class="font-black text-navy">${item.title}</h3>
+                <span class="font-mono text-[11px] text-muted">${item.meta}</span>
+              </div>
+              <p class="mt-2 text-sm leading-6 text-muted">${item.body}</p>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderMarketplace() {
+      document.getElementById("marketplaceList").innerHTML = marketplaceItems.map(item => `
+        <article class="rounded-lg border border-line bg-white p-4 shadow-soft">
+          <div class="flex items-center justify-between gap-2">
+            <span class="chip">${item.tag}</span>
+            <span class="flex items-center gap-1 font-mono text-xs font-bold text-gold">${icon("star", "text-[16px]")} ${item.rating}</span>
+          </div>
+          <h3 class="mt-4 min-h-[48px] text-lg font-black leading-6 text-navy">${item.title}</h3>
+          <p class="mt-2 text-sm text-muted">By ${item.author}</p>
+          <div class="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
+            <span class="font-black text-ink">${item.price}</span>
+            <button class="btn btn-primary h-10 px-3 text-sm" type="button">${icon("shopping_bag", "text-[18px]")}Buy</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderModeration() {
+      document.getElementById("moderationList").innerHTML = moderationItems.map(item => {
+        const color = item.status === "Approved" ? "text-mint" : "text-gold";
+        return `<div class="moderation-row grid grid-cols-[1fr_130px_120px] items-center border-t border-line px-4 py-3">
+          <span class="font-bold text-ink">${item.item}</span>
+          <span class="font-mono text-xs text-muted">${item.type}</span>
+          <span class="font-mono text-xs font-bold ${color}">${item.status}</span>
+        </div>`;
+      }).join("");
+    }
+
+    document.addEventListener("click", event => {
+      const trigger = event.target.closest("[data-action='open-view']");
+      if (trigger) {
+        openView(trigger.dataset.view);
+      }
+    });
+
+    document.getElementById("openDrawer").addEventListener("click", openDrawer);
+    document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
+    document.getElementById("drawerOverlay").addEventListener("click", closeDrawer);
+
+    ["revisionRange", "attendanceRange", "coverageRange", "assignmentRange"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updatePredictor);
+    });
+
+    document.getElementById("courseSelect").addEventListener("change", () => {
+      renderTopics();
+      renderMockList(false);
+    });
+
+    document.querySelectorAll(".mode-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("mockStatus").innerHTML = `${icon("tune", "text-[16px]")}${button.textContent}`;
+      });
+    });
+
+    document.getElementById("generateMockBtn").addEventListener("click", () => renderMockList(true));
+    document.getElementById("downloadPackBtn").addEventListener("click", () => {
+      document.getElementById("mockStatus").innerHTML = `${icon("cloud_done", "text-[16px]")}Synced`;
+    });
+
+    document.getElementById("focusMinus").addEventListener("click", () => {
+      focusHours = Math.max(1, focusHours - 1);
+      renderPlanner();
+    });
+    document.getElementById("focusPlus").addEventListener("click", () => {
+      focusHours = Math.min(5, focusHours + 1);
+      renderPlanner();
+    });
+
+    document.getElementById("chatForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = document.getElementById("chatInput");
+      const value = input.value.trim();
+      if (!value) return;
+      appendMessage(value, "user");
+      input.value = "";
+      window.setTimeout(() => appendMessage(tutorReply(value), "assistant"), 260);
+    });
+
+    document.querySelectorAll(".quick-prompt").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("chatInput").value = button.textContent.trim();
+        document.getElementById("chatForm").requestSubmit();
+      });
+    });
+
+    document.getElementById("flipCardBtn").addEventListener("click", () => document.getElementById("flashcard").classList.add("flipped"));
+    document.getElementById("flipBackBtn").addEventListener("click", () => document.getElementById("flashcard").classList.remove("flipped"));
+    document.getElementById("cardHard").addEventListener("click", () => nextCard(0));
+    document.getElementById("cardGood").addEventListener("click", () => nextCard(1));
+    document.getElementById("cardEasy").addEventListener("click", () => nextCard(1));
+
+    document.getElementById("postSignalBtn").addEventListener("click", () => {
+      feedItems.unshift({
+        icon: "bolt",
+        color: "text-plum",
+        title: "New revision sprint opened",
+        meta: "You · just now",
+        body: "Distributed Systems group sprint scheduled for tonight at 20:00."
+      });
+      renderFeed();
+    });
+
+    document.getElementById("globalSearch").addEventListener("input", event => {
+      const term = event.target.value.trim().toLowerCase();
+      if (!term) return;
+      const match = navItems.find(item => item.label.toLowerCase().includes(term) || item.short.toLowerCase().includes(term));
+      if (match) openView(match.id);
+    });
+
+    renderNavigation();
+    renderTopics();
+    updatePredictor();
+    renderPlanner();
+    renderCard();
+    renderFeed();
+    renderMarketplace();
+    renderModeration();
+  </script>
+</body>
+</html>

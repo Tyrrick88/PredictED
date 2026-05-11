@@ -1,0 +1,88 @@
+package com.predicted.api.config;
+
+import com.predicted.api.auth.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+  @Bean
+  SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
+      throws Exception {
+    return http
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(Customizer.withDefaults())
+        .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/login", "/api/health", "/actuator/health", "/h2-console/**").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
+
+  @Bean
+  UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    UserDetails student = User.withUsername("alex@predicted.test")
+        .password(passwordEncoder.encode("password"))
+        .roles("STUDENT")
+        .build();
+    UserDetails admin = User.withUsername("admin@predicted.test")
+        .password(passwordEncoder.encode("admin123"))
+        .roles("ADMIN")
+        .build();
+    return new InMemoryUserDetailsManager(student, admin);
+  }
+
+  @Bean
+  PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    return configuration.getAuthenticationManager();
+  }
+
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
+    configuration.setExposedHeaders(List.of(HttpHeaders.AUTHORIZATION));
+    configuration.setAllowCredentials(false);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
+}
