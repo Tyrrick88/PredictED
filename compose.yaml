@@ -1,0 +1,37 @@
+services:
+  predicted-postgres:
+    image: postgres:16-alpine
+    container_name: predicted-postgres
+    environment:
+      POSTGRES_DB: predicted
+      POSTGRES_USER: predicted
+      POSTGRES_PASSWORD: predicted_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - predicted_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U predicted -d predicted"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  predicted-redis:
+    image: redis:7-alpine
+    container_name: predicted-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - predicted_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  predicted_postgres_data:
+  predicted_redis_data:
