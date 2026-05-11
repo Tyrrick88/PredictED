@@ -14,6 +14,7 @@ public class DatabaseSeeder implements ApplicationRunner {
 
   private final AppUserRepository userRepository;
   private final CourseRepository courseRepository;
+  private final CourseEnrollmentRepository courseEnrollmentRepository;
   private final StudyTaskRepository studyTaskRepository;
   private final FlashcardRepository flashcardRepository;
   private final FeedSignalRepository feedSignalRepository;
@@ -24,6 +25,7 @@ public class DatabaseSeeder implements ApplicationRunner {
   public DatabaseSeeder(
       AppUserRepository userRepository,
       CourseRepository courseRepository,
+      CourseEnrollmentRepository courseEnrollmentRepository,
       StudyTaskRepository studyTaskRepository,
       FlashcardRepository flashcardRepository,
       FeedSignalRepository feedSignalRepository,
@@ -33,6 +35,7 @@ public class DatabaseSeeder implements ApplicationRunner {
   ) {
     this.userRepository = userRepository;
     this.courseRepository = courseRepository;
+    this.courseEnrollmentRepository = courseEnrollmentRepository;
     this.studyTaskRepository = studyTaskRepository;
     this.flashcardRepository = flashcardRepository;
     this.feedSignalRepository = feedSignalRepository;
@@ -67,6 +70,9 @@ public class DatabaseSeeder implements ApplicationRunner {
 
     if (courseRepository.count() == 0) {
       seedCourses();
+    }
+    if (courseEnrollmentRepository.countByUserEmailIgnoreCase(student.getEmail()) == 0) {
+      seedEnrollments(student);
     }
     if (studyTaskRepository.count() == 0) {
       seedTasks(student);
@@ -196,6 +202,11 @@ public class DatabaseSeeder implements ApplicationRunner {
     studyTaskRepository.save(new StudyTaskEntity("task_data_rules", student, LocalTime.of(21, 0), "Flashcards",
         "Data Mining", "Association rules", "Review confidence, support, and lift.", 25,
         "#c97800", "MEDIUM"));
+  }
+
+  private void seedEnrollments(AppUser student) {
+    courseRepository.findAllByOrderByDisplayOrderAsc()
+        .forEach(course -> courseEnrollmentRepository.save(new CourseEnrollmentEntity(student, course, Instant.now())));
   }
 
   private void seedFlashcards(AppUser student) {

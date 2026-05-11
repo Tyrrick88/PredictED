@@ -5,6 +5,8 @@ import com.predicted.api.auth.AuthResponse;
 import com.predicted.api.auth.RegisterRequest;
 import com.predicted.api.common.Models.MpesaPaymentRequest;
 import com.predicted.api.common.Models.PredictionInput;
+import com.predicted.api.common.Models.UpdateEnrollmentsRequest;
+import com.predicted.api.common.Models.UpdateProfileRequest;
 import com.predicted.api.persistence.PaymentAttemptRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,6 +100,67 @@ class PredictEdApiApplicationTests {
     assertThat(student).containsEntry("name", "Nia Kamau");
     assertThat((Iterable<?>) dashboard.getBody().get("tasks")).hasSize(3);
     assertThat(dashboard.getBody()).containsEntry("flashcardsDue", 3);
+  }
+
+  @Test
+  void studentCanUpdateProfileAndCourseEnrollments() {
+    RegisterRequest request = new RegisterRequest(
+        "Maya Otieno",
+        "maya.otieno@predicted.test",
+        "strongpass123",
+        "Jomo Kenyatta University",
+        "BSc. Data Science",
+        "Year 1, Semester 2",
+        List.of("ai", "data")
+    );
+    AuthResponse auth = restTemplate.postForEntity(
+        url("/api/auth/register"),
+        request,
+        AuthResponse.class
+    ).getBody();
+
+    ResponseEntity<Map> profile = restTemplate.exchange(
+        url("/api/profile"),
+        HttpMethod.PUT,
+        authorized(auth.token(), new UpdateProfileRequest(
+            "Maya A. Otieno",
+            "Strathmore University",
+            "BSc. Informatics",
+            "Year 2, Semester 1"
+        )),
+        Map.class
+    );
+
+    ResponseEntity<Map> enrollments = restTemplate.exchange(
+        url("/api/profile/courses"),
+        HttpMethod.PUT,
+        authorized(auth.token(), new UpdateEnrollmentsRequest(List.of("data"))),
+        Map.class
+    );
+
+    ResponseEntity<Map[]> courses = restTemplate.exchange(
+        url("/api/predictions/courses"),
+        HttpMethod.GET,
+        authorized(auth.token()),
+        Map[].class
+    );
+    ResponseEntity<String> unavailableCourse = restTemplate.exchange(
+        url("/api/predictions/ai/simulate"),
+        HttpMethod.POST,
+        authorized(auth.token(), new PredictionInput(72, 82, 90, 76)),
+        String.class
+    );
+
+    assertThat(profile.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> updatedProfile = (Map<String, Object>) profile.getBody().get("profile");
+    assertThat(updatedProfile).containsEntry("name", "Maya A. Otieno");
+    assertThat(updatedProfile).containsEntry("university", "Strathmore University");
+    assertThat(enrollments.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat((Iterable<?>) enrollments.getBody().get("enrolledCourses")).hasSize(1);
+    assertThat(courses.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(courses.getBody()).hasSize(1);
+    assertThat(courses.getBody()[0]).containsEntry("courseId", "data");
+    assertThat(unavailableCourse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test

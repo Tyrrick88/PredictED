@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -26,25 +27,26 @@ public class PredictionController {
   }
 
   @GetMapping("/courses")
-  public List<CoursePrediction> courses() {
-    return academicDataService.courses();
+  public List<CoursePrediction> courses(Principal principal) {
+    return academicDataService.courses(principal.getName());
   }
 
   @GetMapping("/{courseId}")
-  public CoursePrediction course(@PathVariable String courseId) {
-    return academicDataService.requireCourse(courseId);
+  public CoursePrediction course(@PathVariable String courseId, Principal principal) {
+    return academicDataService.requireCourse(principal.getName(), courseId);
   }
 
   @PostMapping("/{courseId}/simulate")
   public PredictionResult simulate(
       @PathVariable String courseId,
-      @Valid @RequestBody PredictionInput input
+      @Valid @RequestBody PredictionInput input,
+      Principal principal
   ) {
-    return academicDataService.simulate(courseId, input);
+    return academicDataService.simulate(principal.getName(), courseId, input);
   }
 
   @PostMapping("/{courseId}/mock")
-  public List<MockQuestion> mock(@PathVariable String courseId) {
-    return academicDataService.generateMock(courseId);
+  public List<MockQuestion> mock(@PathVariable String courseId, Principal principal) {
+    return academicDataService.generateMock(principal.getName(), courseId);
   }
 }

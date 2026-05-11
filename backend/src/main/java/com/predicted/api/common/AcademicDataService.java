@@ -17,13 +17,18 @@ import com.predicted.api.common.Models.PlannerResponse;
 import com.predicted.api.common.Models.PredictionInput;
 import com.predicted.api.common.Models.PredictionResult;
 import com.predicted.api.common.Models.PredictionSummary;
+import com.predicted.api.common.Models.ProfileSettings;
 import com.predicted.api.common.Models.StudyTask;
 import com.predicted.api.common.Models.TopicPrediction;
 import com.predicted.api.common.Models.TutorRequest;
 import com.predicted.api.common.Models.TutorResponse;
+import com.predicted.api.common.Models.UpdateEnrollmentsRequest;
+import com.predicted.api.common.Models.UpdateProfileRequest;
 import com.predicted.api.common.Models.UserProfile;
 import com.predicted.api.persistence.AppUser;
 import com.predicted.api.persistence.AppUserRepository;
+import com.predicted.api.persistence.CourseEnrollmentEntity;
+import com.predicted.api.persistence.CourseEnrollmentRepository;
 import com.predicted.api.persistence.CourseEntity;
 import com.predicted.api.persistence.CourseRepository;
 import com.predicted.api.persistence.FeedSignalEntity;
@@ -39,13 +44,19 @@ import com.predicted.api.persistence.PaymentAttemptRepository;
 import com.predicted.api.persistence.StudyTaskEntity;
 import com.predicted.api.persistence.StudyTaskRepository;
 import com.predicted.api.persistence.TopicPredictionEntity;
+import com.predicted.api.persistence.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -54,6 +65,7 @@ public class AcademicDataService {
 
   private final AppUserRepository userRepository;
   private final CourseRepository courseRepository;
+  private final CourseEnrollmentRepository courseEnrollmentRepository;
   private final StudyTaskRepository studyTaskRepository;
   private final FeedSignalRepository feedSignalRepository;
   private final FlashcardRepository flashcardRepository;
@@ -64,6 +76,7 @@ public class AcademicDataService {
   public AcademicDataService(
       AppUserRepository userRepository,
       CourseRepository courseRepository,
+      CourseEnrollmentRepository courseEnrollmentRepository,
       StudyTaskRepository studyTaskRepository,
       FeedSignalRepository feedSignalRepository,
       FlashcardRepository flashcardRepository,
@@ -73,6 +86,7 @@ public class AcademicDataService {
   ) {
     this.userRepository = userRepository;
     this.courseRepository = courseRepository;
+    this.courseEnrollmentRepository = courseEnrollmentRepository;
     this.studyTaskRepository = studyTaskRepository;
     this.feedSignalRepository = feedSignalRepository;
     this.flashcardRepository = flashcardRepository;
@@ -82,13 +96,16 @@ public class AcademicDataService {
   }
 
   public DashboardOverview dashboard(String email) {
-    CourseEntity distributedSystems = requireCourseEntity("distributed");
-    List<TopicPrediction> topics = mapTopics(distributedSystems);
+    List<CourseEntity> enrolledCourses = enrolledCourseEntities(email);
+    CourseEntity focusCourse = enrolledCourses.stream()
+        .findFirst()
+        .orElseGet(() -> requireCourseEntity("distributed"));
+    List<TopicPrediction> topics = mapTopics(focusCourse);
     PredictionSummary prediction = new PredictionSummary(
-        distributedSystems.getBaseScore(),
-        gradeFor(distributedSystems.getBaseScore()),
-        distributedSystems.getCertainty(),
-        riskFor(distributedSystems.getBaseScore()),
+        focusCourse.getBaseScore(),
+        gradeFor(focusCourse.getBaseScore()),
+        focusCourse.getCertainty(),
+        riskFor(focusCourse.getBaseScore()),
         0.20,
         topics.stream().limit(3).map(TopicPrediction::topic).toList()
     );
@@ -100,7 +117,7 @@ public class AcademicDataService {
         planner(email, 3).tasks(),
         feed(),
         dueFlashcards(email).size(),
-        4
+        Math.max(1, enrolledCourses.size())
     );
   }
 
@@ -108,8 +125,66 @@ public class AcademicDataService {
     return requireUser(email).toProfile();
   }
 
+  public ProfileSettings profileSettings(String email) {
+    AppUser user = requireUser(email);
+    return new ProfileSettings(
+        user.toProfile(),
+        enrolledCourseEntities(user).stream().map(this::toCoursePrediction).toList(),
+        allCourseEntities().stream().map(this::toCoursePrediction).toList()
+    );
+  }
+
+  @Transactional
+  public ProfileSettings updateProfile(String email, UpdateProfileRequest request) {
+    AppUser user = requireUser(email);
+    user.updateProfile(
+        request.name().trim(),
+        request.university().trim(),
+        request.program().trim(),
+        request.academicLevel().trim()
+    );
+    userRepository.save(user);
+    return profileSettings(email);
+  }
+
+  @Transactional
+  public ProfileSettings updateEnrollments(String email, UpdateEnrollmentsRequest request) {
+    AppUser user = requireUser(email);
+    List<String> requestedIds = request.courseIds().stream()
+        .map(String::trim)
+        .map(id -> id.toLowerCase(Locale.ROOT))
+        .filter(id -> !id.isBlank())
+        .collect(Collectors.toCollection(LinkedHashSet::new))
+        .stream()
+        .toList();
+    if (requestedIds.isEmpty()) {
+      throw new ConflictException("Choose at least one course.");
+    }
+
+    List<CourseEntity> courses = courseRepository.findAllById(requestedIds);
+    if (courses.size() != requestedIds.size()) {
+      throw new ResourceNotFoundException("One or more selected courses were not found.");
+    }
+    Map<String, CourseEntity> byId = courses.stream()
+        .collect(Collectors.toMap(CourseEntity::getId, course -> course));
+
+    courseEnrollmentRepository.deleteByUser(user);
+    courseEnrollmentRepository.flush();
+    requestedIds.forEach(courseId -> courseEnrollmentRepository.save(
+        new CourseEnrollmentEntity(user, byId.get(courseId), Instant.now())
+    ));
+    return profileSettings(email);
+  }
+
   public List<CoursePrediction> courses() {
-    return courseRepository.findAllByOrderByDisplayOrderAsc()
+    return allCourseEntities()
+        .stream()
+        .map(this::toCoursePrediction)
+        .toList();
+  }
+
+  public List<CoursePrediction> courses(String email) {
+    return enrolledCourseEntities(email)
         .stream()
         .map(this::toCoursePrediction)
         .toList();
@@ -119,8 +194,12 @@ public class AcademicDataService {
     return toCoursePrediction(requireCourseEntity(courseId));
   }
 
-  public PredictionResult simulate(String courseId, PredictionInput input) {
-    CourseEntity course = requireCourseEntity(courseId);
+  public CoursePrediction requireCourse(String email, String courseId) {
+    return toCoursePrediction(requireEnrolledCourseEntity(email, courseId));
+  }
+
+  public PredictionResult simulate(String email, String courseId, PredictionInput input) {
+    CourseEntity course = requireEnrolledCourseEntity(email, courseId);
     int score = Math.round(
         (float) ((input.revisionAverage() * 0.36)
             + (input.attendance() * 0.16)
@@ -166,9 +245,36 @@ public class AcademicDataService {
         .toList();
   }
 
+  public List<MockQuestion> generateMock(String email, String courseId) {
+    CoursePrediction course = requireCourse(email, courseId);
+    List<TopicPrediction> topics = course.topics();
+    return IntStream.range(0, Math.min(3, topics.size()))
+        .mapToObj(index -> {
+          TopicPrediction topic = topics.get(index);
+          String prompt = switch (index) {
+            case 0 -> "Explain " + topic.topic() + " using a lecturer-style worked example.";
+            case 1 -> "Compare two approaches related to " + topic.topic() + " and justify the stronger answer.";
+            default -> "Solve a short scenario involving " + topic.topic() + " and show each step.";
+          };
+          return new MockQuestion(
+              index + 1,
+              course.courseId(),
+              topic.topic(),
+              prompt,
+              index == 0 ? 12 : 8,
+              topic.recommendedAction()
+          );
+        })
+        .toList();
+  }
+
   public PlannerResponse planner(String email, int focusHours) {
     int boundedHours = Math.max(1, Math.min(5, focusHours));
-    List<StudyTaskEntity> availableTasks = studyTaskRepository.findByUserEmailIgnoreCaseOrderByScheduledTimeAsc(email);
+    Set<String> enrolledCourseNames = enrolledCourseNames(email);
+    List<StudyTaskEntity> availableTasks = studyTaskRepository.findByUserEmailIgnoreCaseOrderByScheduledTimeAsc(email)
+        .stream()
+        .filter(task -> enrolledCourseNames.isEmpty() || enrolledCourseNames.contains(task.getCourse()))
+        .toList();
     int visibleTasks = Math.min(availableTasks.size(), Math.max(2, boundedHours + 1));
     List<StudyTask> tasks = availableTasks.stream()
         .limit(visibleTasks)
@@ -214,8 +320,10 @@ public class AcademicDataService {
   }
 
   public List<Flashcard> dueFlashcards(String email) {
+    Set<String> enrolledCourseNames = enrolledCourseNames(email);
     return flashcardRepository.findByUserEmailIgnoreCaseOrderByDueInHoursAscIdAsc(email)
         .stream()
+        .filter(card -> enrolledCourseNames.isEmpty() || enrolledCourseNames.contains(card.getCourse()))
         .map(this::toFlashcard)
         .toList();
   }
@@ -307,6 +415,41 @@ public class AcademicDataService {
   private CourseEntity requireCourseEntity(String courseId) {
     return courseRepository.findWithTopicsById(courseId)
         .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
+  }
+
+  private CourseEntity requireEnrolledCourseEntity(String email, String courseId) {
+    List<CourseEntity> enrolledCourses = enrolledCourseEntities(email);
+    return enrolledCourses.stream()
+        .filter(course -> course.getId().equals(courseId))
+        .findFirst()
+        .orElseThrow(() -> new ResourceNotFoundException("Course not enrolled: " + courseId));
+  }
+
+  private List<CourseEntity> allCourseEntities() {
+    return courseRepository.findAllByOrderByDisplayOrderAsc();
+  }
+
+  private List<CourseEntity> enrolledCourseEntities(String email) {
+    return enrolledCourseEntities(requireUser(email));
+  }
+
+  private List<CourseEntity> enrolledCourseEntities(AppUser user) {
+    if (user.getRole() == UserRole.ADMIN) {
+      return allCourseEntities();
+    }
+    List<CourseEntity> enrolledCourses = courseEnrollmentRepository
+        .findByUserEmailIgnoreCaseOrderByCourseDisplayOrderAsc(user.getEmail())
+        .stream()
+        .map(CourseEnrollmentEntity::getCourse)
+        .toList();
+    return enrolledCourses.isEmpty() ? allCourseEntities() : enrolledCourses;
+  }
+
+  private Set<String> enrolledCourseNames(String email) {
+    return enrolledCourseEntities(email)
+        .stream()
+        .map(CourseEntity::getCourseName)
+        .collect(Collectors.toSet());
   }
 
   private CoursePrediction toCoursePrediction(CourseEntity course) {

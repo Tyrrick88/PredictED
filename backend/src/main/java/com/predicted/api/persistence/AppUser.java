@@ -71,6 +71,13 @@ public class AppUser {
     return new UserProfile(id, name, email, university, program, academicLevel, role.name());
   }
 
+  public void updateProfile(String name, String university, String program, String academicLevel) {
+    this.name = name;
+    this.university = university;
+    this.program = program;
+    this.academicLevel = academicLevel;
+  }
+
   public String getId() {
     return id;
   }

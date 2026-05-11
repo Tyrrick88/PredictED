@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 import java.time.LocalTime;
@@ -30,6 +31,26 @@ public final class Models {
       String program,
       String academicLevel,
       String role
+  ) {
+  }
+
+  public record UpdateProfileRequest(
+      @NotBlank @Size(max = 120) String name,
+      @NotBlank @Size(max = 140) String university,
+      @NotBlank @Size(max = 140) String program,
+      @NotBlank @Size(max = 80) String academicLevel
+  ) {
+  }
+
+  public record UpdateEnrollmentsRequest(
+      @NotNull @Size(min = 1) List<@NotBlank String> courseIds
+  ) {
+  }
+
+  public record ProfileSettings(
+      UserProfile profile,
+      List<CoursePrediction> enrolledCourses,
+      List<CoursePrediction> availableCourses
   ) {
   }
 

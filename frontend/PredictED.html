@@ -302,6 +302,10 @@
           <span class="font-mono text-[11px] font-bold uppercase text-muted">Academic level</span>
           <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authAcademicLevel" placeholder="Year 3, Semester 2" type="text" />
         </label>
+        <div class="grid gap-2" data-auth-register>
+          <span class="font-mono text-[11px] font-bold uppercase text-muted">Courses</span>
+          <div class="grid gap-2" id="authCourseList"></div>
+        </div>
         <button class="btn btn-primary mt-1 h-11 w-full" id="authSubmitButton" type="submit">
           <span class="material-symbols-outlined text-[19px]">login</span>
           Sign in
@@ -364,7 +368,7 @@
           <span class="material-symbols-outlined text-[20px]">cloud_done</span>
           <p class="font-mono text-[11px] font-bold uppercase">Offline Pack Ready</p>
         </div>
-        <p class="mt-2 text-sm text-muted">4 courses synced for low-data revision.</p>
+        <p class="mt-2 text-sm text-muted" id="offlinePackSummary">4 courses synced for low-data revision.</p>
         <button class="btn btn-primary mt-3 h-10 w-full text-sm" data-action="open-view" data-view="planner">
           <span class="material-symbols-outlined text-[19px]">download</span>
           Sync Planner
@@ -428,7 +432,7 @@
                 <div class="grid min-h-[310px] md:grid-cols-[1fr_320px]">
                   <div class="p-5 md:p-7">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span class="chip"><span class="material-symbols-outlined text-[16px]">school</span>University of Nairobi</span>
+                      <span class="chip"><span class="material-symbols-outlined text-[16px]">school</span><span id="dashboardUniversity">University of Nairobi</span></span>
                       <span class="chip"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
                       <span class="chip"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
                     </div>
@@ -1023,6 +1027,69 @@
             </div>
           </section>
 
+          <section class="view" id="view-profile" data-title="Profile & Courses" data-eyebrow="Account">
+            <div class="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Student Profile</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Account details</h2>
+                  </div>
+                  <span class="chip"><span class="material-symbols-outlined text-[16px]">verified_user</span><span id="profileRole">Student</span></span>
+                </div>
+                <div class="mt-5 rounded-lg border border-line bg-wash p-4">
+                  <p class="font-mono text-[11px] uppercase text-muted">Email</p>
+                  <p class="mt-1 break-all font-bold text-ink" id="profileEmail">Sign in required</p>
+                </div>
+                <form class="mt-5 grid gap-3" id="profileForm">
+                  <label class="grid gap-1">
+                    <span class="font-mono text-[11px] font-bold uppercase text-muted">Full name</span>
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="profileNameInput" autocomplete="name" type="text" required />
+                  </label>
+                  <div class="grid gap-3 md:grid-cols-2">
+                    <label class="grid gap-1">
+                      <span class="font-mono text-[11px] font-bold uppercase text-muted">University</span>
+                      <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="profileUniversityInput" autocomplete="organization" type="text" required />
+                    </label>
+                    <label class="grid gap-1">
+                      <span class="font-mono text-[11px] font-bold uppercase text-muted">Program</span>
+                      <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="profileProgramInput" type="text" required />
+                    </label>
+                  </div>
+                  <label class="grid gap-1">
+                    <span class="font-mono text-[11px] font-bold uppercase text-muted">Academic level</span>
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="profileAcademicLevelInput" type="text" required />
+                  </label>
+                  <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <button class="btn btn-primary h-11 px-4" id="profileSaveButton" type="submit">
+                      <span class="material-symbols-outlined text-[19px]">save</span>
+                      Save Profile
+                    </button>
+                    <span class="font-mono text-[11px] text-muted" id="profileStatus"></span>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel p-5 md:p-6">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Enrollment</p>
+                    <h2 class="mt-1 text-2xl font-black text-navy">Course load</h2>
+                  </div>
+                  <span class="chip"><span class="material-symbols-outlined text-[16px]">menu_book</span><span id="profileCourseCount">0 courses</span></span>
+                </div>
+                <div class="mt-5 grid gap-3" id="profileCourseList"></div>
+                <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-line pt-4">
+                  <button class="btn btn-primary h-11 px-4" id="profileCoursesSaveButton" type="button">
+                    <span class="material-symbols-outlined text-[19px]">library_add_check</span>
+                    Save Courses
+                  </button>
+                  <span class="font-mono text-[11px] text-muted" id="profileCoursesStatus"></span>
+                </div>
+              </section>
+            </div>
+          </section>
+
           <section class="view" id="view-admin" data-title="Admin & Moderation" data-eyebrow="Operations">
             <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
               <section class="panel p-5 md:p-6">
@@ -1100,7 +1167,15 @@
       { id: "flashcards", label: "Flashcards", short: "Cards", icon: "quiz" },
       { id: "feed", label: "Campus Feed", short: "Feed", icon: "dynamic_feed" },
       { id: "marketplace", label: "Marketplace", short: "Market", icon: "storefront" },
+      { id: "profile", label: "Profile", short: "Profile", icon: "manage_accounts" },
       { id: "admin", label: "Admin", short: "Admin", icon: "admin_panel_settings" }
+    ];
+
+    const defaultCourseCatalog = [
+      { courseId: "distributed", courseName: "Distributed Systems", lecturer: "Dr. Njuguna" },
+      { courseId: "ai", courseName: "Artificial Intelligence", lecturer: "Prof. Otieno" },
+      { courseId: "compiler", courseName: "Compiler Construction", lecturer: "Dr. Karanja" },
+      { courseId: "data", courseName: "Data Mining", lecturer: "Dr. Achieng" }
     ];
 
     let courseTopics = {
@@ -1209,6 +1284,7 @@
     let remembered = 0;
     let authToken = sessionStorage.getItem("predictedToken") || "";
     let currentUser = null;
+    let profileSettings = null;
     let authMode = "login";
     let apiConnected = false;
     let simulateTimer;
@@ -1279,6 +1355,41 @@
       box.classList.add(tone === "error" ? "text-coral" : tone === "success" ? "text-mint" : "text-muted");
     }
 
+    function renderCourseCheckboxes(containerId, courses, selectedIds, checkboxClass) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const selected = new Set(selectedIds);
+      if (!courses.length) {
+        container.innerHTML = `
+          <div class="rounded-lg border border-line bg-white p-3 text-sm text-muted">
+            Courses are loading.
+          </div>`;
+        return;
+      }
+      container.innerHTML = courses.map(course => `
+        <label class="flex min-w-0 cursor-pointer items-start gap-3 rounded-lg border border-line bg-white p-3 shadow-soft">
+          <input class="mt-1 rounded border-line text-cobalt focus:ring-cobalt ${checkboxClass}" type="checkbox" value="${escapeHtml(course.courseId)}" ${selected.has(course.courseId) ? "checked" : ""} />
+          <span class="min-w-0">
+            <span class="block font-bold text-ink">${escapeHtml(course.courseName)}</span>
+            <span class="block truncate text-xs text-muted">${escapeHtml(course.lecturer || "PredictED course")}</span>
+          </span>
+        </label>
+      `).join("");
+    }
+
+    function renderAuthCourses() {
+      renderCourseCheckboxes(
+        "authCourseList",
+        defaultCourseCatalog,
+        defaultCourseCatalog.slice(0, 3).map(course => course.courseId),
+        "auth-course-checkbox"
+      );
+    }
+
+    function selectedCourseIds(selector) {
+      return Array.from(document.querySelectorAll(`${selector}:checked`)).map(input => input.value);
+    }
+
     function setAuthMode(mode) {
       authMode = mode;
       const register = mode === "register";
@@ -1319,8 +1430,10 @@
     function setSession(auth) {
       authToken = auth.token;
       currentUser = auth.user;
+      profileSettings = null;
       sessionStorage.setItem("predictedToken", authToken);
       updateProfile(auth.user);
+      renderProfile({ profile: auth.user, enrolledCourses: [], availableCourses: defaultCourseCatalog });
       document.getElementById("accountName").textContent = auth.user?.name || "Account";
       document.getElementById("signOutButton").classList.remove("hidden");
     }
@@ -1328,11 +1441,13 @@
     function clearSession(updateUi = true) {
       authToken = "";
       currentUser = null;
+      profileSettings = null;
       sessionStorage.removeItem("predictedToken");
       if (updateUi) {
         updateProfile(null);
         document.getElementById("accountName").textContent = "Sign in";
         document.getElementById("signOutButton").classList.add("hidden");
+        renderProfile(null);
       }
     }
 
@@ -1482,6 +1597,7 @@
     async function simulatePrediction() {
       if (!apiConnected) return;
       const courseId = document.getElementById("courseSelect").value;
+      if (!courseId) return;
       const input = {
         revisionAverage: Number(document.getElementById("revisionRange").value),
         attendance: Number(document.getElementById("attendanceRange").value),
@@ -1501,7 +1617,12 @@
 
     function renderTopics() {
       const course = courseTopics[document.getElementById("courseSelect").value];
-      if (!course) return;
+      if (!course) {
+        document.getElementById("topicMatrix").innerHTML = `
+          <div class="px-4 py-5 text-sm text-muted">Choose a course to view its prediction topics.</div>`;
+        renderMockList(false, []);
+        return;
+      }
       document.getElementById("topicMatrix").innerHTML = course.topics.map(topic => {
         const tone = topic[1] >= 85 ? "text-coral" : topic[1] >= 75 ? "text-gold" : "text-aqua";
         return `<div class="course-row grid grid-cols-[1fr_100px_90px] items-center border-t border-line px-4 py-3">
@@ -1515,15 +1636,15 @@
 
     function renderMockList(generated, apiQuestions) {
       const course = courseTopics[document.getElementById("courseSelect").value];
-      const questions = apiQuestions || course.topics.slice(0, 3).map((topic, index) => {
+      const questions = apiQuestions || (course ? course.topics.slice(0, 3).map((topic, index) => {
         const verbs = ["Explain", "Compare", "Solve"];
         return {
           prompt: `${verbs[index]} ${topic[0].toLowerCase()} using a lecturer-style example.`,
           marks: index === 0 ? 12 : 8,
           markingHint: topic[3] || "Show each step clearly."
         };
-      });
-      document.getElementById("mockList").innerHTML = questions.map((question, index) => `
+      }) : []);
+      document.getElementById("mockList").innerHTML = questions.length ? questions.map((question, index) => `
         <li class="rounded-lg border border-line bg-white p-3">
           <div class="flex items-start gap-3">
             <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-wash font-mono text-xs font-bold text-navy">${index + 1}</span>
@@ -1533,7 +1654,7 @@
             </div>
           </div>
         </li>
-      `).join("");
+      `).join("") : `<li class="rounded-lg border border-line bg-white p-3 text-sm text-muted">No mock questions available yet.</li>`;
       document.getElementById("mockStatus").innerHTML = generated
         ? `${icon("done", "text-[16px]")}Generated`
         : `${icon("pending", "text-[16px]")}Ready`;
@@ -1693,6 +1814,87 @@
       }).join("");
     }
 
+    function setProfileStatus(targetId, message, tone = "muted") {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.textContent = message;
+      target.classList.remove("text-coral", "text-mint", "text-muted");
+      target.classList.add(tone === "error" ? "text-coral" : tone === "success" ? "text-mint" : "text-muted");
+    }
+
+    function renderProfile(settings = profileSettings) {
+      const profile = settings?.profile || currentUser;
+      const enrolledCourses = settings?.enrolledCourses || [];
+      const availableCourses = settings?.availableCourses?.length
+        ? settings.availableCourses
+        : defaultCourseCatalog;
+
+      document.getElementById("profileEmail").textContent = profile?.email || "Sign in required";
+      document.getElementById("profileRole").textContent = profile?.role || "Student";
+      document.getElementById("profileNameInput").value = profile?.name || "";
+      document.getElementById("profileUniversityInput").value = profile?.university || "";
+      document.getElementById("profileProgramInput").value = profile?.program || "";
+      document.getElementById("profileAcademicLevelInput").value = profile?.academicLevel || "";
+      document.getElementById("profileCourseCount").textContent = `${enrolledCourses.length} ${enrolledCourses.length === 1 ? "course" : "courses"}`;
+      renderCourseCheckboxes(
+        "profileCourseList",
+        availableCourses,
+        enrolledCourses.map(course => course.courseId),
+        "profile-course-checkbox"
+      );
+    }
+
+    async function loadProfile() {
+      profileSettings = await apiRequest("/api/profile");
+      currentUser = profileSettings.profile;
+      updateProfile(profileSettings.profile);
+      document.getElementById("accountName").textContent = profileSettings.profile.name || "Account";
+      renderProfile(profileSettings);
+    }
+
+    async function saveProfile() {
+      setProfileStatus("profileStatus", "Saving...");
+      const updated = await apiRequest("/api/profile", {
+        method: "PUT",
+        body: JSON.stringify({
+          name: document.getElementById("profileNameInput").value.trim(),
+          university: document.getElementById("profileUniversityInput").value.trim(),
+          program: document.getElementById("profileProgramInput").value.trim(),
+          academicLevel: document.getElementById("profileAcademicLevelInput").value.trim()
+        })
+      });
+      profileSettings = updated;
+      currentUser = updated.profile;
+      updateProfile(updated.profile);
+      document.getElementById("accountName").textContent = updated.profile.name || "Account";
+      renderProfile(updated);
+      setProfileStatus("profileStatus", "Saved", "success");
+      await loadDashboard().catch(() => setApiStatus("Dashboard refresh failed", "offline"));
+    }
+
+    async function saveProfileCourses() {
+      const courseIds = selectedCourseIds(".profile-course-checkbox");
+      if (!courseIds.length) {
+        setProfileStatus("profileCoursesStatus", "Choose at least one course.", "error");
+        return;
+      }
+      setProfileStatus("profileCoursesStatus", "Saving...");
+      const updated = await apiRequest("/api/profile/courses", {
+        method: "PUT",
+        body: JSON.stringify({ courseIds })
+      });
+      profileSettings = updated;
+      currentUser = updated.profile;
+      renderProfile(updated);
+      setProfileStatus("profileCoursesStatus", "Saved", "success");
+      await Promise.allSettled([
+        loadDashboard(),
+        loadCourses(),
+        loadPlanner(),
+        loadFlashcards()
+      ]);
+    }
+
     function renderDashboardPreviews(tasks = plannerBase, feed = feedItems) {
       const taskPreview = document.getElementById("dashboardTaskPreview");
       if (taskPreview) {
@@ -1726,8 +1928,10 @@
 
     function applyDashboard(data) {
       updateProfile(data.student);
+      currentUser = data.student;
       const prediction = data.prediction;
       const gamification = data.gamification;
+      document.getElementById("dashboardUniversity").textContent = data.student.university;
       document.getElementById("dashboardHeadline").textContent = `Semester 2 final prep is trending to ${prediction.grade}.`;
       document.getElementById("dashboardSubcopy").textContent = `${prediction.focusAreas.slice(0, 2).join(" and ")} are driving the risk score. Today's sessions are weighted toward predictive lecturer patterns.`;
       document.getElementById("dashboardPredictionScore").textContent = `${prediction.score}%`;
@@ -1741,6 +1945,7 @@
       document.getElementById("dashboardStudyHours").textContent = gamification.studyHours;
       document.getElementById("dashboardCardsDue").textContent = data.flashcardsDue;
       document.getElementById("dashboardOffline").textContent = data.offlinePacksSynced;
+      document.getElementById("offlinePackSummary").textContent = `${data.offlinePacksSynced} ${data.offlinePacksSynced === 1 ? "course" : "courses"} synced for low-data revision.`;
     }
 
     function mapTask(task) {
@@ -1789,6 +1994,11 @@
         };
       });
       const select = document.getElementById("courseSelect");
+      if (!courses.length) {
+        select.innerHTML = `<option value="">No enrolled courses</option>`;
+        renderTopics();
+        return;
+      }
       const current = select.value;
       select.innerHTML = courses.map(course => `<option value="${escapeHtml(course.courseId)}">${escapeHtml(course.courseName)}</option>`).join("");
       select.value = courseTopics[current] ? current : courses[0]?.courseId || "distributed";
@@ -1859,6 +2069,7 @@
         loadFlashcards(),
         loadFeed(),
         loadMarketplace(),
+        loadProfile(),
         loadAdmin()
       ]);
     }
@@ -1946,7 +2157,7 @@
         showAuthGate();
         return;
       }
-      setApiStatus(`Signed in: ${currentUser?.name || "Account"}`, "online");
+      openView("profile");
     });
     document.getElementById("signOutButton").addEventListener("click", () => {
       clearSession();
@@ -1983,22 +2194,69 @@
       try {
         const email = document.getElementById("authEmail").value.trim();
         const password = document.getElementById("authPassword").value;
-        const auth = authMode === "register"
-          ? await registerWith({
-              name: document.getElementById("authName").value.trim(),
-              email,
-              password,
-              university: document.getElementById("authUniversity").value.trim(),
-              program: document.getElementById("authProgram").value.trim(),
-              academicLevel: document.getElementById("authAcademicLevel").value.trim()
-            })
-          : await loginWith(email, password);
+        let auth;
+        if (authMode === "register") {
+          const courseIds = selectedCourseIds(".auth-course-checkbox");
+          if (!courseIds.length) {
+            throw new Error("Choose at least one course.");
+          }
+          auth = await registerWith({
+            name: document.getElementById("authName").value.trim(),
+            email,
+            password,
+            university: document.getElementById("authUniversity").value.trim(),
+            program: document.getElementById("authProgram").value.trim(),
+            academicLevel: document.getElementById("authAcademicLevel").value.trim(),
+            courseIds
+          });
+        } else {
+          auth = await loginWith(email, password);
+        }
         await finishAuthentication(auth);
       } catch (error) {
         setAuthMessage(error.message, "error");
         setApiStatus("Auth failed", "offline");
       } finally {
         setAuthBusy(false);
+      }
+    });
+
+    document.getElementById("profileForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!apiConnected) {
+        setProfileStatus("profileStatus", "Sign in to save.", "error");
+        showAuthGate("Sign in to update your profile.");
+        return;
+      }
+      const button = document.getElementById("profileSaveButton");
+      button.disabled = true;
+      button.classList.add("opacity-70");
+      try {
+        await saveProfile();
+      } catch (error) {
+        setProfileStatus("profileStatus", error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.classList.remove("opacity-70");
+      }
+    });
+
+    document.getElementById("profileCoursesSaveButton").addEventListener("click", async () => {
+      if (!apiConnected) {
+        setProfileStatus("profileCoursesStatus", "Sign in to save.", "error");
+        showAuthGate("Sign in to update your courses.");
+        return;
+      }
+      const button = document.getElementById("profileCoursesSaveButton");
+      button.disabled = true;
+      button.classList.add("opacity-70");
+      try {
+        await saveProfileCourses();
+      } catch (error) {
+        setProfileStatus("profileCoursesStatus", error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.classList.remove("opacity-70");
       }
     });
 
@@ -2009,6 +2267,7 @@
     document.getElementById("courseSelect").addEventListener("change", () => {
       renderTopics();
       renderMockList(false);
+      updatePredictor();
     });
 
     document.querySelectorAll(".mode-btn").forEach(button => {
@@ -2123,6 +2382,8 @@
       if (match) openView(match.id);
     });
 
+    renderAuthCourses();
+    renderProfile();
     renderNavigation();
     renderTopics();
     updatePredictor();
