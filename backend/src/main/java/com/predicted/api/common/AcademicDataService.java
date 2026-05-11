@@ -46,8 +46,13 @@ import com.predicted.api.persistence.StudyTaskEntity;
 import com.predicted.api.persistence.StudyTaskRepository;
 import com.predicted.api.persistence.TopicPredictionEntity;
 import com.predicted.api.persistence.UserRole;
+import com.predicted.api.upload.DownloadedFile;
+import com.predicted.api.upload.FileStorageService;
+import com.predicted.api.upload.StoredFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.Comparator;
@@ -73,6 +78,7 @@ public class AcademicDataService {
   private final NotePackRepository notePackRepository;
   private final ModerationItemRepository moderationItemRepository;
   private final PaymentAttemptRepository paymentAttemptRepository;
+  private final FileStorageService fileStorageService;
 
   public AcademicDataService(
       AcademicAiService academicAiService,
@@ -84,7 +90,8 @@ public class AcademicDataService {
       FlashcardRepository flashcardRepository,
       NotePackRepository notePackRepository,
       ModerationItemRepository moderationItemRepository,
-      PaymentAttemptRepository paymentAttemptRepository
+      PaymentAttemptRepository paymentAttemptRepository,
+      FileStorageService fileStorageService
   ) {
     this.academicAiService = academicAiService;
     this.userRepository = userRepository;
@@ -96,6 +103,7 @@ public class AcademicDataService {
     this.notePackRepository = notePackRepository;
     this.moderationItemRepository = moderationItemRepository;
     this.paymentAttemptRepository = paymentAttemptRepository;
+    this.fileStorageService = fileStorageService;
   }
 
   public DashboardOverview dashboard(String email) {
@@ -333,6 +341,80 @@ public class AcademicDataService {
         .toList();
   }
 
+  @Transactional
+  public NotePack uploadNotePack(
+      String email,
+      String title,
+      String courseId,
+      int priceKes,
+      String tag,
+      MultipartFile file
+  ) {
+    AppUser user = requireUser(email);
+    String normalizedCourseId = cleanCourseId(courseId);
+    CourseEntity course = requireEnrolledCourseEntity(email, normalizedCourseId);
+    String cleanTitle = cleanText(title, "Title", 180);
+    int boundedPrice = boundedPrice(priceKes);
+    String cleanTag = StringUtils.hasText(tag) ? cleanText(tag, "Tag", 40) : "Review";
+    StoredFile storedFile = fileStorageService.storeNote(file, user.getId());
+    Instant now = Instant.now();
+
+    NotePackEntity notePack = notePackRepository.save(new NotePackEntity(
+        "pack_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12),
+        cleanTitle,
+        user.getName(),
+        boundedPrice,
+        0.0,
+        cleanTag,
+        false,
+        (int) notePackRepository.count() + 1,
+        user,
+        course,
+        storedFile.originalFilename(),
+        storedFile.storagePath(),
+        storedFile.contentType(),
+        storedFile.sizeBytes(),
+        storedFile.sha256(),
+        now
+    ));
+
+    moderationItemRepository.save(new ModerationItemEntity(
+        "mod_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10),
+        cleanTitle,
+        "Notes",
+        "Review",
+        "Uploaded file awaiting verification",
+        (int) moderationItemRepository.count() + 1
+    ));
+
+    feedSignalRepository.save(new FeedSignalEntity(
+        "sig_" + UUID.randomUUID().toString().substring(0, 8),
+        user,
+        "description",
+        cleanTitle + " uploaded",
+        "Marketplace",
+        course.getCourseName() + " notes uploaded by " + user.getName() + ".",
+        now,
+        false
+    ));
+
+    return toNotePack(notePack);
+  }
+
+  public DownloadedFile downloadNotePack(String notePackId) {
+    NotePackEntity notePack = notePackRepository.findById(notePackId)
+        .orElseThrow(() -> new ResourceNotFoundException("Note pack not found: " + notePackId));
+    if (!StringUtils.hasText(notePack.getStoragePath())) {
+      throw new ResourceNotFoundException("This note pack does not have a downloadable file yet.");
+    }
+    return new DownloadedFile(
+        fileStorageService.load(notePack.getStoragePath()),
+        notePack.getOriginalFilename(),
+        notePack.getContentType(),
+        notePack.getSizeBytes()
+    );
+  }
+
   public List<ModerationItem> moderationItems() {
     return moderationItemRepository.findAllByOrderByDisplayOrderAsc()
         .stream()
@@ -480,6 +562,8 @@ public class AcademicDataService {
   }
 
   private NotePack toNotePack(NotePackEntity notePack) {
+    CourseEntity course = notePack.getCourse();
+    boolean downloadable = StringUtils.hasText(notePack.getStoragePath());
     return new NotePack(
         notePack.getId(),
         notePack.getTitle(),
@@ -487,7 +571,15 @@ public class AcademicDataService {
         notePack.getPriceKes(),
         notePack.getRating(),
         notePack.getTag(),
-        notePack.isVerified()
+        notePack.isVerified(),
+        course == null ? null : course.getId(),
+        course == null ? null : course.getCourseName(),
+        notePack.getOriginalFilename(),
+        notePack.getContentType(),
+        notePack.getSizeBytes(),
+        notePack.getCreatedAt(),
+        downloadable,
+        downloadable ? "/api/marketplace/notes/" + notePack.getId() + "/download" : null
     );
   }
 
@@ -539,5 +631,30 @@ public class AcademicDataService {
       return "MEDIUM";
     }
     return "HIGH";
+  }
+
+  private String cleanCourseId(String courseId) {
+    if (!StringUtils.hasText(courseId)) {
+      throw new BadRequestException("Choose a course for this upload.");
+    }
+    return courseId.trim().toLowerCase(Locale.ROOT);
+  }
+
+  private String cleanText(String value, String field, int maxLength) {
+    if (!StringUtils.hasText(value)) {
+      throw new BadRequestException(field + " is required.");
+    }
+    String clean = value.trim();
+    if (clean.length() > maxLength) {
+      throw new BadRequestException(field + " must be " + maxLength + " characters or fewer.");
+    }
+    return clean;
+  }
+
+  private int boundedPrice(int priceKes) {
+    if (priceKes < 0 || priceKes > 5000) {
+      throw new BadRequestException("Price must be between KES 0 and KES 5000.");
+    }
+    return priceKes;
   }
 }

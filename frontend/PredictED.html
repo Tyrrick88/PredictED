@@ -980,11 +980,38 @@
                     <p class="font-mono text-[11px] font-bold uppercase text-muted">Student Notes</p>
                     <h2 class="mt-1 text-2xl font-black text-navy">Verified academic packs</h2>
                   </div>
-                  <button class="btn btn-primary px-4">
+                  <button class="btn btn-primary px-4" id="uploadNotesButton" type="button">
                     <span class="material-symbols-outlined">upload</span>
                     Upload Notes
                   </button>
                 </div>
+                <form class="mt-5 hidden rounded-lg border border-line bg-white p-4" id="noteUploadForm">
+                  <div class="grid gap-3 md:grid-cols-[1.4fr_1fr_120px]">
+                    <label class="grid gap-1">
+                      <span class="font-mono text-[10px] font-bold uppercase text-muted">Title</span>
+                      <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="noteUploadTitle" maxlength="180" required type="text" />
+                    </label>
+                    <label class="grid gap-1">
+                      <span class="font-mono text-[10px] font-bold uppercase text-muted">Course</span>
+                      <select class="rounded-lg border-line bg-white text-sm font-bold text-navy focus:border-cobalt focus:ring-cobalt" id="noteUploadCourse" required></select>
+                    </label>
+                    <label class="grid gap-1">
+                      <span class="font-mono text-[10px] font-bold uppercase text-muted">KES</span>
+                      <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="noteUploadPrice" max="5000" min="0" step="5" type="number" value="0" />
+                    </label>
+                  </div>
+                  <div class="mt-3 grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
+                    <label class="grid gap-1">
+                      <span class="font-mono text-[10px] font-bold uppercase text-muted">File</span>
+                      <input class="rounded-lg border border-line bg-white text-sm file:mr-3 file:border-0 file:bg-navy file:px-3 file:py-2 file:text-sm file:font-bold file:text-white focus:border-cobalt focus:ring-cobalt" id="noteUploadFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" required type="file" />
+                    </label>
+                    <button class="btn btn-primary h-11 px-4" id="noteUploadSubmit" type="submit">
+                      <span class="material-symbols-outlined text-[19px]">cloud_upload</span>
+                      Upload
+                    </button>
+                  </div>
+                  <p class="mt-3 font-mono text-[11px] text-muted" id="noteUploadStatus"></p>
+                </form>
                 <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4" id="marketplaceList"></div>
               </section>
 
@@ -1453,7 +1480,7 @@
 
     async function apiRequest(path, options = {}, token = authToken) {
       const headers = new Headers(options.headers || {});
-      if (!headers.has("Content-Type") && options.body) {
+      if (!headers.has("Content-Type") && options.body && !(options.body instanceof FormData)) {
         headers.set("Content-Type", "application/json");
       }
       if (token) {
@@ -1773,6 +1800,53 @@
       `).join("");
     }
 
+    function mapNote(note) {
+      return {
+        id: note.id,
+        title: note.title,
+        author: note.author,
+        price: `KES ${note.priceKes}`,
+        priceKes: note.priceKes,
+        rating: note.rating,
+        tag: note.tag,
+        courseName: note.courseName,
+        originalFilename: note.originalFilename,
+        sizeBytes: note.sizeBytes,
+        downloadable: note.downloadable,
+        downloadUrl: note.downloadUrl
+      };
+    }
+
+    function formatBytes(bytes = 0) {
+      const value = Number(bytes || 0);
+      if (value >= 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+      if (value >= 1024) return `${Math.round(value / 1024)} KB`;
+      return value ? `${value} B` : "Marketplace pack";
+    }
+
+    function renderUploadCourseOptions() {
+      const select = document.getElementById("noteUploadCourse");
+      if (!select) return;
+      const courses = profileSettings?.enrolledCourses?.length
+        ? profileSettings.enrolledCourses
+        : Object.entries(courseTopics).map(([courseId, course]) => ({
+          courseId,
+          courseName: course.label
+        }));
+      const available = courses.length ? courses : defaultCourseCatalog;
+      const current = select.value;
+      select.innerHTML = available.map(course => `<option value="${escapeHtml(course.courseId)}">${escapeHtml(course.courseName)}</option>`).join("");
+      select.value = available.some(course => course.courseId === current) ? current : available[0]?.courseId || "";
+    }
+
+    function setUploadStatus(message, tone = "muted") {
+      const status = document.getElementById("noteUploadStatus");
+      if (!status) return;
+      status.textContent = message;
+      status.classList.remove("text-coral", "text-mint", "text-muted");
+      status.classList.add(tone === "error" ? "text-coral" : tone === "success" ? "text-mint" : "text-muted");
+    }
+
     function renderMarketplace() {
       document.getElementById("marketplaceList").innerHTML = marketplaceItems.map(item => `
         <article class="rounded-lg border border-line bg-white p-4 shadow-soft">
@@ -1782,9 +1856,12 @@
           </div>
           <h3 class="mt-4 min-h-[48px] text-lg font-black leading-6 text-navy">${escapeHtml(item.title)}</h3>
           <p class="mt-2 text-sm text-muted">By ${escapeHtml(item.author)}</p>
+          <p class="mt-1 min-h-[20px] text-xs text-muted">${escapeHtml(item.courseName || item.originalFilename || "")}${item.downloadable ? ` · ${escapeHtml(formatBytes(item.sizeBytes))}` : ""}</p>
           <div class="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
             <span class="font-black text-ink">${escapeHtml(item.price)}</span>
-            <button class="btn btn-primary h-10 px-3 text-sm buy-note" type="button" data-note-id="${escapeHtml(item.id || "")}" data-note-price="${Number(item.priceKes || String(item.price).replace(/\D/g, "") || 1)}">${icon("shopping_bag", "text-[18px]")}Buy</button>
+            ${item.downloadable
+              ? `<button class="btn btn-primary h-10 px-3 text-sm download-note" type="button" data-note-id="${escapeHtml(item.id || "")}" data-note-url="${escapeHtml(item.downloadUrl || "")}">${icon("download", "text-[18px]")}Download</button>`
+              : `<button class="btn btn-primary h-10 px-3 text-sm buy-note" type="button" data-note-id="${escapeHtml(item.id || "")}" data-note-price="${Number(item.priceKes || String(item.price).replace(/\D/g, "") || 1)}">${icon("shopping_bag", "text-[18px]")}Buy</button>`}
           </div>
         </article>
       `).join("");
@@ -1842,6 +1919,7 @@
         enrolledCourses.map(course => course.courseId),
         "profile-course-checkbox"
       );
+      renderUploadCourseOptions();
     }
 
     async function loadProfile() {
@@ -2002,6 +2080,7 @@
       const current = select.value;
       select.innerHTML = courses.map(course => `<option value="${escapeHtml(course.courseId)}">${escapeHtml(course.courseName)}</option>`).join("");
       select.value = courseTopics[current] ? current : courses[0]?.courseId || "distributed";
+      renderUploadCourseOptions();
       renderTopics();
       updatePredictor();
     }
@@ -2038,16 +2117,83 @@
 
     async function loadMarketplace() {
       const data = await apiRequest("/api/marketplace/notes");
-      marketplaceItems = data.map(note => ({
-        id: note.id,
-        title: note.title,
-        author: note.author,
-        price: `KES ${note.priceKes}`,
-        priceKes: note.priceKes,
-        rating: note.rating,
-        tag: note.tag
-      }));
+      marketplaceItems = data.map(mapNote);
       renderMarketplace();
+    }
+
+    async function uploadNotePack(event) {
+      event.preventDefault();
+      if (!authToken) {
+        showAuthGate("Sign in to upload notes.");
+        return;
+      }
+      const submit = document.getElementById("noteUploadSubmit");
+      const fileInput = document.getElementById("noteUploadFile");
+      if (!fileInput.files.length) {
+        setUploadStatus("Choose a file.", "error");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("title", document.getElementById("noteUploadTitle").value.trim());
+      formData.append("courseId", document.getElementById("noteUploadCourse").value);
+      formData.append("priceKes", document.getElementById("noteUploadPrice").value || "0");
+      formData.append("file", fileInput.files[0]);
+
+      submit.disabled = true;
+      setUploadStatus("Uploading...");
+      try {
+        const note = await apiRequest("/api/marketplace/notes", {
+          method: "POST",
+          body: formData
+        });
+        marketplaceItems.unshift(mapNote(note));
+        renderMarketplace();
+        document.getElementById("noteUploadForm").reset();
+        document.getElementById("noteUploadPrice").value = "0";
+        renderUploadCourseOptions();
+        setUploadStatus("Uploaded for review.", "success");
+        await Promise.allSettled([loadFeed(), loadAdmin()]);
+      } catch (error) {
+        setUploadStatus(error.message, "error");
+      } finally {
+        submit.disabled = false;
+      }
+    }
+
+    async function downloadNotePack(path, fallbackName) {
+      if (!authToken) {
+        showAuthGate("Sign in to download notes.");
+        return;
+      }
+      try {
+        const response = await fetch(`${API_BASE}${path}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (!response.ok) {
+          throw new Error(await apiErrorMessage(response, `Download failed with ${response.status}`));
+        }
+        const blob = await response.blob();
+        const filename = filenameFromDisposition(response.headers.get("Content-Disposition")) || fallbackName || "notes-pack";
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(objectUrl);
+        setApiStatus("Download ready", "online");
+      } catch (error) {
+        setApiStatus("Download failed", "offline");
+      }
+    }
+
+    function filenameFromDisposition(value) {
+      if (!value) return "";
+      const utfMatch = value.match(/filename\*=UTF-8''([^;]+)/i);
+      if (utfMatch) return decodeURIComponent(utfMatch[1].replaceAll("+", "%20"));
+      const plainMatch = value.match(/filename="?([^"]+)"?/i);
+      return plainMatch ? plainMatch[1] : "";
     }
 
     async function loadAdmin() {
@@ -2143,6 +2289,13 @@
         return;
       }
 
+      const downloadButton = event.target.closest(".download-note");
+      if (downloadButton) {
+        const note = marketplaceItems.find(item => item.id === downloadButton.dataset.noteId);
+        downloadNotePack(downloadButton.dataset.noteUrl, note?.originalFilename || note?.title);
+        return;
+      }
+
       const trigger = event.target.closest("[data-action='open-view']");
       if (trigger) {
         openView(trigger.dataset.view);
@@ -2166,6 +2319,15 @@
       showAuthGate("Signed out.");
       loadAdmin();
     });
+    document.getElementById("uploadNotesButton").addEventListener("click", () => {
+      if (!authToken) {
+        showAuthGate("Sign in to upload notes.");
+        return;
+      }
+      renderUploadCourseOptions();
+      document.getElementById("noteUploadForm").classList.toggle("hidden");
+    });
+    document.getElementById("noteUploadForm").addEventListener("submit", uploadNotePack);
     document.getElementById("authLoginTab").addEventListener("click", () => setAuthMode("login"));
     document.getElementById("authRegisterTab").addEventListener("click", () => setAuthMode("register"));
     document.getElementById("authOfflineButton").addEventListener("click", () => {

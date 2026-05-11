@@ -228,7 +228,15 @@ public final class Models {
       int priceKes,
       double rating,
       String tag,
-      boolean verified
+      boolean verified,
+      String courseId,
+      String courseName,
+      String originalFilename,
+      String contentType,
+      long sizeBytes,
+      Instant createdAt,
+      boolean downloadable,
+      String downloadUrl
   ) {
   }
 

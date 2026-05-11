@@ -61,8 +61,25 @@ curl http://localhost:8080/api/dashboard/overview \
 - `GET /api/feed`
 - `POST /api/feed`
 - `GET /api/marketplace/notes`
+- `POST /api/marketplace/notes` multipart upload
+- `GET /api/marketplace/notes/{noteId}/download`
 - `POST /api/payments/mpesa/stk-push`
 - `GET /api/admin/moderation` with admin token
+
+## File uploads
+
+Authenticated students can upload note packs into the marketplace:
+
+```bash
+curl http://localhost:8080/api/marketplace/notes \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "title=Vector Clocks Revision Pack" \
+  -F "courseId=distributed" \
+  -F "priceKes=0" \
+  -F "file=@/path/to/notes.pdf"
+```
+
+Uploaded files are stored under `UPLOAD_ROOT` with metadata in Postgres/H2. Defaults accept PDF, Word, PowerPoint, text, and image files up to 20MB. New uploads are listed as marketplace packs, queued for moderation, and can be downloaded with the returned `downloadUrl`.
 
 ## Real AI services
 

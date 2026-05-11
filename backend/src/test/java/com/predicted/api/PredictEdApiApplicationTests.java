@@ -18,8 +18,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -246,6 +251,56 @@ class PredictEdApiApplicationTests {
   }
 
   @Test
+  void studentCanUploadAndDownloadNotePack() {
+    AuthResponse auth = login("alex@predicted.test", "password");
+    ByteArrayResource file = new ByteArrayResource("Vector clocks notes".getBytes(StandardCharsets.UTF_8)) {
+      @Override
+      public String getFilename() {
+        return "vector-clocks.pdf";
+      }
+    };
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("title", "Vector Clocks Upload");
+    body.add("courseId", "distributed");
+    body.add("priceKes", "0");
+    body.add("file", file);
+
+    ResponseEntity<Map> upload = restTemplate.exchange(
+        url("/api/marketplace/notes"),
+        HttpMethod.POST,
+        authorizedMultipart(auth.token(), body),
+        Map.class
+    );
+
+    assertThat(upload.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    assertThat(upload.getBody()).containsEntry("title", "Vector Clocks Upload");
+    assertThat(upload.getBody()).containsEntry("courseId", "distributed");
+    assertThat(upload.getBody()).containsEntry("downloadable", true);
+    assertThat(upload.getBody()).containsEntry("originalFilename", "vector-clocks.pdf");
+    assertThat(((Number) upload.getBody().get("sizeBytes")).longValue()).isEqualTo("Vector clocks notes".length());
+
+    ResponseEntity<byte[]> download = restTemplate.exchange(
+        url((String) upload.getBody().get("downloadUrl")),
+        HttpMethod.GET,
+        authorized(auth.token()),
+        byte[].class
+    );
+    ResponseEntity<Map[]> notes = restTemplate.exchange(
+        url("/api/marketplace/notes"),
+        HttpMethod.GET,
+        authorized(auth.token()),
+        Map[].class
+    );
+
+    assertThat(download.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(new String(download.getBody(), StandardCharsets.UTF_8)).isEqualTo("Vector clocks notes");
+    assertThat(download.getHeaders().getContentDisposition().getFilename()).isEqualTo("vector-clocks.pdf");
+    assertThat(notes.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(List.of(notes.getBody()))
+        .anySatisfy(note -> assertThat(note).containsEntry("id", upload.getBody().get("id")));
+  }
+
+  @Test
   void adminModerationRequiresAdminRole() {
     AuthResponse student = login("alex@predicted.test", "password");
     ResponseEntity<String> denied = restTemplate.exchange(
@@ -317,6 +372,16 @@ class PredictEdApiApplicationTests {
   private HttpEntity<Object> authorized(String token, Object body) {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(token);
+    return new HttpEntity<>(body, headers);
+  }
+
+  private HttpEntity<MultiValueMap<String, Object>> authorizedMultipart(
+      String token,
+      MultiValueMap<String, Object> body
+  ) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
     return new HttpEntity<>(body, headers);
   }
 
