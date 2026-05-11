@@ -96,8 +96,17 @@ public class SecurityConfig {
   private List<String> csv(String value) {
     List<String> values = Arrays.stream(value.split(","))
         .map(String::trim)
+        .map(this::normalizeOriginPattern)
         .filter(item -> !item.isBlank())
         .toList();
     return values.isEmpty() ? List.of("*") : values;
+  }
+
+  private String normalizeOriginPattern(String value) {
+    String normalized = value.replaceFirst("^(https?://)(https?://)+", "$1");
+    while (normalized.endsWith("/") && normalized.length() > 1) {
+      normalized = normalized.substring(0, normalized.length() - 1);
+    }
+    return normalized;
   }
 }

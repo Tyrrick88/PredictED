@@ -17,7 +17,7 @@ Set these backend variables:
 SPRING_PROFILES_ACTIVE=postgres
 PORT=8080
 JWT_SECRET=replace-with-64-plus-random-characters
-CORS_ALLOWED_ORIGIN_PATTERNS=https://your-vercel-domain.vercel.app
+CORS_ALLOWED_ORIGIN_PATTERNS=https://predict-ed.vercel.app
 AI_PROVIDER=fallback
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5.5

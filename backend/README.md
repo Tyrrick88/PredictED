@@ -74,7 +74,7 @@ For split hosting:
 
 - Deploy the backend to Railway from the repo root. `railway.json` and `nixpacks.toml` build the Spring Boot app from `backend`.
 - Deploy the frontend to Vercel from the `frontend` root. The build defaults to `https://predicted-production-0574.up.railway.app`; set `PREDICTED_API_BASE` in Vercel only if the Railway backend URL changes.
-- Set `CORS_ALLOWED_ORIGIN_PATTERNS` in Railway to the Vercel domain.
+- Set `CORS_ALLOWED_ORIGIN_PATTERNS` in Railway to `https://predict-ed.vercel.app`.
 
 ## File uploads
 
@@ -169,7 +169,7 @@ SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/predicted \
 SPRING_DATASOURCE_USERNAME=predicted \
 SPRING_DATASOURCE_PASSWORD='replace-with-production-db-password' \
 JWT_SECRET='replace-with-a-long-production-secret' \
-CORS_ALLOWED_ORIGIN_PATTERNS='https://your-vercel-domain.vercel.app' \
+CORS_ALLOWED_ORIGIN_PATTERNS='https://predict-ed.vercel.app' \
 mvn spring-boot:run
 ```
 
