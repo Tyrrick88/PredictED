@@ -80,6 +80,12 @@ From the repo root, start PostgreSQL and Redis:
 docker compose up -d predicted-postgres predicted-redis
 ```
 
+If Docker is not installed on Ubuntu yet, run this from your local terminal so sudo can securely ask for your password:
+
+```bash
+./scripts/install-docker-ubuntu.sh
+```
+
 Then run the API with the Postgres profile:
 
 ```bash
@@ -95,6 +101,12 @@ mvn spring-boot:run
 ```
 
 Flyway will create the schema, seed data will load, and the API will still start on `http://localhost:8080`.
+
+The helper script wraps those steps:
+
+```bash
+./scripts/run-backend-postgres.sh
+```
 
 ## Production Postgres profile
 
