@@ -343,6 +343,10 @@
               <span class="material-symbols-outlined">notifications</span>
               <span class="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-coral" style="animation:pulseDot 1.6s ease infinite"></span>
             </button>
+            <span class="chip hidden md:inline-flex" id="apiStatus">
+              <span class="material-symbols-outlined text-[16px]">sync_problem</span>
+              <span id="apiStatusText">Offline demo</span>
+            </span>
             <button class="btn btn-primary hidden px-4 text-sm md:inline-flex" data-action="open-view" data-view="predictor">
               <span class="material-symbols-outlined text-[19px]">auto_graph</span>
               Run Prediction
@@ -363,8 +367,8 @@
                       <span class="chip"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
                       <span class="chip"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
                     </div>
-                    <h2 class="mt-5 max-w-2xl text-3xl font-black tracking-tight text-navy md:text-5xl">Semester 2 final prep is trending to B+.</h2>
-                    <p class="mt-3 max-w-2xl text-base leading-7 text-muted">Distributed Systems and Compiler Construction are driving the risk score. The next three sessions are weighted toward past-paper patterns from lecturer history.</p>
+                    <h2 class="mt-5 max-w-2xl text-3xl font-black tracking-tight text-navy md:text-5xl" id="dashboardHeadline">Semester 2 final prep is trending to B+.</h2>
+                    <p class="mt-3 max-w-2xl text-base leading-7 text-muted" id="dashboardSubcopy">Distributed Systems and Compiler Construction are driving the risk score. The next three sessions are weighted toward past-paper patterns from lecturer history.</p>
                     <div class="mt-6 flex flex-wrap gap-3">
                       <button class="btn btn-primary px-4" data-action="open-view" data-view="planner">
                         <span class="material-symbols-outlined text-[20px]">event_note</span>
@@ -390,18 +394,18 @@
                           <circle class="ring-progress" cx="60" cy="60" r="54" fill="none" stroke="#34d399" stroke-linecap="round" stroke-width="10" stroke-dasharray="339.292" stroke-dashoffset="339.292" style="--dash:88.216"></circle>
                         </svg>
                         <div class="-mt-44 flex h-44 w-44 flex-col items-center justify-center">
-                          <span class="text-5xl font-black">74%</span>
-                          <span class="font-mono text-sm text-white/72">B+ expected</span>
+                          <span class="text-5xl font-black" id="dashboardPredictionScore">74%</span>
+                          <span class="font-mono text-sm text-white/72" id="dashboardPredictionGrade">B+ expected</span>
                         </div>
                       </div>
                       <div class="grid grid-cols-2 gap-3 border-t border-white/18 pt-4">
                         <div>
                           <p class="font-mono text-[10px] uppercase text-white/60">GPA Lift</p>
-                          <p class="text-xl font-black">+0.20</p>
+                          <p class="text-xl font-black" id="dashboardGpaLift">+0.20</p>
                         </div>
                         <div>
                           <p class="font-mono text-[10px] uppercase text-white/60">Focus</p>
-                          <p class="text-xl font-black text-amber-200">High</p>
+                          <p class="text-xl font-black text-amber-200" id="dashboardFocus">High</p>
                         </div>
                       </div>
                     </div>
@@ -413,27 +417,27 @@
                 <div class="flex items-start justify-between gap-4">
                   <div>
                     <p class="font-mono text-[11px] font-bold uppercase text-muted">Gamification</p>
-                    <h3 class="mt-1 text-2xl font-black text-navy">Level 24</h3>
+                    <h3 class="mt-1 text-2xl font-black text-navy" id="gamificationLevel">Level 24</h3>
                   </div>
                   <span class="material-symbols-outlined text-4xl text-gold" style="font-variation-settings:'FILL' 1">workspace_premium</span>
                 </div>
                 <div class="mt-5">
                   <div class="flex items-center justify-between text-sm">
-                    <span class="font-bold text-ink">Senior Scholar</span>
-                    <span class="font-mono text-muted">12,450 / 15,000 XP</span>
+                    <span class="font-bold text-ink" id="gamificationTitle">Senior Scholar</span>
+                    <span class="font-mono text-muted" id="gamificationXp">12,450 / 15,000 XP</span>
                   </div>
                   <div class="mt-2 h-2 overflow-hidden rounded-full bg-wash">
-                    <div class="progress-bar h-full rounded-full bg-gold" style="--bar:83%"></div>
+                    <div class="progress-bar h-full rounded-full bg-gold" id="gamificationBar" style="--bar:83%"></div>
                   </div>
                 </div>
                 <div class="mt-6 grid grid-cols-2 gap-3">
                   <div class="border-t border-line pt-3">
                     <p class="font-mono text-[10px] uppercase text-muted">Study Hours</p>
-                    <p class="mt-1 text-2xl font-black text-navy">128.5</p>
+                    <p class="mt-1 text-2xl font-black text-navy" id="dashboardStudyHours">128.5</p>
                   </div>
                   <div class="border-t border-line pt-3">
                     <p class="font-mono text-[10px] uppercase text-muted">Cards Due</p>
-                    <p class="mt-1 text-2xl font-black text-coral">38</p>
+                    <p class="mt-1 text-2xl font-black text-coral" id="dashboardCardsDue">38</p>
                   </div>
                   <div class="border-t border-line pt-3">
                     <p class="font-mono text-[10px] uppercase text-muted">Groups</p>
@@ -441,7 +445,7 @@
                   </div>
                   <div class="border-t border-line pt-3">
                     <p class="font-mono text-[10px] uppercase text-muted">Offline</p>
-                    <p class="mt-1 text-2xl font-black text-mint">4</p>
+                    <p class="mt-1 text-2xl font-black text-mint" id="dashboardOffline">4</p>
                   </div>
                 </div>
               </div>
@@ -494,7 +498,7 @@
                     Planner
                   </button>
                 </div>
-                <div class="mt-4 grid gap-3 md:grid-cols-3">
+                <div class="mt-4 grid gap-3 md:grid-cols-3" id="dashboardTaskPreview">
                   <div class="study-tile soft-panel p-4" style="--accent:#cf3f4f">
                     <div class="flex items-center justify-between gap-2">
                       <span class="rounded-full bg-rose-50 px-2 py-1 font-mono text-[10px] font-bold text-coral">High Yield</span>
@@ -532,7 +536,7 @@
                     <span class="material-symbols-outlined">dynamic_feed</span>
                   </button>
                 </div>
-                <div class="mt-4 grid gap-2">
+                <div class="mt-4 grid gap-2" id="dashboardFeedPreview">
                   <div class="feed-row rounded-lg border border-line bg-white p-3">
                     <div class="flex items-start gap-3">
                       <span class="rounded-lg bg-amber-50 p-2 text-gold"><span class="material-symbols-outlined text-[18px]">campaign</span></span>
@@ -1034,7 +1038,7 @@
       { id: "admin", label: "Admin", short: "Admin", icon: "admin_panel_settings" }
     ];
 
-    const courseTopics = {
+    let courseTopics = {
       distributed: {
         label: "Distributed Systems",
         topics: [
@@ -1073,14 +1077,14 @@
       }
     };
 
-    const plannerBase = [
+    let plannerBase = [
       { time: "14:00", tag: "High Yield", course: "Distributed Systems", task: "Practice vector clocks with 3-process timelines.", accent: "#cf3f4f", minutes: 35 },
       { time: "16:30", tag: "Revision", course: "Artificial Intelligence", task: "Drill Bayesian independence and d-separation.", accent: "#1d4ed8", minutes: 45 },
       { time: "19:00", tag: "Lab Prep", course: "Compiler Construction", task: "Build LL(1) table from grammar exercises.", accent: "#0f9fbc", minutes: 55 },
       { time: "21:00", tag: "Flashcards", course: "Data Mining", task: "Review association rule confidence and lift.", accent: "#c97800", minutes: 25 }
     ];
 
-    const cards = [
+    let cards = [
       {
         course: "Distributed Systems",
         question: "What problem do vector clocks solve?",
@@ -1108,21 +1112,21 @@
       }
     ];
 
-    const feedItems = [
+    let feedItems = [
       { icon: "campaign", color: "text-gold", title: "AI CAT moved to Thursday", meta: "Class rep · 18 min ago", body: "Venue changed to LT2. Lecturer confirmed question scope stays the same." },
       { icon: "description", color: "text-cobalt", title: "Data Mining past paper uploaded", meta: "Marketplace · 42 min ago", body: "Includes 2023 marking guide and lecturer annotations." },
       { icon: "groups", color: "text-aqua", title: "Compiler lab sprint opened", meta: "Study Group · 1 hr ago", body: "8 students joined the FIRST/FOLLOW debugging room." },
       { icon: "verified", color: "text-mint", title: "Distributed Systems pattern verified", meta: "Predictive Engine · 2 hrs ago", body: "Vector-clock questions appeared in 4 of 5 recent exams." }
     ];
 
-    const marketplaceItems = [
+    let marketplaceItems = [
       { title: "Distributed Systems Final Pack", author: "Brian O.", price: "KES 80", rating: "4.9", tag: "Verified" },
       { title: "AI CAT Revision Notes", author: "Mary W.", price: "KES 45", rating: "4.7", tag: "Hot" },
       { title: "Compiler Lab Walkthroughs", author: "CS Club", price: "KES 120", rating: "4.8", tag: "Bundle" },
       { title: "Data Mining Past Papers", author: "Amina K.", price: "KES 60", rating: "4.6", tag: "New" }
     ];
 
-    const moderationItems = [
+    let moderationItems = [
       { item: "Distributed Systems Final Pack", type: "Notes", status: "Review" },
       { item: "CAT moved to Thursday", type: "Feed", status: "Approved" },
       { item: "Compiler Lab Walkthroughs", type: "Marketplace", status: "Review" },
@@ -1133,13 +1137,127 @@
     const viewTitle = document.getElementById("viewTitle");
     const viewEyebrow = document.getElementById("viewEyebrow");
     const circumference = 339.292;
+    const API_BASE = localStorage.getItem("predictedApiBase") || "http://localhost:8080";
     let activeView = "dashboard";
     let focusHours = 3;
     let cardIndex = 0;
     let remembered = 0;
+    let authToken = sessionStorage.getItem("predictedToken") || "";
+    let adminToken = sessionStorage.getItem("predictedAdminToken") || "";
+    let apiConnected = false;
+    let simulateTimer;
 
     function icon(name, classes = "") {
       return `<span class="material-symbols-outlined ${classes}">${name}</span>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function setApiStatus(text, state = "offline") {
+      const label = document.getElementById("apiStatusText");
+      const iconEl = document.querySelector("#apiStatus .material-symbols-outlined");
+      const status = document.getElementById("apiStatus");
+      if (!label || !status || !iconEl) return;
+      label.textContent = text;
+      status.classList.remove("text-mint", "text-gold", "text-coral");
+      status.classList.add(state === "online" ? "text-mint" : state === "loading" ? "text-gold" : "text-coral");
+      iconEl.textContent = state === "online" ? "cloud_done" : state === "loading" ? "sync" : "cloud_off";
+    }
+
+    async function loginWith(email, password) {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      if (!response.ok) {
+        throw new Error(`Login failed with ${response.status}`);
+      }
+      return response.json();
+    }
+
+    async function ensureStudentToken() {
+      if (authToken) return authToken;
+      const auth = await loginWith("alex@predicted.test", "password");
+      authToken = auth.token;
+      sessionStorage.setItem("predictedToken", authToken);
+      updateProfile(auth.user);
+      return authToken;
+    }
+
+    async function ensureAdminToken() {
+      if (adminToken) return adminToken;
+      const auth = await loginWith("admin@predicted.test", "admin123");
+      adminToken = auth.token;
+      sessionStorage.setItem("predictedAdminToken", adminToken);
+      return adminToken;
+    }
+
+    async function apiRequest(path, options = {}, token = authToken) {
+      const headers = new Headers(options.headers || {});
+      if (!headers.has("Content-Type") && options.body) {
+        headers.set("Content-Type", "application/json");
+      }
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+      if (response.status === 401 && token === authToken) {
+        authToken = "";
+        sessionStorage.removeItem("predictedToken");
+        await ensureStudentToken();
+        return apiRequest(path, options, authToken);
+      }
+      if (!response.ok) {
+        throw new Error(`${path} failed with ${response.status}`);
+      }
+      if (apiConnected) {
+        setApiStatus("API connected", "online");
+      }
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    function updateProfile(user) {
+      if (!user) return;
+      document.querySelectorAll("img[alt='Alex Mwangi profile']").forEach(img => {
+        img.alt = `${user.name} profile`;
+        const name = img.parentElement?.querySelector("p:first-of-type");
+        const meta = img.parentElement?.querySelector("p:nth-of-type(2)");
+        if (name) name.textContent = user.name;
+        if (meta) meta.textContent = user.academicLevel || user.program || "Student";
+      });
+    }
+
+    function formatTime(value) {
+      return String(value || "").slice(0, 5) || "Now";
+    }
+
+    function relativeTime(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "just now";
+      const diffMinutes = Math.max(1, Math.round((Date.now() - date.getTime()) / 60000));
+      if (diffMinutes < 60) return `${diffMinutes} min ago`;
+      const hours = Math.round(diffMinutes / 60);
+      if (hours < 24) return `${hours} hr ago`;
+      return `${Math.round(hours / 24)} days ago`;
+    }
+
+    function iconColor(iconName) {
+      return {
+        campaign: "text-gold",
+        description: "text-cobalt",
+        groups: "text-aqua",
+        verified: "text-mint",
+        bolt: "text-plum"
+      }[iconName] || "text-cobalt";
     }
 
     function renderNavigation() {
@@ -1193,50 +1311,87 @@
       return "C";
     }
 
+    function applyPrediction(score, grade = gradeFor(score), riskLabel) {
+      const ring = document.getElementById("predictorRing");
+      const dash = circumference * (1 - score / 100);
+      const risk = riskLabel || (score >= 75 ? "Low Risk" : score >= 65 ? "Medium Risk" : "High Risk");
+
+      document.getElementById("predictorScore").textContent = `${score}%`;
+      document.getElementById("predictorGrade").textContent = grade;
+      document.getElementById("predictorRisk").textContent = risk.replaceAll("_", " ");
+      ring.style.strokeDashoffset = dash;
+      ring.style.stroke = score >= 75 ? "#16a34a" : score >= 65 ? "#c97800" : "#cf3f4f";
+    }
+
     function updatePredictor() {
       const revision = Number(document.getElementById("revisionRange").value);
       const attendance = Number(document.getElementById("attendanceRange").value);
       const coverage = Number(document.getElementById("coverageRange").value);
       const assignment = Number(document.getElementById("assignmentRange").value);
       const score = Math.round((revision * 0.36) + (attendance * 0.16) + (coverage * 0.28) + (assignment * 0.20));
-      const ring = document.getElementById("predictorRing");
-      const dash = circumference * (1 - score / 100);
 
       document.getElementById("revisionValue").textContent = revision;
       document.getElementById("attendanceValue").textContent = attendance;
       document.getElementById("coverageValue").textContent = coverage;
       document.getElementById("assignmentValue").textContent = assignment;
-      document.getElementById("predictorScore").textContent = `${score}%`;
-      document.getElementById("predictorGrade").textContent = gradeFor(score);
-      document.getElementById("predictorRisk").textContent = score >= 75 ? "Low Risk" : score >= 65 ? "Medium Risk" : "High Risk";
-      ring.style.strokeDashoffset = dash;
-      ring.style.stroke = score >= 75 ? "#16a34a" : score >= 65 ? "#c97800" : "#cf3f4f";
+      applyPrediction(score);
+
+      window.clearTimeout(simulateTimer);
+      simulateTimer = window.setTimeout(simulatePrediction, 280);
+    }
+
+    async function simulatePrediction() {
+      if (!apiConnected) return;
+      const courseId = document.getElementById("courseSelect").value;
+      const input = {
+        revisionAverage: Number(document.getElementById("revisionRange").value),
+        attendance: Number(document.getElementById("attendanceRange").value),
+        pastPaperCoverage: Number(document.getElementById("coverageRange").value),
+        assignmentScore: Number(document.getElementById("assignmentRange").value)
+      };
+      try {
+        const result = await apiRequest(`/api/predictions/${courseId}/simulate`, {
+          method: "POST",
+          body: JSON.stringify(input)
+        });
+        applyPrediction(result.score, result.grade, `${result.risk.charAt(0)}${result.risk.slice(1).toLowerCase()} Risk`);
+      } catch (error) {
+        if (!apiConnected) setApiStatus("Offline demo", "offline");
+      }
     }
 
     function renderTopics() {
       const course = courseTopics[document.getElementById("courseSelect").value];
+      if (!course) return;
       document.getElementById("topicMatrix").innerHTML = course.topics.map(topic => {
         const tone = topic[1] >= 85 ? "text-coral" : topic[1] >= 75 ? "text-gold" : "text-aqua";
         return `<div class="course-row grid grid-cols-[1fr_100px_90px] items-center border-t border-line px-4 py-3">
-          <span class="font-bold text-ink">${topic[0]}</span>
+          <span class="font-bold text-ink">${escapeHtml(topic[0])}</span>
           <span class="font-mono text-sm font-bold ${tone}">${topic[1]}%</span>
-          <span class="font-mono text-xs text-muted">${topic[2]}</span>
+          <span class="font-mono text-xs text-muted">${escapeHtml(topic[2])}</span>
         </div>`;
       }).join("");
       renderMockList(false);
     }
 
-    function renderMockList(generated) {
+    function renderMockList(generated, apiQuestions) {
       const course = courseTopics[document.getElementById("courseSelect").value];
-      const questions = course.topics.slice(0, 3).map((topic, index) => {
+      const questions = apiQuestions || course.topics.slice(0, 3).map((topic, index) => {
         const verbs = ["Explain", "Compare", "Solve"];
-        return `${verbs[index]} ${topic[0].toLowerCase()} using a lecturer-style example.`;
+        return {
+          prompt: `${verbs[index]} ${topic[0].toLowerCase()} using a lecturer-style example.`,
+          marks: index === 0 ? 12 : 8,
+          markingHint: topic[3] || "Show each step clearly."
+        };
       });
       document.getElementById("mockList").innerHTML = questions.map((question, index) => `
         <li class="rounded-lg border border-line bg-white p-3">
           <div class="flex items-start gap-3">
             <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-wash font-mono text-xs font-bold text-navy">${index + 1}</span>
-            <p class="text-sm font-semibold leading-6 text-ink">${question}</p>
+            <div>
+              <p class="text-sm font-semibold leading-6 text-ink">${escapeHtml(question.prompt)}</p>
+              <p class="mt-1 font-mono text-[11px] text-muted">${question.marks || 8} marks · ${escapeHtml(question.markingHint || "Lecturer-style answer")}</p>
+            </div>
           </div>
         </li>
       `).join("");
@@ -1252,21 +1407,35 @@
         <article class="study-tile rounded-lg border border-line bg-white p-4 shadow-soft" style="--accent:${item.accent};animation:fadeUp .24s ease both;animation-delay:${index * 0.035}s">
           <div class="grid gap-3 md:grid-cols-[96px_1fr_auto] md:items-center">
             <div>
-              <p class="font-mono text-[11px] uppercase text-muted">${item.time}</p>
+              <p class="font-mono text-[11px] uppercase text-muted">${escapeHtml(formatTime(item.time))}</p>
               <p class="mt-1 text-sm font-black text-navy">${item.minutes} min</p>
             </div>
             <div>
-              <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${item.tag}</span>
-              <h3 class="mt-2 text-lg font-black text-navy">${item.course}</h3>
-              <p class="mt-1 text-sm text-muted">${item.task}</p>
+              <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${escapeHtml(item.tag)}</span>
+              <h3 class="mt-2 text-lg font-black text-navy">${escapeHtml(item.course)}</h3>
+              <p class="mt-1 text-sm text-muted">${escapeHtml(item.task)}</p>
             </div>
-            <button class="btn btn-ghost h-10 px-3 text-sm" type="button">
-              ${icon("check_circle", "text-[18px] text-mint")}
-              Done
+            <button class="btn btn-ghost h-10 px-3 text-sm task-complete" type="button" data-task-id="${escapeHtml(item.id || "")}" ${item.completed ? "disabled" : ""}>
+              ${icon(item.completed ? "task_alt" : "check_circle", "text-[18px] text-mint")}
+              ${item.completed ? "Done" : "Done"}
             </button>
           </div>
         </article>
       `).join("");
+    }
+
+    async function completeTask(taskId) {
+      const task = plannerBase.find(item => item.id === taskId);
+      if (task) task.completed = true;
+      renderPlanner();
+      try {
+        if (apiConnected && taskId) {
+          await apiRequest(`/api/planner/tasks/${encodeURIComponent(taskId)}/complete`, { method: "POST" });
+          await loadPlanner();
+        }
+      } catch (error) {
+        setApiStatus("Task saved locally", "offline");
+      }
     }
 
     function appendMessage(text, sender = "user") {
@@ -1299,6 +1468,7 @@
 
     function renderCard() {
       const current = cards[cardIndex];
+      if (!current) return;
       document.getElementById("flashcard").classList.remove("flipped");
       document.getElementById("cardCourse").textContent = current.course;
       document.getElementById("cardQuestion").textContent = current.question;
@@ -1306,13 +1476,24 @@
       document.getElementById("cardProgress").textContent = `${cardIndex + 1} / ${cards.length}`;
     }
 
-    function nextCard(rememberedDelta) {
+    async function nextCard(rememberedDelta, rating) {
+      const current = cards[cardIndex];
       remembered = Math.min(cards.length, remembered + rememberedDelta);
       cardIndex = (cardIndex + 1) % cards.length;
       const percent = Math.round((remembered / cards.length) * 100);
       document.getElementById("rememberedCount").textContent = remembered;
       document.getElementById("rememberedBar").style.width = `${percent}%`;
       renderCard();
+      try {
+        if (apiConnected && current?.id && rating) {
+          await apiRequest(`/api/flashcards/${encodeURIComponent(current.id)}/review`, {
+            method: "POST",
+            body: JSON.stringify({ rating })
+          });
+        }
+      } catch (error) {
+        setApiStatus("Card saved locally", "offline");
+      }
     }
 
     function renderFeed() {
@@ -1322,10 +1503,10 @@
             <span class="rounded-lg bg-wash p-2 ${item.color}">${icon(item.icon, "text-[20px]")}</span>
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-start justify-between gap-2">
-                <h3 class="font-black text-navy">${item.title}</h3>
-                <span class="font-mono text-[11px] text-muted">${item.meta}</span>
+                <h3 class="font-black text-navy">${escapeHtml(item.title)}</h3>
+                <span class="font-mono text-[11px] text-muted">${escapeHtml(item.meta)}</span>
               </div>
-              <p class="mt-2 text-sm leading-6 text-muted">${item.body}</p>
+              <p class="mt-2 text-sm leading-6 text-muted">${escapeHtml(item.body)}</p>
             </div>
           </div>
         </article>
@@ -1336,14 +1517,14 @@
       document.getElementById("marketplaceList").innerHTML = marketplaceItems.map(item => `
         <article class="rounded-lg border border-line bg-white p-4 shadow-soft">
           <div class="flex items-center justify-between gap-2">
-            <span class="chip">${item.tag}</span>
+            <span class="chip">${escapeHtml(item.tag)}</span>
             <span class="flex items-center gap-1 font-mono text-xs font-bold text-gold">${icon("star", "text-[16px]")} ${item.rating}</span>
           </div>
-          <h3 class="mt-4 min-h-[48px] text-lg font-black leading-6 text-navy">${item.title}</h3>
-          <p class="mt-2 text-sm text-muted">By ${item.author}</p>
+          <h3 class="mt-4 min-h-[48px] text-lg font-black leading-6 text-navy">${escapeHtml(item.title)}</h3>
+          <p class="mt-2 text-sm text-muted">By ${escapeHtml(item.author)}</p>
           <div class="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
-            <span class="font-black text-ink">${item.price}</span>
-            <button class="btn btn-primary h-10 px-3 text-sm" type="button">${icon("shopping_bag", "text-[18px]")}Buy</button>
+            <span class="font-black text-ink">${escapeHtml(item.price)}</span>
+            <button class="btn btn-primary h-10 px-3 text-sm buy-note" type="button" data-note-id="${escapeHtml(item.id || "")}" data-note-price="${Number(item.priceKes || String(item.price).replace(/\D/g, "") || 1)}">${icon("shopping_bag", "text-[18px]")}Buy</button>
           </div>
         </article>
       `).join("");
@@ -1353,14 +1534,225 @@
       document.getElementById("moderationList").innerHTML = moderationItems.map(item => {
         const color = item.status === "Approved" ? "text-mint" : "text-gold";
         return `<div class="moderation-row grid grid-cols-[1fr_130px_120px] items-center border-t border-line px-4 py-3">
-          <span class="font-bold text-ink">${item.item}</span>
-          <span class="font-mono text-xs text-muted">${item.type}</span>
-          <span class="font-mono text-xs font-bold ${color}">${item.status}</span>
+          <span class="font-bold text-ink">${escapeHtml(item.item)}</span>
+          <span class="font-mono text-xs text-muted">${escapeHtml(item.type)}</span>
+          <span class="font-mono text-xs font-bold ${color}">${escapeHtml(item.status)}</span>
         </div>`;
       }).join("");
     }
 
+    function renderDashboardPreviews(tasks = plannerBase, feed = feedItems) {
+      const taskPreview = document.getElementById("dashboardTaskPreview");
+      if (taskPreview) {
+        taskPreview.innerHTML = tasks.slice(0, 3).map(task => `
+          <div class="study-tile soft-panel p-4" style="--accent:${escapeHtml(task.accent || "#1d4ed8")}">
+            <div class="flex items-center justify-between gap-2">
+              <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${escapeHtml(task.tag)}</span>
+              <span class="font-mono text-[10px] text-muted">${escapeHtml(formatTime(task.time))}</span>
+            </div>
+            <h4 class="mt-3 font-black text-navy">${escapeHtml(task.course)}</h4>
+            <p class="mt-1 text-sm text-muted">${escapeHtml(task.task)}</p>
+          </div>
+        `).join("");
+      }
+
+      const feedPreview = document.getElementById("dashboardFeedPreview");
+      if (feedPreview) {
+        feedPreview.innerHTML = feed.slice(0, 2).map(item => `
+          <div class="feed-row rounded-lg border border-line bg-white p-3">
+            <div class="flex items-start gap-3">
+              <span class="rounded-lg bg-wash p-2 ${item.color}">${icon(item.icon, "text-[18px]")}</span>
+              <div>
+                <p class="text-sm font-bold text-ink">${escapeHtml(item.title)}</p>
+                <p class="mt-1 text-xs text-muted">${escapeHtml(item.meta)}</p>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    function applyDashboard(data) {
+      updateProfile(data.student);
+      const prediction = data.prediction;
+      const gamification = data.gamification;
+      document.getElementById("dashboardHeadline").textContent = `Semester 2 final prep is trending to ${prediction.grade}.`;
+      document.getElementById("dashboardSubcopy").textContent = `${prediction.focusAreas.slice(0, 2).join(" and ")} are driving the risk score. Today's sessions are weighted toward predictive lecturer patterns.`;
+      document.getElementById("dashboardPredictionScore").textContent = `${prediction.score}%`;
+      document.getElementById("dashboardPredictionGrade").textContent = `${prediction.grade} expected`;
+      document.getElementById("dashboardGpaLift").textContent = `+${prediction.expectedGpaLift.toFixed(2)}`;
+      document.getElementById("dashboardFocus").textContent = prediction.risk.charAt(0) + prediction.risk.slice(1).toLowerCase();
+      document.getElementById("gamificationLevel").textContent = `Level ${gamification.level}`;
+      document.getElementById("gamificationTitle").textContent = gamification.title;
+      document.getElementById("gamificationXp").textContent = `${gamification.xp.toLocaleString()} / ${gamification.nextLevelXp.toLocaleString()} XP`;
+      document.getElementById("gamificationBar").style.setProperty("--bar", `${Math.min(100, Math.round((gamification.xp / gamification.nextLevelXp) * 100))}%`);
+      document.getElementById("dashboardStudyHours").textContent = gamification.studyHours;
+      document.getElementById("dashboardCardsDue").textContent = data.flashcardsDue;
+      document.getElementById("dashboardOffline").textContent = data.offlinePacksSynced;
+    }
+
+    function mapTask(task) {
+      return {
+        id: task.id,
+        time: task.time,
+        tag: task.tag,
+        course: task.course,
+        task: task.description || task.title,
+        accent: task.accent,
+        minutes: task.minutes,
+        completed: task.completed
+      };
+    }
+
+    function mapSignal(signal) {
+      return {
+        id: signal.id,
+        icon: signal.icon || "bolt",
+        color: iconColor(signal.icon),
+        title: signal.title,
+        meta: `${signal.source || "Campus"} · ${relativeTime(signal.createdAt)}`,
+        body: signal.body
+      };
+    }
+
+    async function loadDashboard() {
+      const data = await apiRequest("/api/dashboard/overview");
+      applyDashboard(data);
+      plannerBase = data.tasks.map(mapTask);
+      feedItems = data.feed.map(mapSignal);
+      renderDashboardPreviews(plannerBase, feedItems);
+      renderPlanner();
+      renderFeed();
+    }
+
+    async function loadCourses() {
+      const courses = await apiRequest("/api/predictions/courses");
+      courseTopics = {};
+      courses.forEach(course => {
+        courseTopics[course.courseId] = {
+          label: course.courseName,
+          lecturer: course.lecturer,
+          certainty: course.certainty,
+          topics: course.topics.map(topic => [topic.topic, topic.likelihood, topic.weight, topic.recommendedAction])
+        };
+      });
+      const select = document.getElementById("courseSelect");
+      const current = select.value;
+      select.innerHTML = courses.map(course => `<option value="${escapeHtml(course.courseId)}">${escapeHtml(course.courseName)}</option>`).join("");
+      select.value = courseTopics[current] ? current : courses[0]?.courseId || "distributed";
+      renderTopics();
+      updatePredictor();
+    }
+
+    async function loadPlanner() {
+      const data = await apiRequest(`/api/planner/today?focusHours=${focusHours}`);
+      plannerBase = data.tasks.map(mapTask);
+      renderPlanner();
+      renderDashboardPreviews(plannerBase, feedItems);
+    }
+
+    async function loadFlashcards() {
+      const data = await apiRequest("/api/flashcards/due");
+      cards = data.map(card => ({
+        id: card.id,
+        course: card.course,
+        question: card.question,
+        answer: card.answer,
+        mastery: card.mastery
+      }));
+      cardIndex = 0;
+      remembered = cards.filter(card => card.mastery >= 70).length;
+      document.getElementById("rememberedCount").textContent = remembered;
+      document.getElementById("rememberedBar").style.width = `${Math.round((remembered / Math.max(1, cards.length)) * 100)}%`;
+      renderCard();
+    }
+
+    async function loadFeed() {
+      const data = await apiRequest("/api/feed");
+      feedItems = data.map(mapSignal);
+      renderFeed();
+      renderDashboardPreviews(plannerBase, feedItems);
+    }
+
+    async function loadMarketplace() {
+      const data = await apiRequest("/api/marketplace/notes");
+      marketplaceItems = data.map(note => ({
+        id: note.id,
+        title: note.title,
+        author: note.author,
+        price: `KES ${note.priceKes}`,
+        priceKes: note.priceKes,
+        rating: note.rating,
+        tag: note.tag
+      }));
+      renderMarketplace();
+    }
+
+    async function loadAdmin() {
+      const token = await ensureAdminToken();
+      const data = await apiRequest("/api/admin/moderation", {}, token);
+      moderationItems = data;
+      renderModeration();
+    }
+
+    async function initiatePayment(noteId, amountKes) {
+      try {
+        if (!apiConnected) {
+          setApiStatus("Payment demo only", "offline");
+          return;
+        }
+        const result = await apiRequest("/api/payments/mpesa/stk-push", {
+          method: "POST",
+          body: JSON.stringify({
+            phoneNumber: "254700000000",
+            amountKes,
+            reference: noteId || "notes-pack"
+          })
+        });
+        setApiStatus(result.status === "QUEUED" ? "M-Pesa queued" : "Payment started", "online");
+      } catch (error) {
+        setApiStatus("Payment failed", "offline");
+      }
+    }
+
+    async function bootstrapApi() {
+      setApiStatus("Connecting API", "loading");
+      try {
+        const auth = await loginWith("alex@predicted.test", "password");
+        authToken = auth.token;
+        sessionStorage.setItem("predictedToken", authToken);
+        updateProfile(auth.user);
+        apiConnected = true;
+        setApiStatus("API connected", "online");
+        await Promise.allSettled([
+          loadDashboard(),
+          loadCourses(),
+          loadPlanner(),
+          loadFlashcards(),
+          loadFeed(),
+          loadMarketplace(),
+          loadAdmin()
+        ]);
+      } catch (error) {
+        apiConnected = false;
+        setApiStatus("Offline demo", "offline");
+        renderDashboardPreviews(plannerBase, feedItems);
+      }
+    }
+
     document.addEventListener("click", event => {
+      const taskButton = event.target.closest(".task-complete");
+      if (taskButton) {
+        completeTask(taskButton.dataset.taskId);
+        return;
+      }
+
+      const buyButton = event.target.closest(".buy-note");
+      if (buyButton) {
+        initiatePayment(buyButton.dataset.noteId, Number(buyButton.dataset.notePrice || 1));
+        return;
+      }
+
       const trigger = event.target.closest("[data-action='open-view']");
       if (trigger) {
         openView(trigger.dataset.view);
@@ -1388,7 +1780,19 @@
       });
     });
 
-    document.getElementById("generateMockBtn").addEventListener("click", () => renderMockList(true));
+    document.getElementById("generateMockBtn").addEventListener("click", async () => {
+      const courseId = document.getElementById("courseSelect").value;
+      try {
+        if (apiConnected) {
+          const questions = await apiRequest(`/api/predictions/${courseId}/mock`, { method: "POST" });
+          renderMockList(true, questions);
+          return;
+        }
+      } catch (error) {
+        setApiStatus("Mock fallback", "offline");
+      }
+      renderMockList(true);
+    });
     document.getElementById("downloadPackBtn").addEventListener("click", () => {
       document.getElementById("mockStatus").innerHTML = `${icon("cloud_done", "text-[16px]")}Synced`;
     });
@@ -1396,19 +1800,36 @@
     document.getElementById("focusMinus").addEventListener("click", () => {
       focusHours = Math.max(1, focusHours - 1);
       renderPlanner();
+      if (apiConnected) loadPlanner().catch(() => setApiStatus("Planner fallback", "offline"));
     });
     document.getElementById("focusPlus").addEventListener("click", () => {
       focusHours = Math.min(5, focusHours + 1);
       renderPlanner();
+      if (apiConnected) loadPlanner().catch(() => setApiStatus("Planner fallback", "offline"));
     });
 
-    document.getElementById("chatForm").addEventListener("submit", event => {
+    document.getElementById("chatForm").addEventListener("submit", async event => {
       event.preventDefault();
       const input = document.getElementById("chatInput");
       const value = input.value.trim();
       if (!value) return;
       appendMessage(value, "user");
       input.value = "";
+      try {
+        if (apiConnected) {
+          const response = await apiRequest("/api/tutor/messages", {
+            method: "POST",
+            body: JSON.stringify({
+              prompt: value,
+              courseId: document.getElementById("courseSelect").value
+            })
+          });
+          appendMessage(`${response.answer} ${response.nextSteps?.length ? "Next: " + response.nextSteps.join(" · ") : ""}`, "assistant");
+          return;
+        }
+      } catch (error) {
+        setApiStatus("Tutor fallback", "offline");
+      }
       window.setTimeout(() => appendMessage(tutorReply(value), "assistant"), 260);
     });
 
@@ -1421,19 +1842,39 @@
 
     document.getElementById("flipCardBtn").addEventListener("click", () => document.getElementById("flashcard").classList.add("flipped"));
     document.getElementById("flipBackBtn").addEventListener("click", () => document.getElementById("flashcard").classList.remove("flipped"));
-    document.getElementById("cardHard").addEventListener("click", () => nextCard(0));
-    document.getElementById("cardGood").addEventListener("click", () => nextCard(1));
-    document.getElementById("cardEasy").addEventListener("click", () => nextCard(1));
+    document.getElementById("cardHard").addEventListener("click", () => nextCard(0, "HARD"));
+    document.getElementById("cardGood").addEventListener("click", () => nextCard(1, "GOOD"));
+    document.getElementById("cardEasy").addEventListener("click", () => nextCard(1, "EASY"));
 
-    document.getElementById("postSignalBtn").addEventListener("click", () => {
+    document.getElementById("postSignalBtn").addEventListener("click", async () => {
+      const payload = {
+        title: "New revision sprint opened",
+        body: "Distributed Systems group sprint scheduled for tonight at 20:00.",
+        source: "You"
+      };
+      try {
+        if (apiConnected) {
+          const signal = await apiRequest("/api/feed", {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+          feedItems.unshift(mapSignal(signal));
+          renderFeed();
+          renderDashboardPreviews(plannerBase, feedItems);
+          return;
+        }
+      } catch (error) {
+        setApiStatus("Signal saved locally", "offline");
+      }
       feedItems.unshift({
         icon: "bolt",
         color: "text-plum",
-        title: "New revision sprint opened",
+        title: payload.title,
         meta: "You · just now",
-        body: "Distributed Systems group sprint scheduled for tonight at 20:00."
+        body: payload.body
       });
       renderFeed();
+      renderDashboardPreviews(plannerBase, feedItems);
     });
 
     document.getElementById("globalSearch").addEventListener("input", event => {
@@ -1451,6 +1892,8 @@
     renderFeed();
     renderMarketplace();
     renderModeration();
+    renderDashboardPreviews(plannerBase, feedItems);
+    bootstrapApi();
   </script>
 </body>
 </html>
