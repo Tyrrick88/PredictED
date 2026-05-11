@@ -1,6 +1,7 @@
 package com.predicted.api.auth;
 
 import com.predicted.api.common.Models.UserProfile;
+import com.predicted.api.persistence.AppUserRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +21,16 @@ public class AuthController {
 
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
+  private final AppUserRepository userRepository;
 
-  public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
+  public AuthController(
+      AuthenticationManager authenticationManager,
+      JwtService jwtService,
+      AppUserRepository userRepository
+  ) {
     this.authenticationManager = authenticationManager;
     this.jwtService = jwtService;
+    this.userRepository = userRepository;
   }
 
   @PostMapping("/login")
@@ -46,26 +53,9 @@ public class AuthController {
     return profileFor(principal.getName());
   }
 
-  public static UserProfile profileFor(String email) {
-    if ("admin@predicted.test".equalsIgnoreCase(email)) {
-      return new UserProfile(
-          "usr_admin",
-          "Grace Wanjiku",
-          email,
-          "predictED Operations",
-          "Platform Administration",
-          "Admin",
-          "ADMIN"
-      );
-    }
-    return new UserProfile(
-        "usr_alex",
-        "Alex Mwangi",
-        email,
-        "University of Nairobi",
-        "BSc. Computer Science",
-        "Year 3, Semester 2",
-        "STUDENT"
-    );
+  private UserProfile profileFor(String email) {
+    return userRepository.findByEmailIgnoreCase(email)
+        .orElseThrow(() -> new IllegalArgumentException("User not found: " + email))
+        .toProfile();
   }
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/planner")
 public class PlannerController {
@@ -21,12 +23,15 @@ public class PlannerController {
   }
 
   @GetMapping("/today")
-  public PlannerResponse today(@RequestParam(defaultValue = "3") int focusHours) {
-    return academicDataService.planner(focusHours);
+  public PlannerResponse today(
+      @RequestParam(defaultValue = "3") int focusHours,
+      Principal principal
+  ) {
+    return academicDataService.planner(principal.getName(), focusHours);
   }
 
   @PostMapping("/tasks/{taskId}/complete")
-  public StudyTask complete(@PathVariable String taskId) {
-    return academicDataService.completeTask(taskId);
+  public StudyTask complete(@PathVariable String taskId, Principal principal) {
+    return academicDataService.completeTask(principal.getName(), taskId);
   }
 }

@@ -1,6 +1,7 @@
 package com.predicted.api.config;
 
 import com.predicted.api.auth.JwtAuthenticationFilter;
+import com.predicted.api.persistence.AppUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -14,9 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -50,16 +50,13 @@ public class SecurityConfig {
   }
 
   @Bean
-  UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-    UserDetails student = User.withUsername("alex@predicted.test")
-        .password(passwordEncoder.encode("password"))
-        .roles("STUDENT")
-        .build();
-    UserDetails admin = User.withUsername("admin@predicted.test")
-        .password(passwordEncoder.encode("admin123"))
-        .roles("ADMIN")
-        .build();
-    return new InMemoryUserDetailsManager(student, admin);
+  UserDetailsService userDetailsService(AppUserRepository userRepository) {
+    return email -> userRepository.findByEmailIgnoreCase(email)
+        .map(user -> User.withUsername(user.getEmail())
+            .password(user.getPasswordHash())
+            .roles(user.getRole().name())
+            .build())
+        .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
   }
 
   @Bean

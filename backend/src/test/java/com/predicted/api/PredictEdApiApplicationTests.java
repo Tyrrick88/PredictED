@@ -2,7 +2,9 @@ package com.predicted.api;
 
 import com.predicted.api.auth.AuthRequest;
 import com.predicted.api.auth.AuthResponse;
+import com.predicted.api.common.Models.MpesaPaymentRequest;
 import com.predicted.api.common.Models.PredictionInput;
+import com.predicted.api.persistence.PaymentAttemptRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +20,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {
+        "spring.datasource.url=jdbc:h2:mem:predicted-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
+        "spring.jpa.hibernate.ddl-auto=create-drop"
+    }
+)
 class PredictEdApiApplicationTests {
 
   @LocalServerPort
@@ -26,6 +34,9 @@ class PredictEdApiApplicationTests {
 
   @Autowired
   TestRestTemplate restTemplate;
+
+  @Autowired
+  PaymentAttemptRepository paymentAttemptRepository;
 
   @Test
   void healthIsPublic() {
@@ -89,6 +100,33 @@ class PredictEdApiApplicationTests {
     assertThat(denied.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     assertThat(allowed.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(allowed.getBody()).isNotEmpty();
+  }
+
+  @Test
+  void plannerAndPaymentWritesPersistToDatabase() {
+    AuthResponse auth = login("alex@predicted.test", "password");
+
+    ResponseEntity<Map> completed = restTemplate.exchange(
+        url("/api/planner/tasks/task_ds_vectors/complete"),
+        HttpMethod.POST,
+        authorized(auth.token()),
+        Map.class
+    );
+
+    assertThat(completed.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(completed.getBody()).containsEntry("completed", true);
+
+    MpesaPaymentRequest request = new MpesaPaymentRequest("254700000000", 80, "pack_ds_final");
+    ResponseEntity<Map> payment = restTemplate.exchange(
+        url("/api/payments/mpesa/stk-push"),
+        HttpMethod.POST,
+        authorized(auth.token(), request),
+        Map.class
+    );
+
+    assertThat(payment.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(payment.getBody()).containsEntry("status", "QUEUED");
+    assertThat(paymentAttemptRepository.existsById((String) payment.getBody().get("checkoutRequestId"))).isTrue();
   }
 
   private AuthResponse login(String email, String password) {

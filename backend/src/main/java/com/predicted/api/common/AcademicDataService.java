@@ -1,6 +1,5 @@
 package com.predicted.api.common;
 
-import com.predicted.api.auth.AuthController;
 import com.predicted.api.common.Models.CoursePrediction;
 import com.predicted.api.common.Models.CreateFeedSignalRequest;
 import com.predicted.api.common.Models.DashboardOverview;
@@ -23,93 +22,121 @@ import com.predicted.api.common.Models.TopicPrediction;
 import com.predicted.api.common.Models.TutorRequest;
 import com.predicted.api.common.Models.TutorResponse;
 import com.predicted.api.common.Models.UserProfile;
+import com.predicted.api.persistence.AppUser;
+import com.predicted.api.persistence.AppUserRepository;
+import com.predicted.api.persistence.CourseEntity;
+import com.predicted.api.persistence.CourseRepository;
+import com.predicted.api.persistence.FeedSignalEntity;
+import com.predicted.api.persistence.FeedSignalRepository;
+import com.predicted.api.persistence.FlashcardEntity;
+import com.predicted.api.persistence.FlashcardRepository;
+import com.predicted.api.persistence.ModerationItemEntity;
+import com.predicted.api.persistence.ModerationItemRepository;
+import com.predicted.api.persistence.NotePackEntity;
+import com.predicted.api.persistence.NotePackRepository;
+import com.predicted.api.persistence.PaymentAttemptEntity;
+import com.predicted.api.persistence.PaymentAttemptRepository;
+import com.predicted.api.persistence.StudyTaskEntity;
+import com.predicted.api.persistence.StudyTaskRepository;
+import com.predicted.api.persistence.TopicPredictionEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.IntStream;
 
 @Service
+@Transactional(readOnly = true)
 public class AcademicDataService {
 
-  private final Map<String, CoursePrediction> courses;
-  private final List<StudyTask> baseTasks;
-  private final CopyOnWriteArrayList<FeedSignal> feedSignals;
-  private final List<Flashcard> flashcards;
-  private final List<NotePack> notePacks;
-  private final List<ModerationItem> moderationItems;
-  private final Set<String> completedTasks = ConcurrentHashMap.newKeySet();
-  private final Map<String, Integer> cardMastery = new ConcurrentHashMap<>();
+  private final AppUserRepository userRepository;
+  private final CourseRepository courseRepository;
+  private final StudyTaskRepository studyTaskRepository;
+  private final FeedSignalRepository feedSignalRepository;
+  private final FlashcardRepository flashcardRepository;
+  private final NotePackRepository notePackRepository;
+  private final ModerationItemRepository moderationItemRepository;
+  private final PaymentAttemptRepository paymentAttemptRepository;
 
-  public AcademicDataService() {
-    this.courses = seedCourses();
-    this.baseTasks = seedTasks();
-    this.feedSignals = new CopyOnWriteArrayList<>(seedFeed());
-    this.flashcards = seedFlashcards();
-    this.notePacks = seedNotePacks();
-    this.moderationItems = seedModeration();
+  public AcademicDataService(
+      AppUserRepository userRepository,
+      CourseRepository courseRepository,
+      StudyTaskRepository studyTaskRepository,
+      FeedSignalRepository feedSignalRepository,
+      FlashcardRepository flashcardRepository,
+      NotePackRepository notePackRepository,
+      ModerationItemRepository moderationItemRepository,
+      PaymentAttemptRepository paymentAttemptRepository
+  ) {
+    this.userRepository = userRepository;
+    this.courseRepository = courseRepository;
+    this.studyTaskRepository = studyTaskRepository;
+    this.feedSignalRepository = feedSignalRepository;
+    this.flashcardRepository = flashcardRepository;
+    this.notePackRepository = notePackRepository;
+    this.moderationItemRepository = moderationItemRepository;
+    this.paymentAttemptRepository = paymentAttemptRepository;
   }
 
   public DashboardOverview dashboard(String email) {
-    CoursePrediction distributedSystems = requireCourse("distributed");
+    CourseEntity distributedSystems = requireCourseEntity("distributed");
+    List<TopicPrediction> topics = mapTopics(distributedSystems);
     PredictionSummary prediction = new PredictionSummary(
-        distributedSystems.baseScore(),
-        gradeFor(distributedSystems.baseScore()),
-        distributedSystems.certainty(),
-        riskFor(distributedSystems.baseScore()),
+        distributedSystems.getBaseScore(),
+        gradeFor(distributedSystems.getBaseScore()),
+        distributedSystems.getCertainty(),
+        riskFor(distributedSystems.getBaseScore()),
         0.20,
-        distributedSystems.topics().stream().limit(3).map(TopicPrediction::topic).toList()
+        topics.stream().limit(3).map(TopicPrediction::topic).toList()
     );
 
     return new DashboardOverview(
-        AuthController.profileFor(email),
+        requireUser(email).toProfile(),
         prediction,
         new GamificationSummary(24, "Senior Scholar", 12450, 15000, 14, 128.5),
-        planner(3).tasks(),
+        planner(email, 3).tasks(),
         feed(),
-        flashcards.size(),
+        dueFlashcards(email).size(),
         4
     );
   }
 
+  public UserProfile profile(String email) {
+    return requireUser(email).toProfile();
+  }
+
   public List<CoursePrediction> courses() {
-    return List.copyOf(courses.values());
+    return courseRepository.findAllByOrderByDisplayOrderAsc()
+        .stream()
+        .map(this::toCoursePrediction)
+        .toList();
   }
 
   public CoursePrediction requireCourse(String courseId) {
-    CoursePrediction course = courses.get(courseId);
-    if (course == null) {
-      throw new ResourceNotFoundException("Course not found: " + courseId);
-    }
-    return course;
+    return toCoursePrediction(requireCourseEntity(courseId));
   }
 
   public PredictionResult simulate(String courseId, PredictionInput input) {
-    CoursePrediction course = requireCourse(courseId);
+    CourseEntity course = requireCourseEntity(courseId);
     int score = Math.round(
         (float) ((input.revisionAverage() * 0.36)
             + (input.attendance() * 0.16)
             + (input.pastPaperCoverage() * 0.28)
             + (input.assignmentScore() * 0.20))
     );
-    double expectedGpaLift = Math.round(((score - course.baseScore()) / 100.0) * 100.0) / 100.0;
+    double expectedGpaLift = Math.round(((score - course.getBaseScore()) / 100.0) * 100.0) / 100.0;
 
     return new PredictionResult(
-        course.courseId(),
+        course.getId(),
         score,
         gradeFor(score),
         riskFor(score),
-        certaintyFor(input, course.certainty()),
+        certaintyFor(input, course.getCertainty()),
         expectedGpaLift,
-        course.topics().stream()
+        mapTopics(course).stream()
             .sorted(Comparator.comparing(TopicPrediction::likelihood).reversed())
             .limit(3)
             .toList()
@@ -118,44 +145,45 @@ public class AcademicDataService {
 
   public List<MockQuestion> generateMock(String courseId) {
     CoursePrediction course = requireCourse(courseId);
-    List<MockQuestion> questions = new ArrayList<>();
-    for (int index = 0; index < Math.min(3, course.topics().size()); index += 1) {
-      TopicPrediction topic = course.topics().get(index);
-      String prompt = switch (index) {
-        case 0 -> "Explain " + topic.topic() + " using a lecturer-style worked example.";
-        case 1 -> "Compare two approaches related to " + topic.topic() + " and justify the stronger answer.";
-        default -> "Solve a short scenario involving " + topic.topic() + " and show each step.";
-      };
-      questions.add(new MockQuestion(
-          index + 1,
-          course.courseId(),
-          topic.topic(),
-          prompt,
-          index == 0 ? 12 : 8,
-          topic.recommendedAction()
-      ));
-    }
-    return questions;
+    List<TopicPrediction> topics = course.topics();
+    return IntStream.range(0, Math.min(3, topics.size()))
+        .mapToObj(index -> {
+          TopicPrediction topic = topics.get(index);
+          String prompt = switch (index) {
+            case 0 -> "Explain " + topic.topic() + " using a lecturer-style worked example.";
+            case 1 -> "Compare two approaches related to " + topic.topic() + " and justify the stronger answer.";
+            default -> "Solve a short scenario involving " + topic.topic() + " and show each step.";
+          };
+          return new MockQuestion(
+              index + 1,
+              course.courseId(),
+              topic.topic(),
+              prompt,
+              index == 0 ? 12 : 8,
+              topic.recommendedAction()
+          );
+        })
+        .toList();
   }
 
-  public PlannerResponse planner(int focusHours) {
+  public PlannerResponse planner(String email, int focusHours) {
     int boundedHours = Math.max(1, Math.min(5, focusHours));
-    int visibleTasks = Math.min(baseTasks.size(), Math.max(2, boundedHours + 1));
-    List<StudyTask> tasks = baseTasks.stream()
+    List<StudyTaskEntity> availableTasks = studyTaskRepository.findByUserEmailIgnoreCaseOrderByScheduledTimeAsc(email);
+    int visibleTasks = Math.min(availableTasks.size(), Math.max(2, boundedHours + 1));
+    List<StudyTask> tasks = availableTasks.stream()
         .limit(visibleTasks)
-        .map(task -> taskWithCompletion(task, completedTasks.contains(task.id())))
+        .map(this::toStudyTask)
         .toList();
     int totalMinutes = tasks.stream().mapToInt(StudyTask::minutes).sum();
     return new PlannerResponse(boundedHours, totalMinutes, tasks);
   }
 
-  public StudyTask completeTask(String taskId) {
-    StudyTask task = baseTasks.stream()
-        .filter(candidate -> candidate.id().equals(taskId))
-        .findFirst()
+  @Transactional
+  public StudyTask completeTask(String email, String taskId) {
+    StudyTaskEntity task = studyTaskRepository.findByIdAndUserEmailIgnoreCase(taskId, email)
         .orElseThrow(() -> new ResourceNotFoundException("Study task not found: " + taskId));
-    completedTasks.add(taskId);
-    return taskWithCompletion(task, true);
+    task.markCompleted();
+    return toStudyTask(studyTaskRepository.save(task));
   }
 
   public TutorResponse tutorReply(TutorRequest request) {
@@ -185,202 +213,182 @@ public class AcademicDataService {
     return new TutorResponse(answer, nextSteps, generatedCards);
   }
 
-  public List<Flashcard> dueFlashcards() {
-    return flashcards.stream()
-        .map(card -> new Flashcard(
-            card.id(),
-            card.course(),
-            card.question(),
-            card.answer(),
-            card.dueInHours(),
-            cardMastery.getOrDefault(card.id(), card.mastery())
-        ))
+  public List<Flashcard> dueFlashcards(String email) {
+    return flashcardRepository.findByUserEmailIgnoreCaseOrderByDueInHoursAscIdAsc(email)
+        .stream()
+        .map(this::toFlashcard)
         .toList();
   }
 
-  public FlashcardReviewResponse reviewFlashcard(String cardId, FlashcardRating rating) {
-    Flashcard card = flashcards.stream()
-        .filter(candidate -> candidate.id().equals(cardId))
-        .findFirst()
+  @Transactional
+  public FlashcardReviewResponse reviewFlashcard(String email, String cardId, FlashcardRating rating) {
+    FlashcardEntity card = flashcardRepository.findByIdAndUserEmailIgnoreCase(cardId, email)
         .orElseThrow(() -> new ResourceNotFoundException("Flashcard not found: " + cardId));
-    int current = cardMastery.getOrDefault(card.id(), card.mastery());
     int updated = switch (rating) {
-      case HARD -> Math.max(0, current - 5);
-      case GOOD -> Math.min(100, current + 8);
-      case EASY -> Math.min(100, current + 14);
+      case HARD -> Math.max(0, card.getMastery() - 5);
+      case GOOD -> Math.min(100, card.getMastery() + 8);
+      case EASY -> Math.min(100, card.getMastery() + 14);
     };
     int nextReviewHours = switch (rating) {
       case HARD -> 4;
       case GOOD -> 24;
       case EASY -> 72;
     };
-    cardMastery.put(card.id(), updated);
-    return new FlashcardReviewResponse(card.id(), rating, nextReviewHours, updated);
+    card.applyReview(nextReviewHours, updated);
+    flashcardRepository.save(card);
+    return new FlashcardReviewResponse(card.getId(), rating, nextReviewHours, updated);
   }
 
   public List<FeedSignal> feed() {
-    return feedSignals.stream()
-        .sorted(Comparator.comparing(FeedSignal::createdAt).reversed())
+    return feedSignalRepository.findAllByOrderByCreatedAtDesc()
+        .stream()
+        .map(this::toFeedSignal)
         .toList();
   }
 
-  public FeedSignal createFeedSignal(CreateFeedSignalRequest request) {
-    FeedSignal signal = new FeedSignal(
+  @Transactional
+  public FeedSignal createFeedSignal(String email, CreateFeedSignalRequest request) {
+    AppUser creator = userRepository.findByEmailIgnoreCase(email).orElse(null);
+    FeedSignalEntity signal = feedSignalRepository.save(new FeedSignalEntity(
         "sig_" + UUID.randomUUID().toString().substring(0, 8),
+        creator,
         "bolt",
         request.title(),
         request.source() == null || request.source().isBlank() ? "Student Signal" : request.source(),
         request.body(),
         Instant.now(),
         false
-    );
-    feedSignals.add(signal);
-    return signal;
+    ));
+    return toFeedSignal(signal);
   }
 
   public List<NotePack> notePacks() {
-    return notePacks;
+    return notePackRepository.findAllByOrderByDisplayOrderAsc()
+        .stream()
+        .map(this::toNotePack)
+        .toList();
   }
 
   public List<ModerationItem> moderationItems() {
-    return moderationItems;
+    return moderationItemRepository.findAllByOrderByDisplayOrderAsc()
+        .stream()
+        .map(this::toModerationItem)
+        .toList();
   }
 
-  public MpesaPaymentResponse initiateMpesaPayment(MpesaPaymentRequest request) {
-    return new MpesaPaymentResponse(
-        "ws_CO_" + UUID.randomUUID().toString().replace("-", "").substring(0, 18),
+  @Transactional
+  public MpesaPaymentResponse initiateMpesaPayment(String email, MpesaPaymentRequest request) {
+    String checkoutRequestId = "ws_CO_" + UUID.randomUUID().toString().replace("-", "").substring(0, 18);
+    String customerMessage = "STK push queued for " + request.phoneNumber()
+        + ". Complete payment of KES " + request.amountKes() + ".";
+    AppUser user = userRepository.findByEmailIgnoreCase(email).orElse(null);
+    PaymentAttemptEntity attempt = paymentAttemptRepository.save(new PaymentAttemptEntity(
+        checkoutRequestId,
+        user,
+        request.phoneNumber(),
+        request.amountKes(),
+        request.reference(),
         "QUEUED",
-        "STK push queued for " + request.phoneNumber() + ". Complete payment of KES " + request.amountKes() + "."
-    );
-  }
-
-  private Map<String, CoursePrediction> seedCourses() {
-    Map<String, CoursePrediction> seeded = new LinkedHashMap<>();
-    seeded.put("distributed", new CoursePrediction(
-        "distributed",
-        "Distributed Systems",
-        "Dr. Njuguna",
-        89,
-        74,
-        List.of(
-            new TopicPrediction("Vector clocks", 91, "High", "Show update, send, receive, and comparison rules."),
-            new TopicPrediction("Lamport timestamps", 88, "High", "Explain ordering limits and tie-breaking."),
-            new TopicPrediction("Mutual exclusion", 76, "Medium", "Compare token and permission approaches."),
-            new TopicPrediction("Replication consistency", 69, "Medium", "Use a real data-replica scenario.")
-        )
+        customerMessage,
+        Instant.now()
     ));
-    seeded.put("ai", new CoursePrediction(
-        "ai",
-        "Artificial Intelligence",
-        "Prof. Otieno",
-        84,
-        72,
-        List.of(
-            new TopicPrediction("Bayesian networks", 90, "High", "State graph assumptions before factorization."),
-            new TopicPrediction("A* search", 82, "High", "Mention admissibility and consistency."),
-            new TopicPrediction("Constraint satisfaction", 74, "Medium", "Show variable, domain, and constraint setup."),
-            new TopicPrediction("Minimax pruning", 66, "Medium", "Trace alpha and beta updates.")
-        )
-    ));
-    seeded.put("compiler", new CoursePrediction(
-        "compiler",
-        "Compiler Construction",
-        "Dr. Karanja",
-        86,
-        68,
-        List.of(
-            new TopicPrediction("FIRST/FOLLOW sets", 93, "High", "Write epsilon cases carefully."),
-            new TopicPrediction("LL(1) parsing table", 86, "High", "Check conflicts after filling every cell."),
-            new TopicPrediction("Lexical analysis", 72, "Medium", "Differentiate tokens, patterns, and lexemes."),
-            new TopicPrediction("Intermediate code", 61, "Medium", "Use triples or quadruples consistently.")
-        )
-    ));
-    seeded.put("data", new CoursePrediction(
-        "data",
-        "Data Mining",
-        "Dr. Achieng",
-        81,
-        76,
-        List.of(
-            new TopicPrediction("Association rules", 87, "High", "Compute support, confidence, and lift."),
-            new TopicPrediction("Decision trees", 82, "High", "Show information-gain calculations."),
-            new TopicPrediction("Clustering metrics", 78, "Medium", "Name the metric before interpreting it."),
-            new TopicPrediction("Naive Bayes", 70, "Medium", "State independence assumptions.")
-        )
-    ));
-    return seeded;
-  }
-
-  private List<StudyTask> seedTasks() {
-    return List.of(
-        new StudyTask("task_ds_vectors", LocalTime.of(14, 0), "High Yield", "Distributed Systems",
-            "Vector clocks sprint", "Practice vector clocks with 3-process timelines.", 35, "#cf3f4f", "HIGH", false),
-        new StudyTask("task_ai_bayes", LocalTime.of(16, 30), "Revision", "Artificial Intelligence",
-            "Bayesian networks", "Drill independence and d-separation.", 45, "#1d4ed8", "HIGH", false),
-        new StudyTask("task_compiler_ll1", LocalTime.of(19, 0), "Lab Prep", "Compiler Construction",
-            "LL(1) parsing table", "Build a parsing table from grammar exercises.", 55, "#0f9fbc", "MEDIUM", false),
-        new StudyTask("task_data_rules", LocalTime.of(21, 0), "Flashcards", "Data Mining",
-            "Association rules", "Review confidence, support, and lift.", 25, "#c97800", "MEDIUM", false)
+    return new MpesaPaymentResponse(
+        attempt.getCheckoutRequestId(),
+        attempt.getStatus(),
+        attempt.getCustomerMessage()
     );
   }
 
-  private List<FeedSignal> seedFeed() {
-    Instant now = Instant.now();
-    return List.of(
-        new FeedSignal("sig_cat_moved", "campaign", "AI CAT moved to Thursday", "Class rep",
-            "Venue changed to LT2. Lecturer confirmed question scope stays the same.", now.minusSeconds(18 * 60), true),
-        new FeedSignal("sig_data_pack", "description", "Data Mining past paper uploaded", "Marketplace",
-            "Includes 2023 marking guide and lecturer annotations.", now.minusSeconds(42 * 60), true),
-        new FeedSignal("sig_compiler_room", "groups", "Compiler lab sprint opened", "Study Group",
-            "8 students joined the FIRST/FOLLOW debugging room.", now.minusSeconds(60 * 60), false),
-        new FeedSignal("sig_ds_pattern", "verified", "Distributed Systems pattern verified", "Predictive Engine",
-            "Vector-clock questions appeared in 4 of 5 recent exams.", now.minusSeconds(2 * 60 * 60), true)
+  private AppUser requireUser(String email) {
+    return userRepository.findByEmailIgnoreCase(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+  }
+
+  private CourseEntity requireCourseEntity(String courseId) {
+    return courseRepository.findWithTopicsById(courseId)
+        .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
+  }
+
+  private CoursePrediction toCoursePrediction(CourseEntity course) {
+    return new CoursePrediction(
+        course.getId(),
+        course.getCourseName(),
+        course.getLecturer(),
+        course.getCertainty(),
+        course.getBaseScore(),
+        mapTopics(course)
     );
   }
 
-  private List<Flashcard> seedFlashcards() {
-    return List.of(
-        new Flashcard("card_vectors", "Distributed Systems", "What problem do vector clocks solve?",
-            "They infer causal ordering without a global clock.", 0, 62),
-        new Flashcard("card_bayes", "Artificial Intelligence", "What does d-separation test?",
-            "It tests conditional independence by checking whether evidence blocks graph paths.", 0, 58),
-        new Flashcard("card_ll1", "Compiler Construction", "What makes a grammar LL(1)?",
-            "One lookahead token chooses exactly one production per nonterminal.", 2, 54),
-        new Flashcard("card_lift", "Data Mining", "What does lift measure?",
-            "Observed co-occurrence compared with expected co-occurrence.", 3, 68)
-    );
+  private List<TopicPrediction> mapTopics(CourseEntity course) {
+    return course.getTopics().stream()
+        .sorted(Comparator.comparing(TopicPredictionEntity::getDisplayOrder))
+        .map(topic -> new TopicPrediction(
+            topic.getTopic(),
+            topic.getLikelihood(),
+            topic.getWeight(),
+            topic.getRecommendedAction()
+        ))
+        .toList();
   }
 
-  private List<NotePack> seedNotePacks() {
-    return List.of(
-        new NotePack("pack_ds_final", "Distributed Systems Final Pack", "Brian O.", 80, 4.9, "Verified", true),
-        new NotePack("pack_ai_cat", "AI CAT Revision Notes", "Mary W.", 45, 4.7, "Hot", true),
-        new NotePack("pack_compiler_labs", "Compiler Lab Walkthroughs", "CS Club", 120, 4.8, "Bundle", true),
-        new NotePack("pack_data_papers", "Data Mining Past Papers", "Amina K.", 60, 4.6, "New", false)
-    );
-  }
-
-  private List<ModerationItem> seedModeration() {
-    return List.of(
-        new ModerationItem("mod_ds_pack", "Distributed Systems Final Pack", "Notes", "Review", "Needs source confirmation"),
-        new ModerationItem("mod_cat_moved", "CAT moved to Thursday", "Feed", "Approved", "Verified by class rep"),
-        new ModerationItem("mod_compiler_pack", "Compiler Lab Walkthroughs", "Marketplace", "Review", "Check duplicate upload"),
-        new ModerationItem("mod_ds_group", "DS Past Paper Sprint", "Group", "Approved", "Community guidelines passed")
-    );
-  }
-
-  private StudyTask taskWithCompletion(StudyTask task, boolean completed) {
+  private StudyTask toStudyTask(StudyTaskEntity task) {
     return new StudyTask(
-        task.id(),
-        task.time(),
-        task.tag(),
-        task.course(),
-        task.title(),
-        task.description(),
-        task.minutes(),
-        task.accent(),
-        task.priority(),
-        completed
+        task.getId(),
+        task.getScheduledTime(),
+        task.getTag(),
+        task.getCourse(),
+        task.getTitle(),
+        task.getDescription(),
+        task.getMinutes(),
+        task.getAccent(),
+        task.getPriority(),
+        task.isCompleted()
+    );
+  }
+
+  private Flashcard toFlashcard(FlashcardEntity card) {
+    return new Flashcard(
+        card.getId(),
+        card.getCourse(),
+        card.getQuestion(),
+        card.getAnswer(),
+        card.getDueInHours(),
+        card.getMastery()
+    );
+  }
+
+  private FeedSignal toFeedSignal(FeedSignalEntity signal) {
+    return new FeedSignal(
+        signal.getId(),
+        signal.getIcon(),
+        signal.getTitle(),
+        signal.getSource(),
+        signal.getBody(),
+        signal.getCreatedAt(),
+        signal.isVerified()
+    );
+  }
+
+  private NotePack toNotePack(NotePackEntity notePack) {
+    return new NotePack(
+        notePack.getId(),
+        notePack.getTitle(),
+        notePack.getAuthor(),
+        notePack.getPriceKes(),
+        notePack.getRating(),
+        notePack.getTag(),
+        notePack.isVerified()
+    );
+  }
+
+  private ModerationItem toModerationItem(ModerationItemEntity item) {
+    return new ModerationItem(
+        item.getId(),
+        item.getItem(),
+        item.getType(),
+        item.getStatus(),
+        item.getReason()
     );
   }
 

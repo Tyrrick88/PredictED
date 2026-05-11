@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class FeedController {
   }
 
   @PostMapping
-  public FeedSignal create(@Valid @RequestBody CreateFeedSignalRequest request) {
-    return academicDataService.createFeedSignal(request);
+  public FeedSignal create(@Valid @RequestBody CreateFeedSignalRequest request, Principal principal) {
+    return academicDataService.createFeedSignal(principal.getName(), request);
   }
 }

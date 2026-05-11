@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -25,15 +26,16 @@ public class FlashcardController {
   }
 
   @GetMapping("/due")
-  public List<Flashcard> due() {
-    return academicDataService.dueFlashcards();
+  public List<Flashcard> due(Principal principal) {
+    return academicDataService.dueFlashcards(principal.getName());
   }
 
   @PostMapping("/{cardId}/review")
   public FlashcardReviewResponse review(
       @PathVariable String cardId,
-      @Valid @RequestBody FlashcardReviewRequest request
+      @Valid @RequestBody FlashcardReviewRequest request,
+      Principal principal
   ) {
-    return academicDataService.reviewFlashcard(cardId, request.rating());
+    return academicDataService.reviewFlashcard(principal.getName(), cardId, request.rating());
   }
 }

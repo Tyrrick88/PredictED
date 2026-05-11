@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -20,7 +22,10 @@ public class PaymentController {
   }
 
   @PostMapping("/mpesa/stk-push")
-  public MpesaPaymentResponse stkPush(@Valid @RequestBody MpesaPaymentRequest request) {
-    return academicDataService.initiateMpesaPayment(request);
+  public MpesaPaymentResponse stkPush(
+      @Valid @RequestBody MpesaPaymentRequest request,
+      Principal principal
+  ) {
+    return academicDataService.initiateMpesaPayment(principal.getName(), request);
   }
 }
