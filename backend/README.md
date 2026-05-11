@@ -42,7 +42,11 @@ curl http://localhost:8080/api/dashboard/overview \
 ## MVP endpoints
 
 - `POST /api/auth/login`
+- `POST /api/auth/register`
 - `GET /api/auth/me`
+- `GET /api/profile`
+- `PUT /api/profile`
+- `PUT /api/profile/courses`
 - `GET /api/dashboard/overview`
 - `GET /api/predictions/courses`
 - `GET /api/predictions/{courseId}`
@@ -59,9 +63,18 @@ curl http://localhost:8080/api/dashboard/overview \
 - `POST /api/payments/mpesa/stk-push`
 - `GET /api/admin/moderation` with admin token
 
-## Production profile placeholder
+## Database migrations
 
-The `postgres` profile is ready for environment-backed PostgreSQL, Redis, and JWT configuration:
+Flyway owns the schema. Hibernate is set to `validate`, so startup fails if the database schema does not match the JPA models.
+
+- Migrations live in `src/main/resources/db/migration`.
+- Local H2 runs migrations automatically on startup.
+- Existing local H2 files are baselined automatically, then the legacy-safe V2 enrollment migration runs.
+- For a totally fresh local database, delete the ignored `backend/data` directory and start the API again.
+
+## Production Postgres profile
+
+The `postgres` profile is ready for environment-backed PostgreSQL, Redis, JWT configuration, and Flyway migrations:
 
 ```bash
 SPRING_PROFILES_ACTIVE=postgres \
@@ -71,3 +84,11 @@ DATABASE_PASSWORD=predicted \
 JWT_SECRET='replace-with-a-long-production-secret' \
 mvn spring-boot:run
 ```
+
+Production defaults:
+
+- `JPA_DDL_AUTO=validate`
+- `FLYWAY_ENABLED=true`
+- `FLYWAY_BASELINE_ON_MIGRATE=false`
+
+For a new production database, leave baseline disabled so Flyway creates the full schema from `V1__initial_schema.sql`. Only set `FLYWAY_BASELINE_ON_MIGRATE=true` when connecting to an existing schema you have already inspected.
