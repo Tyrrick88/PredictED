@@ -11,7 +11,7 @@ Payments are intentionally skipped for this deployment. Marketplace files can be
 
 Create a Railway project from this GitHub repo and add a PostgreSQL database.
 
-Set these backend variables:
+Open the backend service, not the PostgreSQL service, then go to Variables. If Railway offers variables from `.env.example`, import them there. You can also paste this block into the raw editor:
 
 ```bash
 SPRING_PROFILES_ACTIVE=postgres
@@ -34,6 +34,8 @@ SPRING_DATASOURCE_URL=jdbc:postgresql://host:port/database
 SPRING_DATASOURCE_USERNAME=postgres-user
 SPRING_DATASOURCE_PASSWORD=postgres-password
 ```
+
+The root `.env.example` uses Railway variable references like `${{Postgres.PGHOST}}`. If your database service has a different name, update `Postgres` in those references to match the actual database service name.
 
 If using uploads in production, add a Railway volume mounted at `/data`.
 
