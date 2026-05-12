@@ -3,7 +3,7 @@
 This repo is set up for a split deployment:
 
 - Frontend: Vercel, project root `frontend`
-- Backend: Railway, project root repo root using `railway.json` and `nixpacks.toml`
+- Backend: Railway, project root repo root using `railway.json` and `Dockerfile`
 
 Payments are intentionally skipped for this deployment. Marketplace files can be uploaded and downloaded, but paid checkout is not active.
 
@@ -15,7 +15,6 @@ Open the backend service, not the PostgreSQL service, then go to Variables. If R
 
 ```bash
 SPRING_PROFILES_ACTIVE=postgres
-NIXPACKS_JDK_VERSION=21
 PORT=8080
 JWT_SECRET=replace-with-64-plus-random-characters
 CORS_ALLOWED_ORIGIN_PATTERNS=https://predict-ed.vercel.app
