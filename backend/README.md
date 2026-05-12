@@ -104,7 +104,7 @@ Default mode is deterministic fallback so local development and tests work witho
 ```bash
 AI_PROVIDER=openai \
 OPENAI_API_KEY='sk-your-key' \
-OPENAI_MODEL=gpt-5.5 \
+OPENAI_MODEL=gpt-4o \
 mvn spring-boot:run
 ```
 

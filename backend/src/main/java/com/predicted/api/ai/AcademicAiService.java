@@ -45,7 +45,7 @@ public class AcademicAiService {
       ObjectMapper objectMapper,
       @Value("${predicted.ai.provider:fallback}") String provider,
       @Value("${predicted.ai.openai.api-key:}") String apiKey,
-      @Value("${predicted.ai.openai.model:gpt-5.5}") String model,
+      @Value("${predicted.ai.openai.model:gpt-4o}") String model,
       @Value("${predicted.ai.openai.base-url:https://api.openai.com/v1}") String baseUrl,
       @Value("${predicted.ai.openai.timeout-seconds:25}") int timeoutSeconds
   ) {
