@@ -75,7 +75,7 @@ For split hosting:
 - Deploy the backend to Railway from the repo root. `railway.json` and `nixpacks.toml` build the Spring Boot app from `backend`.
 - Deploy the frontend to Vercel from the `frontend` root. The build defaults to `https://predicted-production-0574.up.railway.app`; set `PREDICTED_API_BASE` in Vercel only if the Railway backend URL changes.
 - Set `CORS_ALLOWED_ORIGIN_PATTERNS` in Railway to `https://predict-ed.vercel.app`.
-- Add Railway variables on the backend service Variables tab. The root `.env.example` is safe to import or paste into the raw editor.
+- Add Railway variables on the backend service Variables tab. The root `.env.example` is safe to import or paste into the raw editor, and `NIXPACKS_JDK_VERSION=21` is required because the backend compiles with Java 21.
 
 ## File uploads
 

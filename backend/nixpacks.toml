@@ -1,0 +1,11 @@
+[variables]
+NIXPACKS_JDK_VERSION = "21"
+
+[phases.setup]
+nixPkgs = ["jdk21", "maven"]
+
+[phases.build]
+cmds = ["mvn -DskipTests package"]
+
+[start]
+cmd = "java -jar target/predicted-api-0.1.0-SNAPSHOT.jar"

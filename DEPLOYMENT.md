@@ -15,6 +15,7 @@ Open the backend service, not the PostgreSQL service, then go to Variables. If R
 
 ```bash
 SPRING_PROFILES_ACTIVE=postgres
+NIXPACKS_JDK_VERSION=21
 PORT=8080
 JWT_SECRET=replace-with-64-plus-random-characters
 CORS_ALLOWED_ORIGIN_PATTERNS=https://predict-ed.vercel.app
