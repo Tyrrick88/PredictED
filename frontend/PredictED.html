@@ -9,7 +9,7 @@
   <link href="assets/app.css" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <script>
     (() => {
@@ -28,7 +28,11 @@
     *, *::before, *::after { box-sizing: border-box; }
     :root { color-scheme: light; }
     html.dark { color-scheme: dark; }
-    html { scroll-behavior: smooth; font-size: 15px; }
+    html {
+      scroll-behavior: smooth;
+      font-size: 15px;
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    }
     body {
       min-height: 100vh;
       background: #f0f7ff;
@@ -37,7 +41,9 @@
       overflow-x: hidden;
       font-size: 0.9rem;
       line-height: 1.55;
+      font-family: inherit;
     }
+    button, input, select, textarea { font-family: inherit; }
     h1 { font-size: 1.2rem; }
     h2 { font-size: 1.05rem; }
     h3 { font-size: 0.95rem; }
