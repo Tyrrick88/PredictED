@@ -3,10 +3,10 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
 COPY backend/pom.xml backend/pom.xml
-RUN mvn -f backend/pom.xml -DskipTests dependency:go-offline
+RUN mvn -f backend/pom.xml -Dmaven.test.skip=true dependency:go-offline
 
 COPY backend/src backend/src
-RUN mvn -f backend/pom.xml -DskipTests package
+RUN mvn -f backend/pom.xml -Dmaven.test.skip=true package
 
 FROM eclipse-temurin:21-jre-jammy AS runtime
 
