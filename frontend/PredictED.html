@@ -142,30 +142,31 @@
       display: block;
       width: clamp(7.25rem, 18vw, 10rem);
       height: clamp(2.4rem, 4vw, 3rem);
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
-      border-radius: 0.72rem;
-      background: #ffffff;
-      box-shadow: 0 6px 18px rgba(7,30,39,0.06);
+      border-radius: 0;
+      background: transparent;
+      filter: drop-shadow(0 4px 10px rgba(7,30,39,0.08));
     }
     .drawer-brand-logo,
     .auth-brand-logo {
       display: block;
       width: 10.5rem;
       height: 3rem;
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
-      border-radius: 0.72rem;
-      background: #ffffff;
+      border-radius: 0;
+      background: transparent;
+      filter: drop-shadow(0 4px 10px rgba(7,30,39,0.08));
     }
     .drawer-brand-logo {
       width: 11.75rem;
+      filter: invert(1) hue-rotate(180deg) saturate(1.05) drop-shadow(0 4px 10px rgba(0,0,0,0.16));
     }
     .auth-brand-logo-large {
       width: min(15rem, 72vw);
       height: 4.4rem;
-      border-radius: 0.9rem;
-      box-shadow: 0 18px 42px rgba(7,30,39,0.1);
+      border-radius: 0;
     }
     .content-offset {
       padding-top: calc(5.8rem + env(safe-area-inset-top)) !important;
@@ -455,6 +456,10 @@
         radial-gradient(circle at 16% 12%, rgba(91,124,255,0.18), transparent 22rem),
         radial-gradient(circle at 82% 82%, rgba(20,184,166,0.12), transparent 24rem),
         linear-gradient(160deg, #07141c 0%, #0c202b 52%, #091a23 100%);
+    }
+    html.dark .app-header-logo,
+    html.dark .auth-brand-logo {
+      filter: invert(1) hue-rotate(180deg) saturate(1.05) drop-shadow(0 4px 10px rgba(0,0,0,0.2));
     }
     html.dark .glass,
     html.dark .desktop-header-bar,
@@ -913,7 +918,7 @@
   <div class="fixed inset-0 z-[90] flex justify-center overflow-y-auto px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="auth-shell">
       <div class="mb-5 flex justify-center">
-        <img class="auth-brand-logo auth-brand-logo-large border border-line p-1.5" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
+        <img class="auth-brand-logo auth-brand-logo-large" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
       </div>
       <div class="panel w-full p-5 shadow-panel">
         <div class="flex items-start justify-between gap-4 border-b border-line pb-4">
@@ -982,7 +987,7 @@
       <!-- Profile header -->
       <div class="px-5 pt-8 pb-5" style="background:linear-gradient(135deg,#111a5c 0%,#1d4ed8 100%)">
         <div class="flex items-center justify-between mb-4">
-          <img class="drawer-brand-logo p-1.5" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
+          <img class="drawer-brand-logo" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
           <button class="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 text-white transition-colors hover:bg-white/25" id="closeDrawer" aria-label="Close menu">
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
