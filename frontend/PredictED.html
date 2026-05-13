@@ -367,11 +367,51 @@
 
     /* ── Chips ────────────────────────────────────────── */
     :where(.chip) {
+      --chip-bg: linear-gradient(135deg, #edf4ff 0%, #e1eeff 100%);
+      --chip-border: #bfd3ff;
+      --chip-text: #2f5dc9;
+      --chip-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
       display:inline-flex; align-items:center; gap:0.3rem;
-      border-radius:999px; border:1px solid #d6e5ee; background:#ffffff;
+      border-radius:999px; border:1px solid var(--chip-border); background:var(--chip-bg);
       padding:0.3rem 0.6rem;
-      font:600 0.7rem/1.1 "JetBrains Mono",monospace; color:#536471;
+      font:600 0.7rem/1.1 "JetBrains Mono",monospace; color:var(--chip-text);
       white-space:nowrap;
+      box-shadow: var(--chip-shadow);
+    }
+    .chip-blue {
+      --chip-bg: linear-gradient(135deg, #edf4ff 0%, #e1eeff 100%);
+      --chip-border: #bfd3ff;
+      --chip-text: #2f5dc9;
+    }
+    .chip-cyan {
+      --chip-bg: linear-gradient(135deg, #e8fbff 0%, #d9f5fb 100%);
+      --chip-border: #9edeea;
+      --chip-text: #0f8ba8;
+    }
+    .chip-violet {
+      --chip-bg: linear-gradient(135deg, #f3ecff 0%, #eadfff 100%);
+      --chip-border: #d4b8ff;
+      --chip-text: #7444c9;
+    }
+    .chip-emerald {
+      --chip-bg: linear-gradient(135deg, #ebfff3 0%, #dcfce7 100%);
+      --chip-border: #9ee6b8;
+      --chip-text: #15803d;
+    }
+    .chip-amber {
+      --chip-bg: linear-gradient(135deg, #fff7df 0%, #feefc3 100%);
+      --chip-border: #f4cf74;
+      --chip-text: #b86b00;
+    }
+    .chip-rose {
+      --chip-bg: linear-gradient(135deg, #fff0f3 0%, #ffe1e7 100%);
+      --chip-border: #f6b8c5;
+      --chip-text: #c23f58;
+    }
+    .chip-slate {
+      --chip-bg: linear-gradient(135deg, #f3f6f8 0%, #e7edf2 100%);
+      --chip-border: #cad5df;
+      --chip-text: #526273;
     }
 
     /* ── Theme controls ───────────────────────────────── */
@@ -538,6 +578,41 @@
       border-color: #303030;
       color: #ffffff;
       box-shadow: none;
+    }
+    html.dark .chip-blue {
+      --chip-bg: rgba(59, 130, 246, 0.16);
+      --chip-border: rgba(96, 165, 250, 0.38);
+      --chip-text: #dbeafe;
+    }
+    html.dark .chip-cyan {
+      --chip-bg: rgba(6, 182, 212, 0.16);
+      --chip-border: rgba(34, 211, 238, 0.38);
+      --chip-text: #cffafe;
+    }
+    html.dark .chip-violet {
+      --chip-bg: rgba(139, 92, 246, 0.17);
+      --chip-border: rgba(167, 139, 250, 0.38);
+      --chip-text: #ede9fe;
+    }
+    html.dark .chip-emerald {
+      --chip-bg: rgba(16, 185, 129, 0.16);
+      --chip-border: rgba(52, 211, 153, 0.36);
+      --chip-text: #d1fae5;
+    }
+    html.dark .chip-amber {
+      --chip-bg: rgba(245, 158, 11, 0.17);
+      --chip-border: rgba(251, 191, 36, 0.38);
+      --chip-text: #fef3c7;
+    }
+    html.dark .chip-rose {
+      --chip-bg: rgba(244, 63, 94, 0.16);
+      --chip-border: rgba(251, 113, 133, 0.36);
+      --chip-text: #ffe4e6;
+    }
+    html.dark .chip-slate {
+      --chip-bg: rgba(148, 163, 184, 0.13);
+      --chip-border: rgba(148, 163, 184, 0.28);
+      --chip-text: #f5f5f5;
     }
     html.dark .btn-ghost,
     html.dark .drawer-menu-item,
@@ -1333,9 +1408,9 @@
                 <div class="grid min-h-[310px] md:grid-cols-[minmax(0,1fr)_minmax(280px,320px)] xl:grid-cols-[minmax(0,1fr)_minmax(300px,340px)]">
                   <div class="desktop-hero-copy p-5 md:p-7">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span class="chip"><span class="material-symbols-outlined text-[16px]">school</span><span id="dashboardUniversity">University of Nairobi</span></span>
-                      <span class="chip"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
-                      <span class="chip"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
+                      <span class="chip chip-violet"><span class="material-symbols-outlined text-[16px]">school</span><span id="dashboardUniversity">University of Nairobi</span></span>
+                      <span class="chip chip-cyan"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
+                      <span class="chip chip-emerald"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
                     </div>
                     <h2 class="desktop-hero-title mt-5 max-w-2xl text-3xl font-black tracking-tight text-navy md:text-5xl" id="dashboardHeadline">Semester 2 final prep is trending to B+.</h2>
                     <p class="mt-3 max-w-2xl text-base leading-7 text-muted" id="dashboardSubcopy">Distributed Systems and Compiler Construction are driving the risk score. The next three sessions are weighted toward past-paper patterns from lecturer history.</p>
@@ -1634,7 +1709,7 @@
                       <p class="font-mono text-[11px] font-bold uppercase text-muted">AI Mock Generation</p>
                       <h3 class="mt-1 text-xl font-black text-navy">Generated paper</h3>
                     </div>
-                    <span class="chip" id="mockStatus"><span class="material-symbols-outlined text-[16px]">pending</span>Ready</span>
+                    <span class="chip chip-amber" id="mockStatus"><span class="material-symbols-outlined text-[16px]">pending</span>Ready</span>
                   </div>
                   <ol class="mt-4 grid gap-3" id="mockList"></ol>
                 </div>
@@ -1652,7 +1727,7 @@
                       <h2 class="mt-1 text-2xl font-black text-navy">Adaptive academic coach</h2>
                       <p class="mt-1 text-sm text-muted">Set your institution, learning path, deadlines, and study rhythm to build a personalized revision flow.</p>
                     </div>
-                    <span class="chip" id="plannerUrgencyChip"><span class="material-symbols-outlined text-[16px]">flare</span>Planner ready</span>
+                    <span class="chip chip-violet" id="plannerUrgencyChip"><span class="material-symbols-outlined text-[16px]">flare</span>Planner ready</span>
                   </div>
                   <form class="mt-5 grid gap-4" id="plannerSetupForm">
                     <div class="grid gap-3 md:grid-cols-2">
@@ -1785,7 +1860,7 @@
                       <p class="font-mono text-[11px] font-bold uppercase text-muted">Tutor Session</p>
                       <h2 class="mt-1 text-2xl font-black text-navy">Exam-grounded support</h2>
                     </div>
-                    <span class="chip" id="tutorContextChip"><span class="material-symbols-outlined text-[16px]">memory</span>Context: 4 courses</span>
+                    <span class="chip chip-cyan" id="tutorContextChip"><span class="material-symbols-outlined text-[16px]">memory</span>Context: 4 courses</span>
                   </div>
                 </div>
                 <div class="flex-1 space-y-4 overflow-y-auto bg-wash/70 p-4 md:p-6" id="chatMessages">
@@ -1867,7 +1942,7 @@
                     <p class="font-mono text-[11px] font-bold uppercase text-muted">Spaced Repetition</p>
                     <h2 class="mt-1 text-2xl font-black text-navy">High-yield card deck</h2>
                   </div>
-                  <span class="chip" id="cardProgress">1 / 5</span>
+                  <span class="chip chip-blue" id="cardProgress">1 / 5</span>
                 </div>
 
                 <div class="flip-card mt-6" id="flashcard">
@@ -1954,16 +2029,16 @@
                 <div class="panel p-5">
                   <p class="font-mono text-[11px] font-bold uppercase text-muted">Trending</p>
                   <div class="mt-4 flex flex-wrap gap-2">
-                    <span class="chip">#DistributedSystems</span>
-                    <span class="chip">#PastPapers</span>
-                    <span class="chip">#CATMoved</span>
-                    <span class="chip">#CompilerLab</span>
+                    <span class="chip chip-violet">#DistributedSystems</span>
+                    <span class="chip chip-cyan">#PastPapers</span>
+                    <span class="chip chip-amber">#CATMoved</span>
+                    <span class="chip chip-rose">#CompilerLab</span>
                   </div>
                 </div>
                 <div class="panel p-5">
                   <p class="font-mono text-[11px] font-bold uppercase text-muted">Payments</p>
                   <h3 class="mt-1 text-xl font-black text-navy">Paused</h3>
-                  <span class="chip mt-4"><span class="material-symbols-outlined text-[16px]">pause_circle</span>Launch mode</span>
+                  <span class="chip chip-amber mt-4"><span class="material-symbols-outlined text-[16px]">pause_circle</span>Launch mode</span>
                 </div>
               </aside>
             </div>
@@ -2018,7 +2093,7 @@
                     <p class="font-mono text-[11px] font-bold uppercase text-muted">Access Model</p>
                     <h3 class="mt-1 text-xl font-black text-navy">Open launch library</h3>
                   </div>
-                  <span class="chip"><span class="material-symbols-outlined text-[16px]">pause_circle</span>Payments paused</span>
+                  <span class="chip chip-amber"><span class="material-symbols-outlined text-[16px]">pause_circle</span>Payments paused</span>
                 </div>
                 <div class="mt-5 grid gap-3 md:grid-cols-5">
                   <div class="rounded-lg border border-line bg-white p-4">
@@ -2059,7 +2134,7 @@
                     <p class="font-mono text-[11px] font-bold uppercase text-muted">Student Profile</p>
                     <h2 class="mt-1 text-2xl font-black text-navy">Account details</h2>
                   </div>
-                  <span class="chip"><span class="material-symbols-outlined text-[16px]">verified_user</span><span id="profileRole">Student</span></span>
+                  <span class="chip chip-emerald"><span class="material-symbols-outlined text-[16px]">verified_user</span><span id="profileRole">Student</span></span>
                 </div>
                 <div class="mt-5 rounded-lg border border-line bg-wash p-4">
                   <p class="font-mono text-[11px] uppercase text-muted">Email</p>
@@ -2100,7 +2175,7 @@
                     <p class="font-mono text-[11px] font-bold uppercase text-muted">Enrollment</p>
                     <h2 class="mt-1 text-2xl font-black text-navy">Course load</h2>
                   </div>
-                  <span class="chip"><span class="material-symbols-outlined text-[16px]">menu_book</span><span id="profileCourseCount">0 courses</span></span>
+                  <span class="chip chip-blue"><span class="material-symbols-outlined text-[16px]">menu_book</span><span id="profileCourseCount">0 courses</span></span>
                 </div>
                 <div class="mt-5 grid gap-3" id="profileCourseList"></div>
                 <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-line pt-4">
@@ -2123,7 +2198,7 @@
                       <p class="font-mono text-[11px] font-bold uppercase text-muted">Moderation Dashboard</p>
                       <h2 class="mt-1 text-2xl font-black text-navy">Review queue</h2>
                     </div>
-                    <span class="chip"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>Admin</span>
+                    <span class="chip chip-rose"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>Admin</span>
                   </div>
                   <div class="mt-5 overflow-hidden rounded-lg border border-line">
                     <div class="grid grid-cols-[1fr_130px_120px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
@@ -2141,7 +2216,7 @@
                       <p class="font-mono text-[11px] font-bold uppercase text-muted">Academic Expansion</p>
                       <h3 class="mt-1 text-2xl font-black text-navy">Manage non-degree learning paths</h3>
                     </div>
-                    <span class="chip" id="adminAcademicSelectionChip"><span class="material-symbols-outlined text-[16px]">hub</span>No path selected</span>
+                    <span class="chip chip-cyan" id="adminAcademicSelectionChip"><span class="material-symbols-outlined text-[16px]">hub</span>No path selected</span>
                   </div>
                   <div class="mt-5 grid gap-3 md:grid-cols-[1fr_220px]">
                     <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminAcademicSearch" placeholder="Search categories, tags, institutions, or paths" type="text" />
@@ -2280,19 +2355,19 @@
                   <div class="mt-4 grid gap-3">
                     <div class="flex items-center justify-between border-t border-line pt-3">
                       <span class="font-bold text-ink">Spring Boot API</span>
-                      <span class="chip text-mint">OK</span>
+                      <span class="chip chip-emerald">OK</span>
                     </div>
                     <div class="flex items-center justify-between border-t border-line pt-3">
                       <span class="font-bold text-ink">PostgreSQL</span>
-                      <span class="chip text-mint">OK</span>
+                      <span class="chip chip-emerald">OK</span>
                     </div>
                     <div class="flex items-center justify-between border-t border-line pt-3">
                       <span class="font-bold text-ink">AI Coach</span>
-                      <span class="chip text-gold">Adaptive</span>
+                      <span class="chip chip-amber">Adaptive</span>
                     </div>
                     <div class="flex items-center justify-between border-t border-line pt-3">
                       <span class="font-bold text-ink">Catalog Engine</span>
-                      <span class="chip text-mint">Live</span>
+                      <span class="chip chip-emerald">Live</span>
                     </div>
                   </div>
                 </div>
@@ -2678,6 +2753,26 @@
     function formatDifficulty(value = "") {
       const normalized = String(value || "").toLowerCase().replaceAll("_", " ");
       return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "Flexible";
+    }
+
+    const chipTonePalette = ["chip-blue", "chip-cyan", "chip-violet", "chip-emerald", "chip-amber", "chip-rose"];
+
+    function chipTone(seed = "", preferred = "") {
+      if (preferred) return preferred;
+      const value = normalizeCatalogValue(seed);
+      if (!value) return "chip-blue";
+      if (/(live|verified|success|synced|ready|done|ok|download)/.test(value)) return "chip-emerald";
+      if (/(missed|urgent|critical|danger|alert|hot|warning)/.test(value)) return "chip-rose";
+      if (/(paused|pending|review|rescheduled|deadline|countdown|cat|quiz|exam|adaptive)/.test(value)) return "chip-amber";
+      if (/(admin|planner|calendar|context|memory|course|school|profile|hub)/.test(value)) return "chip-violet";
+      if (/(note|resource|study|revision|time|streak|module)/.test(value)) return "chip-cyan";
+      let hash = 0;
+      for (const char of value) hash = ((hash * 31) + char.charCodeAt(0)) >>> 0;
+      return chipTonePalette[hash % chipTonePalette.length];
+    }
+
+    function chipClass(seed = "", preferred = "") {
+      return `chip ${chipTone(seed, preferred)}`;
     }
 
     function plannerPathOptionLabel(path) {
@@ -3208,7 +3303,9 @@
           </div>
         </li>
       `).join("") : `<li class="rounded-lg border border-line bg-white p-3 text-sm text-muted">No mock questions available yet.</li>`;
-      document.getElementById("mockStatus").innerHTML = generated
+      const mockStatus = document.getElementById("mockStatus");
+      mockStatus.className = chipClass(generated ? "generated" : "ready", generated ? "chip-emerald" : "chip-amber");
+      mockStatus.innerHTML = generated
         ? `${icon("done", "text-[16px]")}Generated`
         : `${icon("pending", "text-[16px]")}Ready`;
     }
@@ -3324,7 +3421,7 @@
     }
 
     function plannerMetricChip(iconName, label) {
-      return `<span class="chip">${icon(iconName, "text-[16px]")}${escapeHtml(label)}</span>`;
+      return `<span class="${chipClass(label)}">${icon(iconName, "text-[16px]")}${escapeHtml(label)}</span>`;
     }
 
     function plannerSessionPreviewTasks(data = smartPlanner) {
@@ -3358,7 +3455,12 @@
     function renderPlanner() {
       const data = smartPlanner || buildLocalPlannerDashboard();
       const path = data.selectedPath;
-      document.getElementById("plannerUrgencyChip").innerHTML = data.urgencyMode
+      const urgencyChip = document.getElementById("plannerUrgencyChip");
+      urgencyChip.className = chipClass(
+        data.urgencyMode ? "urgency mode" : data.configured ? "planner ready" : "setup needed",
+        data.urgencyMode ? "chip-rose" : data.configured ? "chip-emerald" : "chip-violet"
+      );
+      urgencyChip.innerHTML = data.urgencyMode
         ? `${icon("whatshot", "text-[16px]")}Urgency mode`
         : `${icon("flare", "text-[16px]")}${data.configured ? "Planner ready" : "Setup needed"}`;
       document.getElementById("plannerMetricChips").innerHTML = [
@@ -3377,10 +3479,10 @@
             </div>
             <div>
               <div class="flex flex-wrap items-center gap-2">
-                <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${escapeHtml(session.tag)}</span>
-                <span class="font-mono text-[10px] text-muted">${escapeHtml(session.priority)}</span>
-                ${session.rescheduled ? `<span class="chip text-gold">${icon("update", "text-[14px]")}Rescheduled</span>` : ""}
-                ${session.missed ? `<span class="chip text-coral">${icon("warning", "text-[14px]")}Missed</span>` : ""}
+                <span class="${chipClass(session.tag)}">${escapeHtml(session.tag)}</span>
+                <span class="${chipClass(session.priority, session.priority === "CRITICAL" ? "chip-rose" : session.priority === "HIGH" ? "chip-violet" : session.priority === "MEDIUM" ? "chip-cyan" : "chip-amber")}">${escapeHtml(session.priority)}</span>
+                ${session.rescheduled ? `<span class="${chipClass("rescheduled", "chip-amber")}">${icon("update", "text-[14px]")}Rescheduled</span>` : ""}
+                ${session.missed ? `<span class="${chipClass("missed", "chip-rose")}">${icon("warning", "text-[14px]")}Missed</span>` : ""}
               </div>
               <h3 class="mt-2 text-lg font-black text-navy">${escapeHtml(session.course)}</h3>
               <p class="mt-1 text-sm font-semibold text-ink">${escapeHtml(session.title)}</p>
@@ -3425,7 +3527,7 @@
         <div class="border-t border-line pt-3">
           <div class="flex items-center justify-between gap-3">
             <p class="font-bold text-ink">${escapeHtml(item.title)}</p>
-            <span class="chip ${item.urgent ? "text-coral" : "text-gold"}">${item.daysRemaining}d</span>
+            <span class="${chipClass(item.urgent ? "urgent countdown" : "countdown", item.urgent ? "chip-rose" : "chip-amber")}">${item.daysRemaining}d</span>
           </div>
           <p class="mt-1 text-sm text-muted">${escapeHtml(item.type)} · ${escapeHtml(String(item.dueAt).replace("T", " ").slice(0, 16))}</p>
         </div>
@@ -3643,6 +3745,10 @@
         || Object.keys(courseTopics || {}).length
         || defaultCourseCatalog.length;
       if (contextChip) {
+        contextChip.className = chipClass(
+          tutorNotes.length ? "notes attached" : "tutor context",
+          tutorNotes.length ? "chip-emerald" : "chip-cyan"
+        );
         contextChip.innerHTML = `${icon("memory", "text-[16px]")}Context: ${courseCount} courses${tutorNotes.length ? ` · ${tutorNotes.length} note${tutorNotes.length === 1 ? "" : "s"}` : ""}`;
       }
       if (!list || !clearButton || !status || !summary || !panel) return;
@@ -3665,7 +3771,7 @@
       status.textContent = `${tutorNotes.length} attached note${tutorNotes.length === 1 ? "" : "s"} will be sent with each tutor question.`;
       summary.textContent = `${tutorNotes.length} note${tutorNotes.length === 1 ? "" : "s"} attached for this session.`;
       list.innerHTML = tutorNotes.map(file => `
-        <span class="chip">
+        <span class="${chipClass(file.name, "chip-cyan")}">
           ${icon("description", "text-[15px]")}
           ${escapeHtml(file.name)}
           · ${escapeHtml(formatBytes(file.size))}
@@ -3706,7 +3812,7 @@
       document.getElementById("marketplaceList").innerHTML = marketplaceItems.map(item => `
         <article class="rounded-lg border border-line bg-white p-4 shadow-soft">
           <div class="flex items-center justify-between gap-2">
-            <span class="chip">${escapeHtml(item.tag)}</span>
+            <span class="${chipClass(item.tag)}">${escapeHtml(item.tag)}</span>
             <span class="flex items-center gap-1 font-mono text-xs font-bold text-gold">${icon("star", "text-[16px]")} ${item.rating}</span>
           </div>
           <h3 class="mt-4 min-h-[48px] text-lg font-black leading-6 text-navy">${escapeHtml(item.title)}</h3>
@@ -3826,6 +3932,7 @@
           document.getElementById("adminResourceList").innerHTML = "";
           document.getElementById("adminResourceModuleSelect").innerHTML = `<option value="">Attach to whole path</option>`;
           if (selectionChip) {
+            selectionChip.className = chipClass("no path selected", "chip-cyan");
             selectionChip.innerHTML = `${icon("hub", "text-[16px]")}No path selected`;
           }
         }
@@ -3835,6 +3942,7 @@
       const current = visiblePaths.find(path => path.id === selectedAdminPathId) || visiblePaths[0];
       if (!selectedAdminPathId && current) selectedAdminPathId = current.id;
       if (selectionChip && current) {
+        selectionChip.className = chipClass(current.title, "chip-cyan");
         selectionChip.innerHTML = `${icon("hub", "text-[16px]")}${escapeHtml(current.title)}`;
       }
 
@@ -3853,7 +3961,7 @@
             </button>
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
-            ${(path.tags || []).map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+            ${(path.tags || []).map(tag => `<span class="${chipClass(tag)}">${escapeHtml(tag)}</span>`).join("")}
           </div>
         </article>
       `).join("");
@@ -3892,8 +4000,8 @@
               <p class="mt-1 font-bold text-ink">${escapeHtml(resource.title)}</p>
               <p class="mt-1 text-sm text-muted">${escapeHtml(resource.description || "Recommended learning resource")}</p>
               <div class="mt-2 flex flex-wrap gap-2">
-                ${resource.externalUrl ? `<a class="chip" href="${escapeHtml(resource.externalUrl)}" target="_blank" rel="noreferrer">Open Link</a>` : ""}
-                ${resource.downloadable ? `<button class="chip admin-resource-download" type="button" data-resource-url="${escapeHtml(resource.downloadUrl || "")}">${icon("download", "text-[14px]")}Download</button>` : ""}
+                ${resource.externalUrl ? `<a class="${chipClass("open link", "chip-violet")}" href="${escapeHtml(resource.externalUrl)}" target="_blank" rel="noreferrer">Open Link</a>` : ""}
+                ${resource.downloadable ? `<button class="${chipClass("download", "chip-emerald")} admin-resource-download" type="button" data-resource-url="${escapeHtml(resource.downloadUrl || "")}">${icon("download", "text-[14px]")}Download</button>` : ""}
               </div>
             </div>
             <button class="btn btn-ghost h-9 px-3 text-xs text-coral admin-resource-delete" type="button" data-resource-id="${resource.id}">
