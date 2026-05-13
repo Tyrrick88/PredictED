@@ -102,6 +102,21 @@ public class FileStorageService {
     }
   }
 
+  public void delete(String storagePath) {
+    if (!StringUtils.hasText(storagePath)) {
+      return;
+    }
+    Path file = uploadRoot.resolve(storagePath).normalize();
+    if (!file.startsWith(uploadRoot)) {
+      throw new BadRequestException("Stored file path is invalid.");
+    }
+    try {
+      Files.deleteIfExists(file);
+    } catch (IOException exception) {
+      throw new BadRequestException("Could not delete uploaded file.", exception);
+    }
+  }
+
   private void validate(MultipartFile file) {
     if (file == null || file.isEmpty()) {
       throw new BadRequestException("Choose a file to upload.");

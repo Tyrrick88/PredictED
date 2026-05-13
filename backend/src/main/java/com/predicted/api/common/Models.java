@@ -5,8 +5,11 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.Valid;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -260,6 +263,183 @@ public final class Models {
       String checkoutRequestId,
       String status,
       String customerMessage
+  ) {
+  }
+
+  public record AcademicPathSummary(
+      String id,
+      String category,
+      String title,
+      String providerName,
+      String duration,
+      String description,
+      String difficultyLevel,
+      List<String> tags,
+      boolean customTrack,
+      int moduleCount
+  ) {
+  }
+
+  public record AcademicModule(
+      Long id,
+      String title,
+      String summary,
+      String stageType,
+      String stageLabel,
+      int displayOrder
+  ) {
+  }
+
+  public record AcademicResource(
+      Long id,
+      Long moduleId,
+      String title,
+      String resourceType,
+      String description,
+      String externalUrl,
+      String originalFilename,
+      Instant createdAt,
+      boolean downloadable,
+      String downloadUrl
+  ) {
+  }
+
+  public record AcademicPathDetail(
+      String id,
+      String category,
+      String title,
+      String providerName,
+      String duration,
+      String description,
+      String entryRequirements,
+      String structureLabel,
+      List<String> careerPaths,
+      String difficultyLevel,
+      List<String> tags,
+      boolean customTrack,
+      boolean active,
+      List<AcademicModule> modules,
+      List<AcademicResource> resources
+  ) {
+  }
+
+  public record AcademicPathUpsertRequest(
+      @NotBlank @Size(max = 60) String category,
+      @NotBlank @Size(max = 180) String title,
+      @NotBlank @Size(max = 160) String providerName,
+      @NotBlank @Size(max = 80) String duration,
+      @NotBlank @Size(max = 1200) String description,
+      @NotBlank @Size(max = 800) String entryRequirements,
+      @Size(max = 160) String structureLabel,
+      List<@NotBlank @Size(max = 120) String> careerPaths,
+      @NotBlank @Size(max = 40) String difficultyLevel,
+      List<@NotBlank @Size(max = 40) String> tags,
+      boolean customTrack,
+      boolean active
+  ) {
+  }
+
+  public record AcademicModuleUpsertRequest(
+      @NotBlank @Size(max = 180) String title,
+      @NotBlank @Size(max = 800) String summary,
+      @NotBlank @Size(max = 40) String stageType,
+      @NotBlank @Size(max = 120) String stageLabel,
+      @Min(1) int displayOrder
+  ) {
+  }
+
+  public record PlannerMilestoneInput(
+      @NotBlank @Size(max = 40) String type,
+      @NotBlank @Size(max = 180) String title,
+      @Size(max = 180) String subjectName,
+      @NotNull LocalDateTime dueAt,
+      @Size(max = 20) String priority
+  ) {
+  }
+
+  public record PlannerSetupRequest(
+      @NotBlank @Size(max = 160) String institutionName,
+      String academicPathId,
+      @NotBlank @Size(max = 180) String learningPathTitle,
+      @Min(1) @Max(12) int availableStudyHoursPerDay,
+      List<@NotBlank @Size(max = 120) String> weakSubjects,
+      List<@NotBlank @Size(max = 120) String> strongSubjects,
+      List<@NotBlank @Size(max = 30) String> preferredStudyTimes,
+      @NotNull List<@Valid PlannerMilestoneInput> milestones,
+      boolean calendarConnected
+  ) {
+  }
+
+  public record SmartPlannerSession(
+      String id,
+      LocalDate sessionDate,
+      LocalTime scheduledTime,
+      String tag,
+      String course,
+      String title,
+      String description,
+      int minutes,
+      String priority,
+      boolean completed,
+      boolean missed,
+      boolean rescheduled
+  ) {
+  }
+
+  public record PlannerGoal(
+      String period,
+      String title,
+      String target
+  ) {
+  }
+
+  public record PlannerCountdown(
+      String title,
+      String type,
+      LocalDateTime dueAt,
+      long daysRemaining,
+      boolean urgent
+  ) {
+  }
+
+  public record PlannerReminder(
+      String title,
+      String type,
+      String message,
+      LocalDateTime dueAt,
+      String tone
+  ) {
+  }
+
+  public record PlannerAnalytics(
+      int completedSessions,
+      int plannedSessions,
+      int completionRate,
+      int streakDays,
+      int upcomingAssessments,
+      int studyMinutesScheduled
+  ) {
+  }
+
+  public record SmartPlannerDashboard(
+      boolean configured,
+      String institutionName,
+      String learningPathTitle,
+      AcademicPathSummary selectedPath,
+      int availableStudyHoursPerDay,
+      List<String> weakSubjects,
+      List<String> strongSubjects,
+      List<String> preferredStudyTimes,
+      boolean urgencyMode,
+      boolean calendarConnected,
+      List<PlannerMilestoneInput> milestones,
+      List<SmartPlannerSession> todaySessions,
+      List<SmartPlannerSession> upcomingSessions,
+      List<PlannerGoal> goals,
+      List<PlannerCountdown> countdowns,
+      List<PlannerReminder> reminders,
+      PlannerAnalytics analytics,
+      List<String> aiRecommendations
   ) {
   }
 }

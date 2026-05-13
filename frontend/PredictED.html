@@ -1612,57 +1612,133 @@
           </section>
 
           <section class="view" id="view-planner" data-title="Smart Study Planner" data-eyebrow="Adaptive Revision">
-            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
-              <section class="panel p-5 md:p-6">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Schedule</p>
-                    <h2 class="mt-1 text-2xl font-black text-navy">Today&apos;s adaptive plan</h2>
+            <div class="grid gap-4 xl:grid-cols-[1.15fr_360px]">
+              <section class="grid gap-4">
+                <div class="panel p-5 md:p-6">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">Planner Setup</p>
+                      <h2 class="mt-1 text-2xl font-black text-navy">Adaptive academic coach</h2>
+                      <p class="mt-1 text-sm text-muted">Set your institution, learning path, deadlines, and study rhythm to build a personalized revision flow.</p>
+                    </div>
+                    <span class="chip" id="plannerUrgencyChip"><span class="material-symbols-outlined text-[16px]">flare</span>Planner ready</span>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <button class="btn btn-ghost h-10 w-10 p-0" id="focusMinus" aria-label="Decrease focus hours">
-                      <span class="material-symbols-outlined">remove</span>
-                    </button>
-                    <span class="rounded-lg border border-line bg-white px-3 py-2 font-mono text-sm font-bold text-navy"><span id="focusHours">3</span>h</span>
-                    <button class="btn btn-ghost h-10 w-10 p-0" id="focusPlus" aria-label="Increase focus hours">
-                      <span class="material-symbols-outlined">add</span>
-                    </button>
+                  <form class="mt-5 grid gap-4" id="plannerSetupForm">
+                    <div class="grid gap-3 md:grid-cols-2">
+                      <label class="grid gap-1">
+                        <span class="font-mono text-[11px] font-bold uppercase text-muted">Institution / Provider</span>
+                        <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="plannerInstitution" placeholder="University, provider, or training centre" type="text" />
+                      </label>
+                      <label class="grid gap-1">
+                        <span class="font-mono text-[11px] font-bold uppercase text-muted">Learning Path</span>
+                        <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="plannerPathInput" list="plannerPathOptions" placeholder="Search diploma, certification, language, bootcamp, or online track" type="text" />
+                        <input id="plannerPathId" type="hidden" />
+                        <datalist id="plannerPathOptions"></datalist>
+                        <p class="text-xs text-muted" id="plannerPathHint">Search across diploma programs, certifications, language tracks, bootcamps, and online skill paths.</p>
+                      </label>
+                    </div>
+                    <div class="grid gap-3 md:grid-cols-3">
+                      <label class="grid gap-1">
+                        <span class="font-mono text-[11px] font-bold uppercase text-muted">Study Hours / Day</span>
+                        <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="plannerHoursPerDay" min="1" max="12" type="number" value="3" />
+                      </label>
+                      <label class="grid gap-1">
+                        <span class="font-mono text-[11px] font-bold uppercase text-muted">Weak Subjects</span>
+                        <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="plannerWeakSubjects" placeholder="Comma separated" type="text" />
+                      </label>
+                      <label class="grid gap-1">
+                        <span class="font-mono text-[11px] font-bold uppercase text-muted">Strong Subjects</span>
+                        <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="plannerStrongSubjects" placeholder="Comma separated" type="text" />
+                      </label>
+                    </div>
+                    <div class="grid gap-2">
+                      <span class="font-mono text-[11px] font-bold uppercase text-muted">Preferred Study Times</span>
+                      <div class="flex flex-wrap gap-2" id="plannerPreferredTimes">
+                        <label class="chip cursor-pointer gap-2 pr-3"><input class="planner-time-checkbox rounded border-line text-cobalt focus:ring-cobalt" type="checkbox" value="MORNING" checked /><span>Morning</span></label>
+                        <label class="chip cursor-pointer gap-2 pr-3"><input class="planner-time-checkbox rounded border-line text-cobalt focus:ring-cobalt" type="checkbox" value="AFTERNOON" /><span>Afternoon</span></label>
+                        <label class="chip cursor-pointer gap-2 pr-3"><input class="planner-time-checkbox rounded border-line text-cobalt focus:ring-cobalt" type="checkbox" value="EVENING" checked /><span>Evening</span></label>
+                        <label class="chip cursor-pointer gap-2 pr-3"><input class="planner-time-checkbox rounded border-line text-cobalt focus:ring-cobalt" type="checkbox" value="NIGHT" /><span>Night</span></label>
+                      </div>
+                    </div>
+                    <div class="grid gap-2">
+                      <div class="flex items-center justify-between gap-3">
+                        <span class="font-mono text-[11px] font-bold uppercase text-muted">CATs, quizzes, assignments, exams</span>
+                        <button class="btn btn-ghost h-9 px-3 text-xs" id="plannerAddDeadline" type="button">
+                          <span class="material-symbols-outlined text-[18px]">add</span>
+                          Add deadline
+                        </button>
+                      </div>
+                      <div class="grid gap-3" id="plannerDeadlineList"></div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <label class="chip cursor-pointer gap-2 pr-3">
+                        <input class="rounded border-line text-cobalt focus:ring-cobalt" id="plannerCalendarConnected" type="checkbox" />
+                        <span>Calendar integration UI enabled</span>
+                      </label>
+                      <div class="flex items-center gap-3">
+                        <span class="font-mono text-[11px] text-muted" id="plannerSetupStatus"></span>
+                        <button class="btn btn-primary h-11 px-4" id="plannerSetupSubmit" type="submit">
+                          <span class="material-symbols-outlined text-[19px]">auto_awesome</span>
+                          Generate smart plan
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <div class="panel p-5 md:p-6">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">Today&apos;s Plan</p>
+                      <h3 class="mt-1 text-2xl font-black text-navy">Personalized revision flow</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-2" id="plannerMetricChips"></div>
+                  </div>
+                  <div class="mt-5 grid gap-3" id="plannerList"></div>
+                </div>
+
+                <div class="grid gap-4 lg:grid-cols-2">
+                  <div class="panel p-5">
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Goals</p>
+                    <h3 class="mt-1 text-xl font-black text-navy">Daily and weekly targets</h3>
+                    <div class="mt-4 grid gap-3" id="plannerGoals"></div>
+                  </div>
+                  <div class="panel p-5">
+                    <p class="font-mono text-[11px] font-bold uppercase text-muted">AI Coach</p>
+                    <h3 class="mt-1 text-xl font-black text-navy">Revision recommendations</h3>
+                    <div class="mt-4 grid gap-3" id="plannerRecommendations"></div>
                   </div>
                 </div>
-                <div class="mt-5 grid gap-3" id="plannerList"></div>
               </section>
 
-              <aside class="grid gap-4">
+              <aside class="grid gap-4 content-start">
                 <div class="panel p-5">
-                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Offline Revision System</p>
-                  <h3 class="mt-1 text-xl font-black text-navy">Synced courses</h3>
-                  <div class="mt-4 grid gap-3">
-                    <label class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white p-3">
-                      <span class="font-bold text-ink">Distributed Systems</span>
-                      <input class="rounded border-line text-navy focus:ring-cobalt" type="checkbox" checked />
-                    </label>
-                    <label class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white p-3">
-                      <span class="font-bold text-ink">AI Revision Pack</span>
-                      <input class="rounded border-line text-navy focus:ring-cobalt" type="checkbox" checked />
-                    </label>
-                    <label class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white p-3">
-                      <span class="font-bold text-ink">Compiler Labs</span>
-                      <input class="rounded border-line text-navy focus:ring-cobalt" type="checkbox" checked />
-                    </label>
-                  </div>
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Countdowns</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">CATs, quizzes, exams</h3>
+                  <div class="mt-4 grid gap-3" id="plannerCountdowns"></div>
                 </div>
                 <div class="panel p-5">
-                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Community Study Groups</p>
-                  <h3 class="mt-1 text-xl font-black text-navy">Live rooms</h3>
-                  <div class="mt-4 grid gap-3">
-                    <button class="btn btn-ghost justify-between px-3 text-left">
-                      <span>DS Past Paper Sprint</span>
-                      <span class="chip">12</span>
-                    </button>
-                    <button class="btn btn-ghost justify-between px-3 text-left">
-                      <span>Compiler Lab Clinic</span>
-                      <span class="chip">8</span>
-                    </button>
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Reminders</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">What needs attention</h3>
+                  <div class="mt-4 grid gap-3" id="plannerReminders"></div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Progress Analytics</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Momentum tracker</h3>
+                  <div class="mt-4 grid gap-3" id="plannerAnalytics"></div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Calendar & Recovery</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Keep the plan flexible</h3>
+                  <div class="mt-4 grid gap-3" id="plannerSupportCards">
+                    <div class="border-t border-line pt-3">
+                      <p class="font-bold text-ink">Miss a session?</p>
+                      <p class="text-sm text-muted">Use reschedule to move it forward without losing your weekly balance.</p>
+                    </div>
+                    <div class="border-t border-line pt-3">
+                      <p class="font-bold text-ink">Burnout guard</p>
+                      <p class="text-sm text-muted">The coach mixes heavier and lighter sessions so high-pressure weeks stay sustainable.</p>
+                    </div>
                   </div>
                 </div>
               </aside>
@@ -2008,25 +2084,166 @@
           </section>
 
           <section class="view" id="view-admin" data-title="Admin & Moderation" data-eyebrow="Operations">
-            <div class="grid gap-4 xl:grid-cols-[1fr_360px]">
-              <section class="panel p-5 md:p-6">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p class="font-mono text-[11px] font-bold uppercase text-muted">Moderation Dashboard</p>
-                    <h2 class="mt-1 text-2xl font-black text-navy">Review queue</h2>
+            <div class="grid gap-4 xl:grid-cols-[1.1fr_420px]">
+              <section class="grid gap-4">
+                <div class="panel p-5 md:p-6">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">Moderation Dashboard</p>
+                      <h2 class="mt-1 text-2xl font-black text-navy">Review queue</h2>
+                    </div>
+                    <span class="chip"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>Admin</span>
                   </div>
-                  <span class="chip"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>Admin</span>
+                  <div class="mt-5 overflow-hidden rounded-lg border border-line">
+                    <div class="grid grid-cols-[1fr_130px_120px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
+                      <span>Item</span>
+                      <span>Type</span>
+                      <span>Status</span>
+                    </div>
+                    <div id="moderationList"></div>
+                  </div>
                 </div>
-                <div class="mt-5 overflow-hidden rounded-lg border border-line">
-                  <div class="grid grid-cols-[1fr_130px_120px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
-                    <span>Item</span>
-                    <span>Type</span>
-                    <span>Status</span>
+
+                <div class="panel p-5 md:p-6">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p class="font-mono text-[11px] font-bold uppercase text-muted">Academic Expansion</p>
+                      <h3 class="mt-1 text-2xl font-black text-navy">Manage non-degree learning paths</h3>
+                    </div>
+                    <span class="chip" id="adminAcademicSelectionChip"><span class="material-symbols-outlined text-[16px]">hub</span>No path selected</span>
                   </div>
-                  <div id="moderationList"></div>
+                  <div class="mt-5 grid gap-3 md:grid-cols-[1fr_220px]">
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminAcademicSearch" placeholder="Search categories, tags, institutions, or paths" type="text" />
+                    <select class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminAcademicCategory">
+                      <option value="">All categories</option>
+                      <option value="DIPLOMA_PROGRAM">Diploma Programs</option>
+                      <option value="PROFESSIONAL_CERTIFICATION">Professional Certifications</option>
+                      <option value="LANGUAGE_PROGRAM">Language Programs</option>
+                      <option value="TECH_BOOTCAMP_SHORT_COURSE">Tech Bootcamps & Short Courses</option>
+                      <option value="ONLINE_CERTIFICATION_SKILL_TRACK">Online Certifications & Skill Tracks</option>
+                    </select>
+                  </div>
+                  <div class="mt-5 grid gap-3" id="adminAcademicList"></div>
                 </div>
               </section>
+
               <aside class="grid gap-4 content-start">
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Path Builder</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Create or edit path</h3>
+                  <form class="mt-4 grid gap-3" id="adminAcademicForm">
+                    <select class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathCategory">
+                      <option value="DIPLOMA_PROGRAM">Diploma Programs</option>
+                      <option value="PROFESSIONAL_CERTIFICATION">Professional Certifications</option>
+                      <option value="LANGUAGE_PROGRAM">Language Programs</option>
+                      <option value="TECH_BOOTCAMP_SHORT_COURSE">Tech Bootcamps & Short Courses</option>
+                      <option value="ONLINE_CERTIFICATION_SKILL_TRACK">Online Certifications & Skill Tracks</option>
+                    </select>
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathTitle" placeholder="Path title" type="text" />
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathProvider" placeholder="Institution / provider" type="text" />
+                    <div class="grid gap-3 sm:grid-cols-2">
+                      <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathDuration" placeholder="Duration" type="text" />
+                      <select class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathDifficulty">
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                        <option value="INTENSIVE">Intensive</option>
+                      </select>
+                    </div>
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathStructure" placeholder="Semester / level / stage structure" type="text" />
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathTags" placeholder="Tags (comma separated)" type="text" />
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathCareers" placeholder="Career paths / outcomes (comma separated)" type="text" />
+                    <textarea class="min-h-[92px] rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathEntryRequirements" placeholder="Entry requirements"></textarea>
+                    <textarea class="min-h-[120px] rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminPathDescription" placeholder="Course description"></textarea>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                      <label class="chip cursor-pointer gap-2 pr-3">
+                        <input class="rounded border-line text-cobalt focus:ring-cobalt" id="adminPathCustomTrack" type="checkbox" />
+                        <span>Custom track</span>
+                      </label>
+                      <label class="chip cursor-pointer gap-2 pr-3">
+                        <input class="rounded border-line text-cobalt focus:ring-cobalt" id="adminPathActive" type="checkbox" checked />
+                        <span>Visible to students</span>
+                      </label>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                      <button class="btn btn-primary h-10 px-4" id="adminAcademicSaveButton" type="submit">
+                        <span class="material-symbols-outlined text-[18px]">save</span>
+                        Save path
+                      </button>
+                      <button class="btn btn-ghost h-10 px-4" id="adminAcademicResetButton" type="button">
+                        <span class="material-symbols-outlined text-[18px]">refresh</span>
+                        New path
+                      </button>
+                      <button class="btn btn-ghost h-10 px-4 text-coral" id="adminAcademicDeleteButton" type="button">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                        Delete
+                      </button>
+                    </div>
+                    <span class="font-mono text-[11px] text-muted" id="adminAcademicStatus"></span>
+                  </form>
+                </div>
+
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Units & Modules</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Semester / level organization</h3>
+                  <form class="mt-4 grid gap-3" id="adminModuleForm">
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminModuleTitle" placeholder="Module / unit title" type="text" />
+                    <div class="grid gap-3 sm:grid-cols-2">
+                      <select class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminModuleStageType">
+                        <option value="SEMESTER">Semester</option>
+                        <option value="LEVEL">Level</option>
+                        <option value="STAGE">Stage</option>
+                        <option value="MODULE">Module</option>
+                        <option value="UNIT">Unit</option>
+                        <option value="CERTIFICATION_STAGE">Certification Stage</option>
+                      </select>
+                      <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminModuleStageLabel" placeholder="Stage label" type="text" />
+                    </div>
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminModuleOrder" min="1" placeholder="Display order" type="number" value="1" />
+                    <textarea class="min-h-[92px] rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminModuleSummary" placeholder="What this unit covers"></textarea>
+                    <div class="flex flex-wrap items-center gap-3">
+                      <button class="btn btn-primary h-10 px-4" type="submit">
+                        <span class="material-symbols-outlined text-[18px]">library_add</span>
+                        Save module
+                      </button>
+                      <span class="font-mono text-[11px] text-muted" id="adminModuleStatus"></span>
+                    </div>
+                  </form>
+                  <div class="mt-4 grid gap-3" id="adminModuleList"></div>
+                </div>
+
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Resources</p>
+                  <h3 class="mt-1 text-xl font-black text-navy">Notes, PDFs, and revision material</h3>
+                  <form class="mt-4 grid gap-3" id="adminResourceForm">
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminResourceTitle" placeholder="Resource title" type="text" />
+                    <div class="grid gap-3 sm:grid-cols-2">
+                      <select class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminResourceType">
+                        <option value="PDF">PDF</option>
+                        <option value="NOTES">Notes</option>
+                        <option value="GUIDE">Guide</option>
+                        <option value="AUDIO">Audio</option>
+                        <option value="ROADMAP">Roadmap</option>
+                        <option value="VIDEO">Video</option>
+                      </select>
+                      <select class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminResourceModuleSelect">
+                        <option value="">Attach to whole path</option>
+                      </select>
+                    </div>
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminResourceUrl" placeholder="External URL (optional if uploading file)" type="url" />
+                    <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminResourceFile" type="file" />
+                    <textarea class="min-h-[80px] rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="adminResourceDescription" placeholder="What this resource is best for"></textarea>
+                    <div class="flex flex-wrap items-center gap-3">
+                      <button class="btn btn-primary h-10 px-4" type="submit">
+                        <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                        Upload resource
+                      </button>
+                      <span class="font-mono text-[11px] text-muted" id="adminResourceStatus"></span>
+                    </div>
+                  </form>
+                  <div class="mt-4 grid gap-3" id="adminResourceList"></div>
+                </div>
+
                 <div class="panel p-5">
                   <p class="font-mono text-[11px] font-bold uppercase text-muted">System Health</p>
                   <div class="mt-4 grid gap-3">
@@ -2039,12 +2256,12 @@
                       <span class="chip text-mint">OK</span>
                     </div>
                     <div class="flex items-center justify-between border-t border-line pt-3">
-                      <span class="font-bold text-ink">AI Microservice</span>
-                      <span class="chip text-gold">Busy</span>
+                      <span class="font-bold text-ink">AI Coach</span>
+                      <span class="chip text-gold">Adaptive</span>
                     </div>
                     <div class="flex items-center justify-between border-t border-line pt-3">
-                      <span class="font-bold text-ink">Redis Cache</span>
-                      <span class="chip text-mint">OK</span>
+                      <span class="font-bold text-ink">Catalog Engine</span>
+                      <span class="chip text-mint">Live</span>
                     </div>
                   </div>
                 </div>
@@ -2053,15 +2270,15 @@
                   <div class="mt-4 grid gap-3">
                     <div class="border-l-4 border-mint pl-3">
                       <p class="font-bold text-navy">Phase 1</p>
-                      <p class="text-sm text-muted">MVP with 3 Kenyan universities</p>
+                      <p class="text-sm text-muted">Degrees, tutor, predictions, and revision workspace are already live.</p>
                     </div>
                     <div class="border-l-4 border-cobalt pl-3">
                       <p class="font-bold text-navy">Phase 2</p>
-                      <p class="text-sm text-muted">Mobile, offline, community</p>
+                      <p class="text-sm text-muted">Diplomas, certifications, language tracks, bootcamps, and online skill paths are admin-managed.</p>
                     </div>
                     <div class="border-l-4 border-gold pl-3">
                       <p class="font-bold text-navy">Phase 3</p>
-                      <p class="text-sm text-muted">GPA prediction, voice tutor</p>
+                      <p class="text-sm text-muted">Deeper notification automation, faculty analytics, and richer academic coaching are next.</p>
                     </div>
                   </div>
                 </div>
@@ -2093,6 +2310,127 @@
       { courseId: "ai", courseName: "Artificial Intelligence", lecturer: "Prof. Otieno" },
       { courseId: "compiler", courseName: "Compiler Construction", lecturer: "Dr. Karanja" },
       { courseId: "data", courseName: "Data Mining", lecturer: "Dr. Achieng" }
+    ];
+
+    const academicCategoryOptions = [
+      { value: "DIPLOMA_PROGRAM", label: "Diploma Programs" },
+      { value: "PROFESSIONAL_CERTIFICATION", label: "Professional Certifications" },
+      { value: "LANGUAGE_PROGRAM", label: "Language Programs" },
+      { value: "TECH_BOOTCAMP_SHORT_COURSE", label: "Tech Bootcamps & Short Courses" },
+      { value: "ONLINE_CERTIFICATION_SKILL_TRACK", label: "Online Certifications & Skill Tracks" }
+    ];
+
+    const localAcademicCatalog = [
+      {
+        id: "ap_diploma_cyber",
+        category: "DIPLOMA_PROGRAM",
+        title: "Diploma in Cyber Security",
+        providerName: "Technical University of Kenya",
+        duration: "2 years",
+        description: "Hands-on diploma covering secure networks, operating systems hardening, threat response, and cyber lab practice.",
+        entryRequirements: "KCSE mean grade C- or equivalent technical admission pathway.",
+        structureLabel: "Semester 1 to Semester 4",
+        careerPaths: ["Security analyst", "SOC technician", "Junior incident responder"],
+        difficultyLevel: "INTERMEDIATE",
+        tags: ["cybersecurity", "networking", "diploma", "kenya"],
+        customTrack: false,
+        active: true,
+        modules: [
+          { id: 1, title: "Network Defense Fundamentals", summary: "Core unit for TCP/IP review, firewall rules, and secure network segmentation.", stageType: "SEMESTER", stageLabel: "Semester 1", displayOrder: 1 },
+          { id: 2, title: "Ethical Hacking Lab", summary: "Guided penetration-testing practice with reporting discipline and lab safety.", stageType: "SEMESTER", stageLabel: "Semester 3", displayOrder: 2 }
+        ],
+        resources: [
+          { id: 1, moduleId: 1, title: "Cyber lab checklist", resourceType: "PDF", description: "Starter checklist for secure lab discipline and revision priorities.", externalUrl: "https://predict.ed/resources/cyber-lab-checklist", originalFilename: null, downloadable: false, downloadUrl: null }
+        ]
+      },
+      {
+        id: "ap_cert_cpa",
+        category: "PROFESSIONAL_CERTIFICATION",
+        title: "CPA Professional Path",
+        providerName: "KASNEB",
+        duration: "18-24 months",
+        description: "Stage-based accounting certification focused on financial reporting, audit, taxation, and business law.",
+        entryRequirements: "KASNEB technician route, relevant degree, or approved accounting entry pathway.",
+        structureLabel: "Foundation, Intermediate, Advanced",
+        careerPaths: ["Auditor", "Accountant", "Finance analyst", "Tax associate"],
+        difficultyLevel: "ADVANCED",
+        tags: ["cpa", "finance", "accounting", "professional"],
+        customTrack: false,
+        active: true,
+        modules: [
+          { id: 3, title: "Financial Accounting", summary: "Ledger flow, adjustments, financial statements, and exam-standard workings.", stageType: "CERTIFICATION_STAGE", stageLabel: "Foundation", displayOrder: 1 },
+          { id: 4, title: "Taxation", summary: "VAT, income tax, corporate tax, and exam-oriented calculation practice.", stageType: "CERTIFICATION_STAGE", stageLabel: "Intermediate", displayOrder: 2 }
+        ],
+        resources: [
+          { id: 2, moduleId: 3, title: "CPA formula pack", resourceType: "NOTES", description: "Quick-recall sheet for accounting adjustments and tax computation patterns.", externalUrl: "https://predict.ed/resources/cpa-formula-pack", originalFilename: null, downloadable: false, downloadUrl: null }
+        ]
+      },
+      {
+        id: "ap_lang_french",
+        category: "LANGUAGE_PROGRAM",
+        title: "French Fluency Track",
+        providerName: "Alliance Francaise Nairobi",
+        duration: "12 months",
+        description: "Progressive French language track for grammar, listening, conversation, and exam preparation.",
+        entryRequirements: "Open entry; placement test for continuing learners.",
+        structureLabel: "A1, A2, B1, B2",
+        careerPaths: ["Translator", "Hospitality roles", "Academic exchange"],
+        difficultyLevel: "BEGINNER",
+        tags: ["french", "language", "communication", "global"],
+        customTrack: false,
+        active: true,
+        modules: [
+          { id: 5, title: "French A1 Communication", summary: "Greetings, introductions, survival grammar, and short listening drills.", stageType: "LEVEL", stageLabel: "A1", displayOrder: 1 },
+          { id: 6, title: "French B1 Conversation", summary: "Structured speaking, reading comprehension, and grammar reinforcement.", stageType: "LEVEL", stageLabel: "B1", displayOrder: 2 }
+        ],
+        resources: [
+          { id: 3, moduleId: 5, title: "French listening playlist", resourceType: "AUDIO", description: "Beginner listening and pronunciation drills.", externalUrl: "https://predict.ed/resources/french-a1-listening", originalFilename: null, downloadable: false, downloadUrl: null }
+        ]
+      },
+      {
+        id: "ap_bootcamp_moringa",
+        category: "TECH_BOOTCAMP_SHORT_COURSE",
+        title: "Software Engineering Bootcamp",
+        providerName: "Moringa School",
+        duration: "6 months",
+        description: "Project-driven bootcamp covering frontend, backend, product thinking, and career coaching for junior developers.",
+        entryRequirements: "Basic computer literacy and commitment to full-time project work.",
+        structureLabel: "Foundation, Core, Capstone",
+        careerPaths: ["Frontend developer", "Backend trainee", "Junior software engineer"],
+        difficultyLevel: "INTENSIVE",
+        tags: ["bootcamp", "software-engineering", "projects", "career"],
+        customTrack: false,
+        active: true,
+        modules: [
+          { id: 7, title: "Frontend Product Build", summary: "Responsive UI delivery with JavaScript, APIs, and production polish.", stageType: "STAGE", stageLabel: "Core", displayOrder: 1 },
+          { id: 8, title: "Career Readiness Sprint", summary: "Portfolio, interview rehearsal, and capstone storytelling.", stageType: "STAGE", stageLabel: "Capstone", displayOrder: 2 }
+        ],
+        resources: [
+          { id: 4, moduleId: 7, title: "Bootcamp capstone rubric", resourceType: "GUIDE", description: "Project quality checklist for frontend/backend delivery and demos.", externalUrl: "https://predict.ed/resources/bootcamp-capstone-rubric", originalFilename: null, downloadable: false, downloadUrl: null }
+        ]
+      },
+      {
+        id: "ap_online_google_data",
+        category: "ONLINE_CERTIFICATION_SKILL_TRACK",
+        title: "Google Data Analytics Skill Track",
+        providerName: "Coursera / Google",
+        duration: "3-6 months",
+        description: "Self-paced data analytics certificate covering spreadsheets, SQL, Tableau, and job-ready case studies.",
+        entryRequirements: "Open entry; ideal for beginners with consistent weekly study time.",
+        structureLabel: "Course 1 to Course 8",
+        careerPaths: ["Data analyst", "Reporting associate", "Business intelligence support"],
+        difficultyLevel: "BEGINNER",
+        tags: ["data", "analytics", "online", "certificate", "skills"],
+        customTrack: true,
+        active: true,
+        modules: [
+          { id: 9, title: "Foundations: Ask, Prepare, Process", summary: "Data cleaning, spreadsheet structure, and analytical framing.", stageType: "MODULE", stageLabel: "Course 1-3", displayOrder: 1 },
+          { id: 10, title: "Analyze and Share", summary: "SQL, Tableau, dashboards, and portfolio case-study writing.", stageType: "MODULE", stageLabel: "Course 4-8", displayOrder: 2 }
+        ],
+        resources: [
+          { id: 5, moduleId: 9, title: "Google DA study map", resourceType: "ROADMAP", description: "Weekly completion guide for self-paced learners balancing work and study.", externalUrl: "https://predict.ed/resources/google-da-study-map", originalFilename: null, downloadable: false, downloadUrl: null }
+        ]
+      }
     ];
 
     const kenyanUniversityCatalog = [
@@ -2200,12 +2538,13 @@
       }
     };
 
-    let plannerBase = [
+    const defaultPlannerBase = [
       { time: "14:00", tag: "High Yield", course: "Distributed Systems", task: "Practice vector clocks with 3-process timelines.", accent: "#cf3f4f", minutes: 35 },
       { time: "16:30", tag: "Revision", course: "Artificial Intelligence", task: "Drill Bayesian independence and d-separation.", accent: "#1d4ed8", minutes: 45 },
       { time: "19:00", tag: "Lab Prep", course: "Compiler Construction", task: "Build LL(1) table from grammar exercises.", accent: "#0f9fbc", minutes: 55 },
       { time: "21:00", tag: "Flashcards", course: "Data Mining", task: "Review association rule confidence and lift.", accent: "#c97800", minutes: 25 }
     ];
+    let plannerBase = defaultPlannerBase.map(item => ({ ...item }));
 
     let cards = [
       {
@@ -2267,6 +2606,11 @@
     let cardIndex = 0;
     let remembered = 0;
     let tutorNotes = [];
+    let academicCatalog = localAcademicCatalog.slice();
+    let smartPlanner = null;
+    let adminAcademicPaths = [];
+    let selectedAdminPathId = "";
+    let selectedAdminModuleId = "";
     let authToken = sessionStorage.getItem("predictedToken") || "";
     let currentUser = null;
     let profileSettings = null;
@@ -2294,6 +2638,83 @@
 
     function normalizeCatalogValue(value) {
       return String(value ?? "").trim().toLowerCase();
+    }
+
+    function formatAcademicCategory(value = "") {
+      return academicCategoryOptions.find(option => option.value === value)?.label || value.replaceAll("_", " ");
+    }
+
+    function formatDifficulty(value = "") {
+      const normalized = String(value || "").toLowerCase().replaceAll("_", " ");
+      return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "Flexible";
+    }
+
+    function plannerPathOptionLabel(path) {
+      return `${path.title} — ${path.providerName}`;
+    }
+
+    function findAcademicPathMatch(value) {
+      const normalized = normalizeCatalogValue(value);
+      return academicCatalog.find(path => {
+        return [
+          path.id,
+          path.title,
+          plannerPathOptionLabel(path)
+        ].some(candidate => normalizeCatalogValue(candidate) === normalized);
+      }) || null;
+    }
+
+    function buildLocalPlannerDashboard() {
+      const selectedPath = academicCatalog[0] || null;
+      const now = new Date();
+      const iso = offsetDays => {
+        const copy = new Date(now);
+        copy.setDate(copy.getDate() + offsetDays);
+        copy.setHours(9, 0, 0, 0);
+        return copy.toISOString().slice(0, 16);
+      };
+      return {
+        configured: false,
+        institutionName: "",
+        learningPathTitle: "",
+        selectedPath,
+        availableStudyHoursPerDay: 3,
+        weakSubjects: [],
+        strongSubjects: [],
+        preferredStudyTimes: ["MORNING", "EVENING"],
+        urgencyMode: false,
+        calendarConnected: false,
+        milestones: [
+          { type: "CAT", title: "Add your nearest CAT", subjectName: selectedPath?.title || "", dueAt: iso(5), priority: "HIGH" }
+        ],
+        todaySessions: [],
+        upcomingSessions: [],
+        goals: [
+          { period: "Getting Started", title: "Tell Predict.ed what you're studying", target: "Pick a path, set your hours, and add every CAT, exam, quiz, and assignment." },
+          { period: "Coach", title: "Unlock adaptive scheduling", target: "Once deadlines are in, the planner will pull harder revision blocks closer to your assessments." }
+        ],
+        countdowns: [],
+        reminders: [
+          { title: "Planner setup required", type: "SETUP", message: "Add your institution, path, and deadlines to build a personalized timetable.", dueAt: null, tone: "info" }
+        ],
+        analytics: {
+          completedSessions: 0,
+          plannedSessions: 0,
+          completionRate: 0,
+          streakDays: 0,
+          upcomingAssessments: 0,
+          studyMinutesScheduled: 0
+        },
+        aiRecommendations: [
+          "Start with your weakest subject and your nearest deadline so the coach can weight the first week properly.",
+          "Use morning or evening focus windows consistently; the planner schedules better when your rhythm is clear.",
+          "Add every CAT, quiz, assignment, and exam date. That is what powers urgency mode and rescheduling."
+        ]
+      };
+    }
+
+    function resetPlannerBase() {
+      plannerBase = defaultPlannerBase.map(item => ({ ...item }));
     }
 
     function configuredApiBase() {
@@ -2523,6 +2944,14 @@
       currentUser = null;
       profileSettings = null;
       tutorNotes = [];
+      smartPlanner = null;
+      adminAcademicPaths = [];
+      selectedAdminPathId = "";
+      selectedAdminModuleId = "";
+      academicCatalog = localAcademicCatalog.slice();
+      resetPlannerBase();
+      loadedViews.clear();
+      inFlightViews.clear();
       sessionStorage.removeItem("predictedToken");
       const tutorNotesInput = document.getElementById("tutorNotesInput");
       if (tutorNotesInput) {
@@ -2534,6 +2963,11 @@
         document.getElementById("accountName").textContent = "Sign in";
         document.getElementById("signOutButton").classList.add("hidden");
         renderProfile(null);
+        populatePlannerPathOptions();
+        populatePlannerForm(buildLocalPlannerDashboard());
+        renderPlanner();
+        renderAdminAcademic();
+        renderDashboardPreviews(plannerBase, feedItems);
       }
     }
 
@@ -2748,28 +3182,257 @@
         : `${icon("pending", "text-[16px]")}Ready`;
     }
 
-    function renderPlanner() {
-      const visible = Math.min(plannerBase.length, Math.max(2, focusHours + 1));
-      document.getElementById("focusHours").textContent = focusHours;
-      document.getElementById("plannerList").innerHTML = plannerBase.slice(0, visible).map((item, index) => `
-        <article class="study-tile rounded-lg border border-line bg-white p-4 shadow-soft" style="--accent:${item.accent}">
-          <div class="grid gap-3 md:grid-cols-[96px_1fr_auto] md:items-center">
-            <div>
-              <p class="font-mono text-[11px] uppercase text-muted">${escapeHtml(formatTime(item.time))}</p>
-              <p class="mt-1 text-sm font-black text-navy">${item.minutes} min</p>
-            </div>
-            <div>
-              <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${escapeHtml(item.tag)}</span>
-              <h3 class="mt-2 text-lg font-black text-navy">${escapeHtml(item.course)}</h3>
-              <p class="mt-1 text-sm text-muted">${escapeHtml(item.task)}</p>
-            </div>
-            <button class="btn btn-ghost h-10 px-3 text-sm task-complete" type="button" data-task-id="${escapeHtml(item.id || "")}" ${item.completed ? "disabled" : ""}>
-              ${icon(item.completed ? "task_alt" : "check_circle", "text-[18px] text-mint")}
-              ${item.completed ? "Done" : "Done"}
+    function populatePlannerPathOptions() {
+      populateDatalist("plannerPathOptions", academicCatalog.map(plannerPathOptionLabel));
+    }
+
+    function toDateTimeLocalValue(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value).slice(0, 16);
+      const local = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      return local.toISOString().slice(0, 16);
+    }
+
+    function plannerDeadlineRowsMarkup(deadline = {}) {
+      return `
+        <article class="rounded-lg border border-line bg-white p-3 shadow-soft">
+          <div class="grid gap-3 md:grid-cols-[120px_1fr_1fr_190px_140px_auto] md:items-center">
+            <select class="planner-deadline-type rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt">
+              ${["CAT", "ASSIGNMENT", "QUIZ", "EXAM"].map(type => `<option value="${type}" ${deadline.type === type ? "selected" : ""}>${type}</option>`).join("")}
+            </select>
+            <input class="planner-deadline-title rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" placeholder="Assessment title" type="text" value="${escapeHtml(deadline.title || "")}" />
+            <input class="planner-deadline-subject rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" placeholder="Unit / module / subject" type="text" value="${escapeHtml(deadline.subjectName || "")}" />
+            <input class="planner-deadline-due rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" type="datetime-local" value="${escapeHtml(toDateTimeLocalValue(deadline.dueAt))}" />
+            <select class="planner-deadline-priority rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt">
+              ${["LOW", "MEDIUM", "HIGH", "CRITICAL"].map(priority => `<option value="${priority}" ${String(deadline.priority || "HIGH").toUpperCase() === priority ? "selected" : ""}>${priority}</option>`).join("")}
+            </select>
+            <button class="btn btn-ghost h-10 px-3 text-sm planner-deadline-remove" type="button">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
             </button>
           </div>
+        </article>`;
+    }
+
+    function renderPlannerDeadlineRows(deadlines = []) {
+      const container = document.getElementById("plannerDeadlineList");
+      if (!container) return;
+      const items = deadlines.length ? deadlines : [{ type: "CAT", priority: "HIGH" }];
+      container.innerHTML = items.map(plannerDeadlineRowsMarkup).join("");
+    }
+
+    function selectedPlannerTimes() {
+      return Array.from(document.querySelectorAll(".planner-time-checkbox:checked")).map(input => input.value);
+    }
+
+    function syncPlannerPathSelection({ preserveInput = false } = {}) {
+      const input = document.getElementById("plannerPathInput");
+      const hidden = document.getElementById("plannerPathId");
+      const hint = document.getElementById("plannerPathHint");
+      if (!input || !hidden) return null;
+      const matched = findAcademicPathMatch(input.value);
+      hidden.value = matched?.id || "";
+      if (matched && !preserveInput) {
+        input.value = plannerPathOptionLabel(matched);
+      }
+      if (hint) {
+        hint.textContent = matched
+          ? `${formatAcademicCategory(matched.category)} · ${matched.duration} · ${matched.modules?.length || matched.moduleCount || 0} modules`
+          : "Search across diploma programs, certifications, language tracks, bootcamps, and online skill paths.";
+      }
+      return matched;
+    }
+
+    function setPlannerStatus(message = "", tone = "muted") {
+      const target = document.getElementById("plannerSetupStatus");
+      if (!target) return;
+      target.textContent = message;
+      target.classList.remove("text-coral", "text-mint", "text-muted");
+      target.classList.add(tone === "error" ? "text-coral" : tone === "success" ? "text-mint" : "text-muted");
+    }
+
+    function populatePlannerForm(data = buildLocalPlannerDashboard()) {
+      document.getElementById("plannerInstitution").value = data.institutionName || "";
+      document.getElementById("plannerHoursPerDay").value = data.availableStudyHoursPerDay || 3;
+      document.getElementById("plannerWeakSubjects").value = (data.weakSubjects || []).join(", ");
+      document.getElementById("plannerStrongSubjects").value = (data.strongSubjects || []).join(", ");
+      document.getElementById("plannerCalendarConnected").checked = Boolean(data.calendarConnected);
+      const pathLabel = data.selectedPath ? plannerPathOptionLabel(data.selectedPath) : (data.learningPathTitle || "");
+      document.getElementById("plannerPathInput").value = pathLabel;
+      document.getElementById("plannerPathId").value = data.selectedPath?.id || "";
+      document.querySelectorAll(".planner-time-checkbox").forEach(input => {
+        input.checked = (data.preferredStudyTimes || []).includes(input.value);
+      });
+      renderPlannerDeadlineRows(data.milestones || []);
+      syncPlannerPathSelection({ preserveInput: true });
+    }
+
+    function plannerPayload() {
+      const path = syncPlannerPathSelection({ preserveInput: true });
+      const deadlines = Array.from(document.querySelectorAll("#plannerDeadlineList > article")).map(row => ({
+        type: row.querySelector(".planner-deadline-type")?.value || "CAT",
+        title: row.querySelector(".planner-deadline-title")?.value.trim() || "",
+        subjectName: row.querySelector(".planner-deadline-subject")?.value.trim() || "",
+        dueAt: row.querySelector(".planner-deadline-due")?.value || "",
+        priority: row.querySelector(".planner-deadline-priority")?.value || "HIGH"
+      })).filter(item => item.title && item.dueAt);
+      return {
+        institutionName: document.getElementById("plannerInstitution").value.trim(),
+        academicPathId: path?.id || document.getElementById("plannerPathId").value || "",
+        learningPathTitle: path?.title || document.getElementById("plannerPathInput").value.trim(),
+        availableStudyHoursPerDay: Number(document.getElementById("plannerHoursPerDay").value || 3),
+        weakSubjects: document.getElementById("plannerWeakSubjects").value.split(",").map(item => item.trim()).filter(Boolean),
+        strongSubjects: document.getElementById("plannerStrongSubjects").value.split(",").map(item => item.trim()).filter(Boolean),
+        preferredStudyTimes: selectedPlannerTimes(),
+        milestones: deadlines.map(item => ({
+          ...item,
+          dueAt: item.dueAt
+        })),
+        calendarConnected: document.getElementById("plannerCalendarConnected").checked
+      };
+    }
+
+    function plannerMetricChip(iconName, label) {
+      return `<span class="chip">${icon(iconName, "text-[16px]")}${escapeHtml(label)}</span>`;
+    }
+
+    function plannerSessionPreviewTasks(data = smartPlanner) {
+      const sessions = data?.todaySessions?.length ? data.todaySessions : data?.upcomingSessions || [];
+      if (!sessions.length) {
+        return defaultPlannerBase.map(item => ({ ...item }));
+      }
+      return sessions.slice(0, 4).map(session => ({
+        id: session.id,
+        time: session.scheduledTime ? formatTime(session.scheduledTime) : "--:--",
+        tag: session.tag || (session.priority === "CRITICAL" ? "Urgent" : "Coach"),
+        course: session.course || data?.learningPathTitle || "Study session",
+        task: session.title || session.description || "Adaptive revision block",
+        accent: session.priority === "CRITICAL"
+          ? "#cf3f4f"
+          : session.priority === "HIGH"
+            ? "#1d4ed8"
+            : session.priority === "MEDIUM"
+              ? "#0f9fbc"
+              : "#c97800",
+        minutes: session.minutes || 45,
+        completed: Boolean(session.completed)
+      }));
+    }
+
+    function syncPlannerPreview() {
+      plannerBase = plannerSessionPreviewTasks();
+      renderDashboardPreviews(plannerBase, feedItems);
+    }
+
+    function renderPlanner() {
+      const data = smartPlanner || buildLocalPlannerDashboard();
+      const path = data.selectedPath;
+      document.getElementById("plannerUrgencyChip").innerHTML = data.urgencyMode
+        ? `${icon("whatshot", "text-[16px]")}Urgency mode`
+        : `${icon("flare", "text-[16px]")}${data.configured ? "Planner ready" : "Setup needed"}`;
+      document.getElementById("plannerMetricChips").innerHTML = [
+        plannerMetricChip("schedule", `${data.availableStudyHoursPerDay || 3}h / day`),
+        plannerMetricChip("calendar_month", `${data.milestones?.length || 0} deadlines`),
+        plannerMetricChip("local_fire_department", `${data.analytics?.streakDays || 0} day streak`)
+      ].join("");
+
+      const sessions = data.todaySessions?.length ? data.todaySessions : data.upcomingSessions || [];
+      document.getElementById("plannerList").innerHTML = sessions.length ? sessions.map(session => `
+        <article class="study-tile rounded-lg border border-line bg-white p-4 shadow-soft">
+          <div class="grid gap-3 md:grid-cols-[110px_1fr_auto] md:items-center">
+            <div>
+              <p class="font-mono text-[11px] uppercase text-muted">${escapeHtml(session.sessionDate || "")} · ${escapeHtml(formatTime(session.scheduledTime || ""))}</p>
+              <p class="mt-1 text-sm font-black text-navy">${session.minutes} min</p>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${escapeHtml(session.tag)}</span>
+                <span class="font-mono text-[10px] text-muted">${escapeHtml(session.priority)}</span>
+                ${session.rescheduled ? `<span class="chip text-gold">${icon("update", "text-[14px]")}Rescheduled</span>` : ""}
+                ${session.missed ? `<span class="chip text-coral">${icon("warning", "text-[14px]")}Missed</span>` : ""}
+              </div>
+              <h3 class="mt-2 text-lg font-black text-navy">${escapeHtml(session.course)}</h3>
+              <p class="mt-1 text-sm font-semibold text-ink">${escapeHtml(session.title)}</p>
+              <p class="mt-1 text-sm text-muted">${escapeHtml(session.description)}</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-ghost h-10 px-3 text-sm planner-session-complete" type="button" data-session-id="${escapeHtml(session.id || "")}" ${session.completed ? "disabled" : ""}>
+                ${icon(session.completed ? "task_alt" : "check_circle", "text-[18px] text-mint")}
+                ${session.completed ? "Done" : "Complete"}
+              </button>
+              <button class="btn btn-ghost h-10 px-3 text-sm planner-session-reschedule" type="button" data-session-id="${escapeHtml(session.id || "")}" ${!session.id ? "disabled" : ""}>
+                ${icon("update", "text-[18px]")}
+                Reschedule
+              </button>
+            </div>
+          </div>
         </article>
+      `).join("") : `
+        <article class="rounded-lg border border-line bg-white p-4 shadow-soft">
+          <p class="font-bold text-ink">No adaptive sessions yet.</p>
+          <p class="mt-1 text-sm text-muted">Complete the planner setup above and Predict.ed will generate a study timetable, countdowns, reminders, and revision priorities.</p>
+        </article>`;
+
+      document.getElementById("plannerGoals").innerHTML = (data.goals || []).map(goal => `
+        <div class="border-t border-line pt-3">
+          <p class="font-mono text-[10px] uppercase text-muted">${escapeHtml(goal.period)}</p>
+          <p class="mt-1 font-bold text-ink">${escapeHtml(goal.title)}</p>
+          <p class="mt-1 text-sm text-muted">${escapeHtml(goal.target)}</p>
+        </div>
       `).join("");
+
+      document.getElementById("plannerRecommendations").innerHTML = (data.aiRecommendations || []).map(item => `
+        <div class="rounded-lg border border-line bg-white p-3 shadow-soft">
+          <div class="flex gap-3">
+            <span class="rounded-lg bg-wash p-2 text-cobalt">${icon("auto_awesome", "text-[18px]")}</span>
+            <p class="text-sm text-ink">${escapeHtml(item)}</p>
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("plannerCountdowns").innerHTML = (data.countdowns || []).length ? (data.countdowns || []).map(item => `
+        <div class="border-t border-line pt-3">
+          <div class="flex items-center justify-between gap-3">
+            <p class="font-bold text-ink">${escapeHtml(item.title)}</p>
+            <span class="chip ${item.urgent ? "text-coral" : "text-gold"}">${item.daysRemaining}d</span>
+          </div>
+          <p class="mt-1 text-sm text-muted">${escapeHtml(item.type)} · ${escapeHtml(String(item.dueAt).replace("T", " ").slice(0, 16))}</p>
+        </div>
+      `).join("") : `<p class="text-sm text-muted">Add assessments to activate countdowns.</p>`;
+
+      document.getElementById("plannerReminders").innerHTML = (data.reminders || []).map(item => `
+        <div class="rounded-lg border border-line bg-white p-3 shadow-soft">
+          <div class="flex items-center justify-between gap-3">
+            <p class="font-bold text-ink">${escapeHtml(item.title)}</p>
+            <span class="font-mono text-[10px] uppercase ${item.tone === "urgent" ? "text-coral" : item.tone === "warn" ? "text-gold" : "text-muted"}">${escapeHtml(item.type)}</span>
+          </div>
+          <p class="mt-1 text-sm text-muted">${escapeHtml(item.message)}</p>
+        </div>
+      `).join("");
+
+      document.getElementById("plannerAnalytics").innerHTML = `
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-lg border border-line bg-white p-3">
+            <p class="font-mono text-[10px] uppercase text-muted">Completion</p>
+            <p class="mt-1 text-2xl font-black text-navy">${data.analytics?.completionRate || 0}%</p>
+          </div>
+          <div class="rounded-lg border border-line bg-white p-3">
+            <p class="font-mono text-[10px] uppercase text-muted">Planned</p>
+            <p class="mt-1 text-2xl font-black text-navy">${data.analytics?.plannedSessions || 0}</p>
+          </div>
+          <div class="rounded-lg border border-line bg-white p-3">
+            <p class="font-mono text-[10px] uppercase text-muted">Streak</p>
+            <p class="mt-1 text-2xl font-black text-navy">${data.analytics?.streakDays || 0}</p>
+          </div>
+          <div class="rounded-lg border border-line bg-white p-3">
+            <p class="font-mono text-[10px] uppercase text-muted">Upcoming</p>
+            <p class="mt-1 text-2xl font-black text-navy">${data.analytics?.upcomingAssessments || 0}</p>
+          </div>
+        </div>
+        <div class="rounded-lg border border-line bg-white p-3">
+          <p class="font-mono text-[10px] uppercase text-muted">Scheduled Minutes</p>
+          <p class="mt-1 text-lg font-black text-navy">${data.analytics?.studyMinutesScheduled || 0} min</p>
+        </div>`;
     }
 
     async function completeTask(taskId) {
@@ -2784,6 +3447,59 @@
       } catch (error) {
         setApiStatus("Task saved locally", "offline");
       }
+    }
+
+    async function completePlannerSession(sessionId) {
+      if (!sessionId) return;
+      try {
+        if (apiConnected) {
+          await apiRequest(`/api/planner/coach/sessions/${encodeURIComponent(sessionId)}/complete`, { method: "POST" });
+          await loadPlanner();
+          return;
+        }
+      } catch (error) {
+        setPlannerStatus(error.message, "error");
+      }
+      if (smartPlanner) {
+        smartPlanner.todaySessions = (smartPlanner.todaySessions || []).map(session => session.id === sessionId ? { ...session, completed: true } : session);
+        smartPlanner.upcomingSessions = (smartPlanner.upcomingSessions || []).map(session => session.id === sessionId ? { ...session, completed: true } : session);
+        syncPlannerPreview();
+        renderPlanner();
+      }
+    }
+
+    async function reschedulePlannerSession(sessionId) {
+      if (!sessionId) return;
+      try {
+        if (apiConnected) {
+          await apiRequest(`/api/planner/coach/sessions/${encodeURIComponent(sessionId)}/reschedule`, { method: "POST" });
+          await loadPlanner();
+          return;
+        }
+      } catch (error) {
+        setPlannerStatus(error.message, "error");
+      }
+      if (smartPlanner) {
+        const moveSession = session => session.id === sessionId
+          ? {
+            ...session,
+            rescheduled: true,
+            missed: false,
+            sessionDate: (() => {
+              const current = new Date(`${session.sessionDate}T${session.scheduledTime || "18:30"}`);
+              current.setDate(current.getDate() + 1);
+              return current.toISOString().slice(0, 10);
+            })()
+          }
+          : session;
+        smartPlanner.todaySessions = (smartPlanner.todaySessions || []).map(moveSession);
+        smartPlanner.upcomingSessions = (smartPlanner.upcomingSessions || []).map(moveSession);
+        syncPlannerPreview();
+        renderPlanner();
+        setPlannerStatus("Session rescheduled locally", "success");
+        return;
+      }
+      setPlannerStatus("Connect the API to save reschedules.", "error");
     }
 
     function appendMessage(text, sender = "user") {
@@ -2999,6 +3715,164 @@
       }).join("");
     }
 
+    function setAdminStatus(targetId, message = "", tone = "muted") {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.textContent = message;
+      target.classList.remove("text-coral", "text-mint", "text-muted");
+      target.classList.add(tone === "error" ? "text-coral" : tone === "success" ? "text-mint" : "text-muted");
+    }
+
+    function selectedAdminPath() {
+      return adminAcademicPaths.find(path => path.id === selectedAdminPathId) || null;
+    }
+
+    function populateAdminAcademicForm(path = null) {
+      const item = path || {
+        category: "DIPLOMA_PROGRAM",
+        title: "",
+        providerName: "",
+        duration: "",
+        description: "",
+        entryRequirements: "",
+        structureLabel: "",
+        careerPaths: [],
+        difficultyLevel: "BEGINNER",
+        tags: [],
+        customTrack: false,
+        active: true
+      };
+      document.getElementById("adminPathCategory").value = item.category;
+      document.getElementById("adminPathTitle").value = item.title || "";
+      document.getElementById("adminPathProvider").value = item.providerName || "";
+      document.getElementById("adminPathDuration").value = item.duration || "";
+      document.getElementById("adminPathDifficulty").value = item.difficultyLevel || "BEGINNER";
+      document.getElementById("adminPathStructure").value = item.structureLabel || "";
+      document.getElementById("adminPathTags").value = (item.tags || []).join(", ");
+      document.getElementById("adminPathCareers").value = (item.careerPaths || []).join(", ");
+      document.getElementById("adminPathEntryRequirements").value = item.entryRequirements || "";
+      document.getElementById("adminPathDescription").value = item.description || "";
+      document.getElementById("adminPathCustomTrack").checked = Boolean(item.customTrack);
+      document.getElementById("adminPathActive").checked = item.active !== false;
+    }
+
+    function resetAdminModuleForm() {
+      selectedAdminModuleId = "";
+      document.getElementById("adminModuleTitle").value = "";
+      document.getElementById("adminModuleStageType").value = "SEMESTER";
+      document.getElementById("adminModuleStageLabel").value = "";
+      document.getElementById("adminModuleOrder").value = "1";
+      document.getElementById("adminModuleSummary").value = "";
+    }
+
+    function renderAdminAcademic() {
+      const list = document.getElementById("adminAcademicList");
+      const selectionChip = document.getElementById("adminAcademicSelectionChip");
+      const categoryFilter = document.getElementById("adminAcademicCategory")?.value || "";
+      const query = (document.getElementById("adminAcademicSearch")?.value || "").trim().toLowerCase();
+      const visiblePaths = adminAcademicPaths.filter(path => {
+        const matchesCategory = !categoryFilter || path.category === categoryFilter;
+        const haystack = [
+          path.title,
+          path.providerName,
+          path.description,
+          ...(path.tags || []),
+          path.category
+        ].join(" ").toLowerCase();
+        return matchesCategory && (!query || haystack.includes(query));
+      });
+
+      if (!visiblePaths.length) {
+        list.innerHTML = `
+          <div class="rounded-lg border border-line bg-white p-4 shadow-soft">
+            <p class="font-bold text-ink">${adminAcademicPaths.length ? "No paths match this filter" : "No academic paths loaded"}</p>
+            <p class="mt-1 text-sm text-muted">${adminAcademicPaths.length ? "Try a different search or category." : "Admin sign-in is required to manage diploma, certification, language, bootcamp, and online tracks."}</p>
+          </div>`;
+        if (!adminAcademicPaths.length) {
+          populateAdminAcademicForm(null);
+          resetAdminModuleForm();
+          document.getElementById("adminModuleList").innerHTML = "";
+          document.getElementById("adminResourceList").innerHTML = "";
+          document.getElementById("adminResourceModuleSelect").innerHTML = `<option value="">Attach to whole path</option>`;
+          if (selectionChip) {
+            selectionChip.innerHTML = `${icon("hub", "text-[16px]")}No path selected`;
+          }
+        }
+        return;
+      }
+
+      const current = visiblePaths.find(path => path.id === selectedAdminPathId) || visiblePaths[0];
+      if (!selectedAdminPathId && current) selectedAdminPathId = current.id;
+      if (selectionChip && current) {
+        selectionChip.innerHTML = `${icon("hub", "text-[16px]")}${escapeHtml(current.title)}`;
+      }
+
+      list.innerHTML = visiblePaths.map(path => `
+        <article class="rounded-lg border ${path.id === current.id ? "border-cobalt" : "border-line"} bg-white p-4 shadow-soft">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-mono text-[10px] uppercase text-muted">${escapeHtml(formatAcademicCategory(path.category))}</p>
+              <h4 class="mt-1 text-lg font-black text-navy">${escapeHtml(path.title)}</h4>
+              <p class="mt-1 text-sm text-muted">${escapeHtml(path.providerName)} · ${escapeHtml(path.duration)} · ${escapeHtml(formatDifficulty(path.difficultyLevel))}</p>
+              <p class="mt-2 text-sm text-muted">${escapeHtml(path.description)}</p>
+            </div>
+            <button class="btn btn-ghost h-10 px-3 text-sm admin-path-select" type="button" data-path-id="${escapeHtml(path.id)}">
+              ${icon("edit", "text-[18px]")}
+              Manage
+            </button>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            ${(path.tags || []).map(tag => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+        </article>
+      `).join("");
+
+      populateAdminAcademicForm(current);
+      document.getElementById("adminModuleList").innerHTML = (current.modules || []).length ? current.modules.map(module => `
+        <div class="rounded-lg border border-line bg-white p-3 shadow-soft">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-mono text-[10px] uppercase text-muted">${escapeHtml(module.stageType)} · ${escapeHtml(module.stageLabel)}</p>
+              <p class="mt-1 font-bold text-ink">${escapeHtml(module.title)}</p>
+              <p class="mt-1 text-sm text-muted">${escapeHtml(module.summary)}</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost h-9 px-3 text-xs admin-module-edit" type="button" data-module-id="${module.id}">
+                ${icon("edit", "text-[16px]")}Edit
+              </button>
+              <button class="btn btn-ghost h-9 px-3 text-xs text-coral admin-module-delete" type="button" data-module-id="${module.id}">
+                ${icon("delete", "text-[16px]")}Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join("") : `<p class="text-sm text-muted">No modules added for this path yet.</p>`;
+
+      document.getElementById("adminResourceModuleSelect").innerHTML = `
+        <option value="">Attach to whole path</option>
+        ${(current.modules || []).map(module => `<option value="${module.id}">${escapeHtml(module.title)}</option>`).join("")}
+      `;
+
+      document.getElementById("adminResourceList").innerHTML = (current.resources || []).length ? current.resources.map(resource => `
+        <div class="rounded-lg border border-line bg-white p-3 shadow-soft">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-mono text-[10px] uppercase text-muted">${escapeHtml(resource.resourceType)}</p>
+              <p class="mt-1 font-bold text-ink">${escapeHtml(resource.title)}</p>
+              <p class="mt-1 text-sm text-muted">${escapeHtml(resource.description || "Recommended learning resource")}</p>
+              <div class="mt-2 flex flex-wrap gap-2">
+                ${resource.externalUrl ? `<a class="chip" href="${escapeHtml(resource.externalUrl)}" target="_blank" rel="noreferrer">Open Link</a>` : ""}
+                ${resource.downloadable ? `<button class="chip admin-resource-download" type="button" data-resource-url="${escapeHtml(resource.downloadUrl || "")}">${icon("download", "text-[14px]")}Download</button>` : ""}
+              </div>
+            </div>
+            <button class="btn btn-ghost h-9 px-3 text-xs text-coral admin-resource-delete" type="button" data-resource-id="${resource.id}">
+              ${icon("delete", "text-[16px]")}Delete
+            </button>
+          </div>
+        </div>
+      `).join("") : `<p class="text-sm text-muted">No resources uploaded for this path yet.</p>`;
+    }
+
     function setProfileStatus(targetId, message, tone = "muted") {
       const target = document.getElementById(targetId);
       if (!target) return;
@@ -3163,7 +4037,8 @@
     async function loadDashboard() {
       const data = await apiRequest("/api/dashboard/overview");
       applyDashboard(data);
-      plannerBase = data.tasks.map(mapTask);
+      const dashboardTasks = data.tasks.map(mapTask);
+      plannerBase = smartPlanner?.configured ? plannerSessionPreviewTasks(smartPlanner) : dashboardTasks;
       feedItems = data.feed.map(mapSignal);
       renderDashboardPreviews(plannerBase, feedItems);
       if (activeView === "planner" || renderedLocalViews.has("planner")) renderPlanner();
@@ -3200,9 +4075,36 @@
       }
     }
 
+    async function loadAcademicCatalog() {
+      try {
+        if (apiConnected) {
+          const data = await apiRequest("/api/catalog/academic-paths");
+          academicCatalog = data.map(path => ({
+            ...path,
+            modules: path.modules || [],
+            resources: path.resources || []
+          }));
+        } else {
+          academicCatalog = localAcademicCatalog.slice();
+        }
+      } catch (error) {
+        academicCatalog = localAcademicCatalog.slice();
+      }
+      populatePlannerPathOptions();
+      syncPlannerPathSelection({ preserveInput: true });
+    }
+
     async function loadPlanner() {
-      const data = await apiRequest(`/api/planner/today?focusHours=${focusHours}`);
-      plannerBase = data.tasks.map(mapTask);
+      const [basic, coach] = await Promise.all([
+        apiRequest(`/api/planner/today?focusHours=${focusHours}`).catch(() => ({ tasks: plannerBase })),
+        loadAcademicCatalog().then(() => apiConnected ? apiRequest("/api/planner/coach") : buildLocalPlannerDashboard()).catch(() => buildLocalPlannerDashboard())
+      ]);
+      const fallbackPlannerTasks = (basic.tasks || []).map(mapTask);
+      smartPlanner = coach || buildLocalPlannerDashboard();
+      populatePlannerForm(smartPlanner);
+      plannerBase = smartPlanner?.configured
+        ? plannerSessionPreviewTasks(smartPlanner)
+        : (fallbackPlannerTasks.length ? fallbackPlannerTasks : defaultPlannerBase.map(item => ({ ...item })));
       if (activeView === "planner" || renderedLocalViews.has("planner")) renderPlanner();
       renderDashboardPreviews(plannerBase, feedItems);
     }
@@ -3314,12 +4216,240 @@
     async function loadAdmin() {
       if (currentUser?.role !== "ADMIN") {
         moderationItems = [];
+        adminAcademicPaths = [];
+        selectedAdminPathId = "";
         renderModeration();
+        renderAdminAcademic();
         return;
       }
-      const data = await apiRequest("/api/admin/moderation");
-      moderationItems = data;
+      const [moderation, paths] = await Promise.all([
+        apiRequest("/api/admin/moderation"),
+        apiRequest("/api/admin/academic/paths").catch(() => [])
+      ]);
+      moderationItems = moderation;
+      adminAcademicPaths = paths;
+      if (!selectedAdminPathId && adminAcademicPaths.length) {
+        selectedAdminPathId = adminAcademicPaths[0].id;
+      }
       renderModeration();
+      renderAdminAcademic();
+    }
+
+    async function savePlannerSetup() {
+      const payload = plannerPayload();
+      if (!payload.institutionName || !payload.learningPathTitle) {
+        setPlannerStatus("Add your institution/provider and learning path.", "error");
+        return;
+      }
+      if (!payload.milestones.length) {
+        setPlannerStatus("Add at least one CAT, quiz, assignment, or exam.", "error");
+        return;
+      }
+      if (!payload.preferredStudyTimes.length) {
+        setPlannerStatus("Choose at least one preferred study window.", "error");
+        return;
+      }
+      setPlannerStatus("Generating your adaptive plan...");
+      if (!apiConnected) {
+        smartPlanner = {
+          ...buildLocalPlannerDashboard(),
+          configured: true,
+          institutionName: payload.institutionName,
+          learningPathTitle: payload.learningPathTitle,
+          selectedPath: findAcademicPathMatch(document.getElementById("plannerPathInput").value),
+          availableStudyHoursPerDay: payload.availableStudyHoursPerDay,
+          weakSubjects: payload.weakSubjects,
+          strongSubjects: payload.strongSubjects,
+          preferredStudyTimes: payload.preferredStudyTimes,
+          milestones: payload.milestones,
+          reminders: [{ title: "Offline planner", type: "INFO", message: "Connect the API to persist this study plan across devices.", dueAt: null, tone: "info" }]
+        };
+        syncPlannerPreview();
+        renderPlanner();
+        setPlannerStatus("Planner updated locally", "success");
+        return;
+      }
+      const data = await apiRequest("/api/planner/coach", {
+        method: "PUT",
+        body: JSON.stringify(payload)
+      });
+      smartPlanner = data;
+      populatePlannerForm(data);
+      syncPlannerPreview();
+      renderPlanner();
+      setPlannerStatus("Planner updated", "success");
+    }
+
+    function populateAdminModuleForm(module = null) {
+      if (!module) {
+        resetAdminModuleForm();
+        return;
+      }
+      selectedAdminModuleId = String(module.id);
+      document.getElementById("adminModuleTitle").value = module.title || "";
+      document.getElementById("adminModuleStageType").value = module.stageType || "SEMESTER";
+      document.getElementById("adminModuleStageLabel").value = module.stageLabel || "";
+      document.getElementById("adminModuleOrder").value = module.displayOrder || 1;
+      document.getElementById("adminModuleSummary").value = module.summary || "";
+    }
+
+    async function saveAdminAcademicPath() {
+      const payload = {
+        category: document.getElementById("adminPathCategory").value,
+        title: document.getElementById("adminPathTitle").value.trim(),
+        providerName: document.getElementById("adminPathProvider").value.trim(),
+        duration: document.getElementById("adminPathDuration").value.trim(),
+        description: document.getElementById("adminPathDescription").value.trim(),
+        entryRequirements: document.getElementById("adminPathEntryRequirements").value.trim(),
+        structureLabel: document.getElementById("adminPathStructure").value.trim(),
+        careerPaths: document.getElementById("adminPathCareers").value.split(",").map(item => item.trim()).filter(Boolean),
+        difficultyLevel: document.getElementById("adminPathDifficulty").value,
+        tags: document.getElementById("adminPathTags").value.split(",").map(item => item.trim()).filter(Boolean),
+        customTrack: document.getElementById("adminPathCustomTrack").checked,
+        active: document.getElementById("adminPathActive").checked
+      };
+      setAdminStatus("adminAcademicStatus", "Saving path...");
+      if (!apiConnected) {
+        setAdminStatus("adminAcademicStatus", "Connect the API to manage the live catalog.", "error");
+        return;
+      }
+      const path = selectedAdminPath();
+      const data = await apiRequest(path ? `/api/admin/academic/paths/${encodeURIComponent(path.id)}` : "/api/admin/academic/paths", {
+        method: path ? "PUT" : "POST",
+        body: JSON.stringify(payload)
+      });
+      selectedAdminPathId = data.id;
+      await loadAdmin();
+      setAdminStatus("adminAcademicStatus", "Path saved", "success");
+    }
+
+    async function deleteSelectedAdminPath() {
+      const path = selectedAdminPath();
+      if (!path) {
+        setAdminStatus("adminAcademicStatus", "Choose a path first.", "error");
+        return;
+      }
+      if (!apiConnected) {
+        setAdminStatus("adminAcademicStatus", "Connect the API to manage the live catalog.", "error");
+        return;
+      }
+      setAdminStatus("adminAcademicStatus", "Deleting...");
+      await apiRequest(`/api/admin/academic/paths/${encodeURIComponent(path.id)}`, { method: "DELETE" });
+      selectedAdminPathId = "";
+      await loadAdmin();
+      setAdminStatus("adminAcademicStatus", "Path deleted", "success");
+    }
+
+    async function saveAdminModule() {
+      const path = selectedAdminPath();
+      if (!path) {
+        setAdminStatus("adminModuleStatus", "Choose a path first.", "error");
+        return;
+      }
+      const payload = {
+        title: document.getElementById("adminModuleTitle").value.trim(),
+        summary: document.getElementById("adminModuleSummary").value.trim(),
+        stageType: document.getElementById("adminModuleStageType").value,
+        stageLabel: document.getElementById("adminModuleStageLabel").value.trim(),
+        displayOrder: Number(document.getElementById("adminModuleOrder").value || 1)
+      };
+      setAdminStatus("adminModuleStatus", "Saving module...");
+      if (!apiConnected) {
+        setAdminStatus("adminModuleStatus", "Connect the API to manage the live catalog.", "error");
+        return;
+      }
+      const pathUrl = selectedAdminModuleId
+        ? `/api/admin/academic/modules/${encodeURIComponent(selectedAdminModuleId)}`
+        : `/api/admin/academic/paths/${encodeURIComponent(path.id)}/modules`;
+      await apiRequest(pathUrl, {
+        method: selectedAdminModuleId ? "PUT" : "POST",
+        body: JSON.stringify(payload)
+      });
+      selectedAdminModuleId = "";
+      await loadAdmin();
+      setAdminStatus("adminModuleStatus", "Module saved", "success");
+    }
+
+    async function uploadAdminResource() {
+      const path = selectedAdminPath();
+      if (!path) {
+        setAdminStatus("adminResourceStatus", "Choose a path first.", "error");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("title", document.getElementById("adminResourceTitle").value.trim());
+      formData.append("resourceType", document.getElementById("adminResourceType").value);
+      const description = document.getElementById("adminResourceDescription").value.trim();
+      const externalUrl = document.getElementById("adminResourceUrl").value.trim();
+      const moduleId = document.getElementById("adminResourceModuleSelect").value;
+      const file = document.getElementById("adminResourceFile").files[0];
+      if (description) formData.append("description", description);
+      if (externalUrl) formData.append("externalUrl", externalUrl);
+      if (moduleId) formData.append("moduleId", moduleId);
+      if (file) formData.append("file", file);
+      setAdminStatus("adminResourceStatus", "Uploading resource...");
+      if (!apiConnected) {
+        setAdminStatus("adminResourceStatus", "Connect the API to upload live resources.", "error");
+        return;
+      }
+      await apiRequest(`/api/admin/academic/paths/${encodeURIComponent(path.id)}/resources`, {
+        method: "POST",
+        body: formData
+      });
+      document.getElementById("adminResourceForm").reset();
+      await loadAdmin();
+      setAdminStatus("adminResourceStatus", "Resource uploaded", "success");
+    }
+
+    async function deleteAdminModule(moduleId) {
+      if (!apiConnected) {
+        setAdminStatus("adminModuleStatus", "Connect the API to manage the live catalog.", "error");
+        return;
+      }
+      await apiRequest(`/api/admin/academic/modules/${encodeURIComponent(moduleId)}`, { method: "DELETE" });
+      if (String(selectedAdminModuleId) === String(moduleId)) {
+        resetAdminModuleForm();
+      }
+      await loadAdmin();
+      setAdminStatus("adminModuleStatus", "Module deleted", "success");
+    }
+
+    async function deleteAdminResource(resourceId) {
+      if (!apiConnected) {
+        setAdminStatus("adminResourceStatus", "Connect the API to manage the live catalog.", "error");
+        return;
+      }
+      await apiRequest(`/api/admin/academic/resources/${encodeURIComponent(resourceId)}`, { method: "DELETE" });
+      await loadAdmin();
+      setAdminStatus("adminResourceStatus", "Resource deleted", "success");
+    }
+
+    async function downloadAcademicResource(path, fallbackName) {
+      if (!authToken) {
+        showAuthGate("Sign in to download resources.");
+        return;
+      }
+      try {
+        const response = await fetch(apiUrl(path), {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (!response.ok) {
+          throw new Error(await apiErrorMessage(response, `Download failed with ${response.status}`));
+        }
+        const blob = await response.blob();
+        const filename = filenameFromDisposition(response.headers.get("Content-Disposition")) || fallbackName || "resource";
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(objectUrl);
+        setAdminStatus("adminResourceStatus", "Resource download ready", "success");
+      } catch (error) {
+        setAdminStatus("adminResourceStatus", error.message, "error");
+      }
     }
 
     function renderLocalView(id) {
@@ -3354,6 +4484,7 @@
       }
       if (id === "admin") {
         renderModeration();
+        renderAdminAcademic();
       }
     }
 
@@ -3471,10 +4602,66 @@
         return;
       }
 
+      const plannerComplete = event.target.closest(".planner-session-complete");
+      if (plannerComplete) {
+        completePlannerSession(plannerComplete.dataset.sessionId);
+        return;
+      }
+
+      const plannerReschedule = event.target.closest(".planner-session-reschedule");
+      if (plannerReschedule) {
+        reschedulePlannerSession(plannerReschedule.dataset.sessionId);
+        return;
+      }
+
       const downloadButton = event.target.closest(".download-note");
       if (downloadButton) {
         const note = marketplaceItems.find(item => item.id === downloadButton.dataset.noteId);
         downloadNotePack(downloadButton.dataset.noteUrl, note?.originalFilename || note?.title);
+        return;
+      }
+
+      const adminSelect = event.target.closest(".admin-path-select");
+      if (adminSelect) {
+        selectedAdminPathId = adminSelect.dataset.pathId || "";
+        selectedAdminModuleId = "";
+        renderAdminAcademic();
+        resetAdminModuleForm();
+        return;
+      }
+
+      const adminModuleEdit = event.target.closest(".admin-module-edit");
+      if (adminModuleEdit) {
+        const module = selectedAdminPath()?.modules?.find(item => String(item.id) === String(adminModuleEdit.dataset.moduleId));
+        populateAdminModuleForm(module || null);
+        return;
+      }
+
+      const adminModuleDelete = event.target.closest(".admin-module-delete");
+      if (adminModuleDelete) {
+        deleteAdminModule(adminModuleDelete.dataset.moduleId);
+        return;
+      }
+
+      const adminResourceDelete = event.target.closest(".admin-resource-delete");
+      if (adminResourceDelete) {
+        deleteAdminResource(adminResourceDelete.dataset.resourceId);
+        return;
+      }
+
+      const adminResourceDownload = event.target.closest(".admin-resource-download");
+      if (adminResourceDownload) {
+        downloadAcademicResource(adminResourceDownload.dataset.resourceUrl, "resource");
+        return;
+      }
+
+      const removeDeadline = event.target.closest(".planner-deadline-remove");
+      if (removeDeadline) {
+        const row = removeDeadline.closest("article");
+        row?.remove();
+        if (!document.querySelector("#plannerDeadlineList > article")) {
+          renderPlannerDeadlineRows([]);
+        }
         return;
       }
 
@@ -3515,6 +4702,65 @@
     document.getElementById("authUniversity").addEventListener("input", () => syncAuthProgramOptions());
     document.getElementById("authUniversity").addEventListener("change", () => syncAuthProgramOptions());
     document.getElementById("authProgram").addEventListener("focus", () => syncAuthProgramOptions({ resetInvalidProgram: false }));
+    document.getElementById("plannerPathInput").addEventListener("input", () => syncPlannerPathSelection({ preserveInput: true }));
+    document.getElementById("plannerPathInput").addEventListener("change", () => syncPlannerPathSelection());
+    document.getElementById("plannerAddDeadline").addEventListener("click", () => {
+      const container = document.getElementById("plannerDeadlineList");
+      container.insertAdjacentHTML("beforeend", plannerDeadlineRowsMarkup({ type: "CAT", priority: "HIGH" }));
+    });
+    document.getElementById("plannerSetupForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const button = document.getElementById("plannerSetupSubmit");
+      button.disabled = true;
+      button.classList.add("opacity-70");
+      try {
+        await savePlannerSetup();
+      } catch (error) {
+        setPlannerStatus(error.message, "error");
+      } finally {
+        button.disabled = false;
+        button.classList.remove("opacity-70");
+      }
+    });
+    document.getElementById("adminAcademicSearch").addEventListener("input", renderAdminAcademic);
+    document.getElementById("adminAcademicCategory").addEventListener("change", renderAdminAcademic);
+    document.getElementById("adminAcademicForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        await saveAdminAcademicPath();
+      } catch (error) {
+        setAdminStatus("adminAcademicStatus", error.message, "error");
+      }
+    });
+    document.getElementById("adminAcademicResetButton").addEventListener("click", () => {
+      selectedAdminPathId = "";
+      populateAdminAcademicForm(null);
+      resetAdminModuleForm();
+      setAdminStatus("adminAcademicStatus", "Ready for a new path.");
+    });
+    document.getElementById("adminAcademicDeleteButton").addEventListener("click", async () => {
+      try {
+        await deleteSelectedAdminPath();
+      } catch (error) {
+        setAdminStatus("adminAcademicStatus", error.message, "error");
+      }
+    });
+    document.getElementById("adminModuleForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        await saveAdminModule();
+      } catch (error) {
+        setAdminStatus("adminModuleStatus", error.message, "error");
+      }
+    });
+    document.getElementById("adminResourceForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      try {
+        await uploadAdminResource();
+      } catch (error) {
+        setAdminStatus("adminResourceStatus", error.message, "error");
+      }
+    });
     document.getElementById("authOfflineButton").addEventListener("click", () => {
       hideAuthGate();
       apiConnected = false;
@@ -3642,17 +4888,6 @@
       document.getElementById("mockStatus").innerHTML = `${icon("cloud_done", "text-[16px]")}Synced`;
     });
 
-    document.getElementById("focusMinus").addEventListener("click", () => {
-      focusHours = Math.max(1, focusHours - 1);
-      renderPlanner();
-      if (apiConnected) loadPlanner().catch(() => setApiStatus("Planner fallback", "offline"));
-    });
-    document.getElementById("focusPlus").addEventListener("click", () => {
-      focusHours = Math.min(5, focusHours + 1);
-      renderPlanner();
-      if (apiConnected) loadPlanner().catch(() => setApiStatus("Planner fallback", "offline"));
-    });
-
     document.getElementById("tutorNotesInput").addEventListener("change", event => {
       const files = Array.from(event.target.files || []);
       tutorNotes = files.slice(0, MAX_TUTOR_NOTES);
@@ -3755,6 +4990,10 @@
     renderNavigation();
     renderDashboardPreviews(plannerBase, feedItems);
     initializeAuthCatalog();
+    populatePlannerPathOptions();
+    renderPlannerDeadlineRows([]);
+    renderPlanner();
+    renderAdminAcademic();
     renderTutorNotes();
     bootstrapApi();
 
@@ -3805,7 +5044,10 @@
     document.getElementById("drawerSignOut")?.addEventListener("click", () => {
       closeDrawer();
       clearSession();
+      apiConnected = false;
+      setApiStatus("Signed out", "offline");
       showAuthGate("You've been signed out.");
+      loadAdmin();
     });
 
     /* ── Remove mobile-content-offset on desktop ─────── */

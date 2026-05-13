@@ -20,6 +20,9 @@ public class DatabaseSeeder implements ApplicationRunner {
   private final FeedSignalRepository feedSignalRepository;
   private final NotePackRepository notePackRepository;
   private final ModerationItemRepository moderationItemRepository;
+  private final AcademicPathRepository academicPathRepository;
+  private final AcademicModuleRepository academicModuleRepository;
+  private final AcademicResourceRepository academicResourceRepository;
   private final PasswordEncoder passwordEncoder;
 
   public DatabaseSeeder(
@@ -31,6 +34,9 @@ public class DatabaseSeeder implements ApplicationRunner {
       FeedSignalRepository feedSignalRepository,
       NotePackRepository notePackRepository,
       ModerationItemRepository moderationItemRepository,
+      AcademicPathRepository academicPathRepository,
+      AcademicModuleRepository academicModuleRepository,
+      AcademicResourceRepository academicResourceRepository,
       PasswordEncoder passwordEncoder
   ) {
     this.userRepository = userRepository;
@@ -41,6 +47,9 @@ public class DatabaseSeeder implements ApplicationRunner {
     this.feedSignalRepository = feedSignalRepository;
     this.notePackRepository = notePackRepository;
     this.moderationItemRepository = moderationItemRepository;
+    this.academicPathRepository = academicPathRepository;
+    this.academicModuleRepository = academicModuleRepository;
+    this.academicResourceRepository = academicResourceRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -88,6 +97,9 @@ public class DatabaseSeeder implements ApplicationRunner {
     }
     if (moderationItemRepository.count() == 0) {
       seedModeration();
+    }
+    if (academicPathRepository.count() == 0) {
+      seedAcademicExpansionCatalog();
     }
   }
 
@@ -257,5 +269,257 @@ public class DatabaseSeeder implements ApplicationRunner {
         "Marketplace", "Review", "Check duplicate upload", 3));
     moderationItemRepository.save(new ModerationItemEntity("mod_ds_group", "DS Past Paper Sprint",
         "Group", "Approved", "Community guidelines passed", 4));
+  }
+
+  private void seedAcademicExpansionCatalog() {
+    Instant now = Instant.now();
+
+    AcademicPathEntity diploma = academicPathRepository.save(new AcademicPathEntity(
+        "ap_diploma_cyber",
+        "DIPLOMA_PROGRAM",
+        "Diploma in Cyber Security",
+        "Technical University of Kenya",
+        "2 years",
+        "Hands-on diploma covering secure networks, operating systems hardening, threat response, and cyber lab practice.",
+        "KCSE mean grade C- or equivalent technical admission pathway.",
+        "Semester 1 to Semester 4",
+        "Security analyst, SOC technician, junior incident responder",
+        "INTERMEDIATE",
+        "cybersecurity,networking,diploma,kenya",
+        false,
+        true,
+        1,
+        now,
+        now
+    ));
+    AcademicPathEntity certification = academicPathRepository.save(new AcademicPathEntity(
+        "ap_cert_cpa",
+        "PROFESSIONAL_CERTIFICATION",
+        "CPA Professional Path",
+        "KASNEB",
+        "18-24 months",
+        "Stage-based accounting certification focused on financial reporting, audit, taxation, and business law.",
+        "KASNEB technician route, relevant degree, or approved accounting entry pathway.",
+        "Foundation, Intermediate, Advanced",
+        "Auditor, accountant, finance analyst, tax associate",
+        "ADVANCED",
+        "cpa,finance,accounting,professional",
+        false,
+        true,
+        2,
+        now,
+        now
+    ));
+    AcademicPathEntity language = academicPathRepository.save(new AcademicPathEntity(
+        "ap_lang_french",
+        "LANGUAGE_PROGRAM",
+        "French Fluency Track",
+        "Alliance Francaise Nairobi",
+        "12 months",
+        "Progressive French language track for grammar, listening, conversation, and exam preparation.",
+        "Open entry; placement test for continuing learners.",
+        "A1, A2, B1, B2",
+        "Translator, hospitality roles, immigration prep, academic exchange",
+        "BEGINNER",
+        "french,language,communication,global",
+        false,
+        true,
+        3,
+        now,
+        now
+    ));
+    AcademicPathEntity bootcamp = academicPathRepository.save(new AcademicPathEntity(
+        "ap_bootcamp_moringa",
+        "TECH_BOOTCAMP_SHORT_COURSE",
+        "Software Engineering Bootcamp",
+        "Moringa School",
+        "6 months",
+        "Project-driven bootcamp covering frontend, backend, product thinking, and career coaching for junior developers.",
+        "Basic computer literacy and commitment to full-time project work.",
+        "Foundation, Core, Capstone",
+        "Frontend developer, backend trainee, junior software engineer",
+        "INTENSIVE",
+        "bootcamp,software-engineering,projects,career",
+        false,
+        true,
+        4,
+        now,
+        now
+    ));
+    AcademicPathEntity online = academicPathRepository.save(new AcademicPathEntity(
+        "ap_online_google_data",
+        "ONLINE_CERTIFICATION_SKILL_TRACK",
+        "Google Data Analytics Skill Track",
+        "Coursera / Google",
+        "3-6 months",
+        "Self-paced data analytics certificate covering spreadsheets, SQL, Tableau, and job-ready case studies.",
+        "Open entry; ideal for beginners with consistent weekly study time.",
+        "Course 1 to Course 8",
+        "Data analyst, reporting associate, business intelligence support",
+        "BEGINNER",
+        "data,analytics,online,certificate,skills",
+        true,
+        true,
+        5,
+        now,
+        now
+    ));
+
+    AcademicModuleEntity diplomaOne = academicModuleRepository.save(new AcademicModuleEntity(
+        diploma,
+        "Network Defense Fundamentals",
+        "Core unit for TCP/IP review, firewall rules, and secure network segmentation.",
+        "SEMESTER",
+        "Semester 1",
+        1
+    ));
+    academicModuleRepository.save(new AcademicModuleEntity(
+        diploma,
+        "Ethical Hacking Lab",
+        "Guided penetration-testing practice with reporting discipline and lab safety.",
+        "SEMESTER",
+        "Semester 3",
+        2
+    ));
+
+    AcademicModuleEntity cpaOne = academicModuleRepository.save(new AcademicModuleEntity(
+        certification,
+        "Financial Accounting",
+        "Ledger flow, adjustments, financial statements, and exam-standard workings.",
+        "CERTIFICATION_STAGE",
+        "Foundation",
+        1
+    ));
+    academicModuleRepository.save(new AcademicModuleEntity(
+        certification,
+        "Taxation",
+        "VAT, income tax, corporate tax, and exam-oriented calculation practice.",
+        "CERTIFICATION_STAGE",
+        "Intermediate",
+        2
+    ));
+
+    AcademicModuleEntity frenchOne = academicModuleRepository.save(new AcademicModuleEntity(
+        language,
+        "French A1 Communication",
+        "Greetings, introductions, survival grammar, and short listening drills.",
+        "LEVEL",
+        "A1",
+        1
+    ));
+    academicModuleRepository.save(new AcademicModuleEntity(
+        language,
+        "French B1 Conversation",
+        "Structured speaking, reading comprehension, and grammar reinforcement.",
+        "LEVEL",
+        "B1",
+        2
+    ));
+
+    AcademicModuleEntity bootcampOne = academicModuleRepository.save(new AcademicModuleEntity(
+        bootcamp,
+        "Frontend Product Build",
+        "Responsive UI delivery with JavaScript, APIs, and production polish.",
+        "STAGE",
+        "Core",
+        1
+    ));
+    academicModuleRepository.save(new AcademicModuleEntity(
+        bootcamp,
+        "Career Readiness Sprint",
+        "Portfolio, interview rehearsal, and capstone storytelling.",
+        "STAGE",
+        "Capstone",
+        2
+    ));
+
+    AcademicModuleEntity onlineOne = academicModuleRepository.save(new AcademicModuleEntity(
+        online,
+        "Foundations: Ask, Prepare, Process",
+        "Data cleaning, spreadsheet structure, and analytical framing.",
+        "MODULE",
+        "Course 1-3",
+        1
+    ));
+    academicModuleRepository.save(new AcademicModuleEntity(
+        online,
+        "Analyze and Share",
+        "SQL, Tableau, dashboards, and portfolio case-study writing.",
+        "MODULE",
+        "Course 4-8",
+        2
+    ));
+
+    academicResourceRepository.save(new AcademicResourceEntity(
+        diploma,
+        diplomaOne,
+        "usr_admin",
+        "Cyber lab checklist",
+        "PDF",
+        "Starter checklist for secure lab discipline and revision priorities.",
+        "https://predict.ed/resources/cyber-lab-checklist",
+        null,
+        null,
+        null,
+        0,
+        1,
+        now
+    ));
+    academicResourceRepository.save(new AcademicResourceEntity(
+        certification,
+        cpaOne,
+        "CPA formula pack",
+        "NOTES",
+        "Quick-recall sheet for accounting adjustments and tax computation patterns.",
+        "https://predict.ed/resources/cpa-formula-pack",
+        null,
+        null,
+        null,
+        0,
+        1,
+        now
+    ));
+    academicResourceRepository.save(new AcademicResourceEntity(
+        language,
+        frenchOne,
+        "French listening playlist",
+        "AUDIO",
+        "Beginner listening and pronunciation drills.",
+        "https://predict.ed/resources/french-a1-listening",
+        null,
+        null,
+        null,
+        0,
+        1,
+        now
+    ));
+    academicResourceRepository.save(new AcademicResourceEntity(
+        bootcamp,
+        bootcampOne,
+        "Bootcamp capstone rubric",
+        "GUIDE",
+        "Project quality checklist for frontend/backend delivery and demos.",
+        "https://predict.ed/resources/bootcamp-capstone-rubric",
+        null,
+        null,
+        null,
+        0,
+        1,
+        now
+    ));
+    academicResourceRepository.save(new AcademicResourceEntity(
+        online,
+        onlineOne,
+        "Google DA study map",
+        "ROADMAP",
+        "Weekly completion guide for self-paced learners balancing work and study.",
+        "https://predict.ed/resources/google-da-study-map",
+        null,
+        null,
+        null,
+        0,
+        1,
+        now
+    ));
   }
 }

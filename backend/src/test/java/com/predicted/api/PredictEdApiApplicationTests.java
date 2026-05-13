@@ -25,6 +25,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -378,6 +379,126 @@ class PredictEdApiApplicationTests {
     assertThat(payment.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(payment.getBody()).containsEntry("status", "QUEUED");
     assertThat(paymentAttemptRepository.existsById((String) payment.getBody().get("checkoutRequestId"))).isTrue();
+  }
+
+  @Test
+  void academicExpansionCatalogPlannerCoachAndAdminFlowsWork() {
+    AuthResponse student = login("alex@predicted.test", "password");
+
+    ResponseEntity<Map[]> catalog = restTemplate.exchange(
+        url("/api/catalog/academic-paths"),
+        HttpMethod.GET,
+        authorized(student.token()),
+        Map[].class
+    );
+
+    assertThat(catalog.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(catalog.getBody()).isNotEmpty();
+    assertThat(catalog.getBody())
+        .anySatisfy(item -> assertThat(item).containsEntry("category", "PROFESSIONAL_CERTIFICATION"));
+
+    Map<String, Object> catalogPath = catalog.getBody()[0];
+    String catalogPathId = (String) catalogPath.get("id");
+    Map<String, Object> plannerPayload = Map.of(
+        "institutionName", String.valueOf(catalogPath.get("providerName")),
+        "academicPathId", catalogPathId,
+        "learningPathTitle", String.valueOf(catalogPath.get("title")),
+        "availableStudyHoursPerDay", 4,
+        "weakSubjects", List.of("Financial Reporting"),
+        "strongSubjects", List.of("Business Law"),
+        "preferredStudyTimes", List.of("MORNING", "EVENING"),
+        "milestones", List.of(Map.of(
+            "type", "EXAM",
+            "title", "Section II Exam",
+            "subjectName", "Financial Reporting",
+            "dueAt", LocalDateTime.now().plusDays(10).withSecond(0).withNano(0).toString(),
+            "priority", "CRITICAL"
+        )),
+        "calendarConnected", true
+    );
+
+    ResponseEntity<Map> planner = restTemplate.exchange(
+        url("/api/planner/coach"),
+        HttpMethod.PUT,
+        authorized(student.token(), plannerPayload),
+        Map.class
+    );
+
+    assertThat(planner.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(planner.getBody()).containsEntry("configured", true);
+    assertThat(planner.getBody()).containsEntry("institutionName", String.valueOf(catalogPath.get("providerName")));
+    assertThat((Iterable<?>) planner.getBody().get("todaySessions")).isNotEmpty();
+    assertThat((Iterable<?>) planner.getBody().get("aiRecommendations")).isNotEmpty();
+
+    AuthResponse admin = login("admin@predicted.test", "admin123");
+    Map<String, Object> pathPayload = Map.of(
+        "category", "TECH_BOOTCAMP_SHORT_COURSE",
+        "title", "Cloud Engineering Launchpad",
+        "providerName", "Predict.ed Labs",
+        "duration", "16 weeks",
+        "description", "Intensive bootcamp for Linux, cloud deployment, monitoring, and job readiness.",
+        "entryRequirements", "Comfort with basic computing and weekly hands-on labs.",
+        "structureLabel", "Stage 1 to Stage 4",
+        "careerPaths", List.of("Cloud support engineer", "Junior DevOps engineer"),
+        "difficultyLevel", "INTERMEDIATE",
+        "tags", List.of("cloud", "devops", "bootcamp"),
+        "customTrack", true,
+        "active", true
+    );
+
+    ResponseEntity<Map> createdPath = restTemplate.exchange(
+        url("/api/admin/academic/paths"),
+        HttpMethod.POST,
+        authorized(admin.token(), pathPayload),
+        Map.class
+    );
+
+    assertThat(createdPath.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(createdPath.getBody()).containsEntry("title", "Cloud Engineering Launchpad");
+    String createdPathId = (String) createdPath.getBody().get("id");
+
+    ResponseEntity<Map> createdModule = restTemplate.exchange(
+        url("/api/admin/academic/paths/" + createdPathId + "/modules"),
+        HttpMethod.POST,
+        authorized(admin.token(), Map.of(
+            "title", "Observability Fundamentals",
+            "summary", "Logging, metrics, dashboards, and alerting for production systems.",
+            "stageType", "STAGE",
+            "stageLabel", "Stage 2",
+            "displayOrder", 1
+        )),
+        Map.class
+    );
+
+    assertThat(createdModule.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(createdModule.getBody()).containsEntry("title", "Observability Fundamentals");
+
+    MultiValueMap<String, Object> resourceBody = new LinkedMultiValueMap<>();
+    resourceBody.add("title", "Bootcamp study checklist");
+    resourceBody.add("resourceType", "LINK");
+    resourceBody.add("externalUrl", "https://example.com/bootcamp-study-checklist");
+    resourceBody.add("description", "Recommended pacing checklist for the bootcamp.");
+
+    ResponseEntity<Map> createdResource = restTemplate.exchange(
+        url("/api/admin/academic/paths/" + createdPathId + "/resources"),
+        HttpMethod.POST,
+        authorizedMultipart(admin.token(), resourceBody),
+        Map.class
+    );
+
+    assertThat(createdResource.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(createdResource.getBody()).containsEntry("title", "Bootcamp study checklist");
+
+    ResponseEntity<Map[]> adminPaths = restTemplate.exchange(
+        url("/api/admin/academic/paths"),
+        HttpMethod.GET,
+        authorized(admin.token()),
+        Map[].class
+    );
+
+    assertThat(adminPaths.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(adminPaths.getBody())
+        .anySatisfy(item -> assertThat(item).containsEntry("id", createdPathId));
   }
 
   private AuthResponse login(String email, String password) {
