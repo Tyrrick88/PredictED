@@ -956,11 +956,14 @@
           <div class="grid gap-3 md:grid-cols-2" data-auth-register>
             <label class="grid gap-1">
               <span class="font-mono text-[11px] font-bold uppercase text-muted">University</span>
-              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" autocomplete="organization" placeholder="University of Nairobi" type="text" />
+              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" list="authUniversityOptions" autocomplete="organization" placeholder="Search your university" type="text" />
+              <datalist id="authUniversityOptions"></datalist>
             </label>
             <label class="grid gap-1">
-              <span class="font-mono text-[11px] font-bold uppercase text-muted">Program</span>
-              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" placeholder="BSc. Computer Science" type="text" />
+              <span class="font-mono text-[11px] font-bold uppercase text-muted">Degree course</span>
+              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" list="authProgramOptions" placeholder="Search your degree course" type="text" />
+              <datalist id="authProgramOptions"></datalist>
+              <p class="text-xs text-muted" id="authProgramHint">Search your university first to narrow the degree-course list.</p>
             </label>
           </div>
           <label class="grid gap-1" data-auth-register>
@@ -2092,6 +2095,72 @@
       { courseId: "data", courseName: "Data Mining", lecturer: "Dr. Achieng" }
     ];
 
+    const kenyanUniversityCatalog = [
+      {
+        university: "University of Nairobi",
+        programs: ["Medicine and Surgery", "Law", "Computer Science", "Architecture", "Civil Engineering", "Business Administration", "Pharmacy"]
+      },
+      {
+        university: "Kenyatta University",
+        programs: ["Education", "Nursing", "Computer Science", "Economics", "Environmental Science", "Journalism"]
+      },
+      {
+        university: "JKUAT",
+        programs: ["Software Engineering", "Mechanical Engineering", "Agriculture", "Computer Technology", "Biotechnology"]
+      },
+      {
+        university: "Strathmore University",
+        programs: ["BBIT", "Law", "Finance", "Accounting", "Data Science"]
+      },
+      {
+        university: "Moi University",
+        programs: ["Medicine", "Education", "Communication", "Information Sciences"]
+      },
+      {
+        university: "Egerton University",
+        programs: ["Agriculture", "Animal Science", "Food Science", "Education"]
+      },
+      {
+        university: "USIU Africa",
+        programs: ["International Relations", "Psychology", "Business Administration", "Software Engineering"]
+      },
+      {
+        university: "Mount Kenya University",
+        programs: ["Nursing", "Clinical Medicine", "Business", "IT", "Law"]
+      },
+      {
+        university: "Technical University of Kenya",
+        programs: ["Architecture", "Electrical Engineering", "Construction Management"]
+      },
+      {
+        university: "Maseno University",
+        programs: ["Computer Science", "Mathematics", "Education", "Public Health"]
+      },
+      {
+        university: "Dedan Kimathi University",
+        programs: ["Mechatronics", "Computer Science", "Industrial Chemistry"]
+      },
+      {
+        university: "Multimedia University of Kenya",
+        programs: ["Film Production", "Software Engineering", "Cyber Security"]
+      },
+      {
+        university: "Masinde Muliro University",
+        programs: ["Nursing", "Engineering", "Education", "Journalism"]
+      },
+      {
+        university: "KCA University",
+        programs: ["Accounting", "Finance", "Business IT", "Data Analytics"]
+      },
+      {
+        university: "Daystar University",
+        programs: ["Communication", "Psychology", "Business", "Theology"]
+      }
+    ];
+    const allKenyanPrograms = Array.from(new Set(
+      kenyanUniversityCatalog.flatMap(entry => entry.programs)
+    ));
+
     let courseTopics = {
       distributed: {
         label: "Distributed Systems",
@@ -2223,6 +2292,10 @@
         .replaceAll("'", "&#039;");
     }
 
+    function normalizeCatalogValue(value) {
+      return String(value ?? "").trim().toLowerCase();
+    }
+
     function configuredApiBase() {
       const buildValue = BUILD_API_BASE.startsWith("__") ? "" : BUILD_API_BASE;
       const localFallback = ["localhost", "127.0.0.1", ""].includes(window.location.hostname)
@@ -2338,6 +2411,54 @@
       );
     }
 
+    function populateDatalist(listId, values) {
+      const list = document.getElementById(listId);
+      if (!list) return;
+      list.innerHTML = values.map(value => `<option value="${escapeHtml(value)}"></option>`).join("");
+    }
+
+    function matchedUniversityCatalog(value) {
+      const normalized = normalizeCatalogValue(value);
+      return kenyanUniversityCatalog.find(entry => normalizeCatalogValue(entry.university) === normalized) || null;
+    }
+
+    function syncAuthProgramOptions({ resetInvalidProgram = true } = {}) {
+      const universityInput = document.getElementById("authUniversity");
+      const programInput = document.getElementById("authProgram");
+      const hint = document.getElementById("authProgramHint");
+      if (!universityInput || !programInput) return;
+
+      const matchedUniversity = matchedUniversityCatalog(universityInput.value);
+      const programs = matchedUniversity?.programs || allKenyanPrograms;
+      populateDatalist("authProgramOptions", programs);
+      programInput.placeholder = matchedUniversity
+        ? `Search ${matchedUniversity.university} degree courses`
+        : "Search your degree course";
+
+      if (
+        resetInvalidProgram
+        && matchedUniversity
+        && programInput.value
+        && !matchedUniversity.programs.some(program => normalizeCatalogValue(program) === normalizeCatalogValue(programInput.value))
+      ) {
+        programInput.value = "";
+      }
+
+      if (hint) {
+        hint.textContent = matchedUniversity
+          ? `${matchedUniversity.programs.length} degree courses available for ${matchedUniversity.university}.`
+          : "Search your university first to narrow the degree-course list.";
+      }
+    }
+
+    function initializeAuthCatalog() {
+      populateDatalist(
+        "authUniversityOptions",
+        kenyanUniversityCatalog.map(entry => entry.university)
+      );
+      syncAuthProgramOptions({ resetInvalidProgram: false });
+    }
+
     function selectedCourseIds(selector) {
       return Array.from(document.querySelectorAll(`${selector}:checked`)).map(input => input.value);
     }
@@ -2355,7 +2476,10 @@
       document.querySelectorAll("[data-auth-register]").forEach(item => item.classList.toggle("hidden", !register));
       document.getElementById("authLoginTab").classList.toggle("active", !register);
       document.getElementById("authRegisterTab").classList.toggle("active", register);
-      if (register) renderAuthCourses();
+      if (register) {
+        renderAuthCourses();
+        initializeAuthCatalog();
+      }
       setAuthMessage("");
     }
 
@@ -3388,6 +3512,9 @@
     document.getElementById("noteUploadForm").addEventListener("submit", uploadNotePack);
     document.getElementById("authLoginTab").addEventListener("click", () => setAuthMode("login"));
     document.getElementById("authRegisterTab").addEventListener("click", () => setAuthMode("register"));
+    document.getElementById("authUniversity").addEventListener("input", () => syncAuthProgramOptions());
+    document.getElementById("authUniversity").addEventListener("change", () => syncAuthProgramOptions());
+    document.getElementById("authProgram").addEventListener("focus", () => syncAuthProgramOptions({ resetInvalidProgram: false }));
     document.getElementById("authOfflineButton").addEventListener("click", () => {
       hideAuthGate();
       apiConnected = false;
@@ -3627,6 +3754,7 @@
 
     renderNavigation();
     renderDashboardPreviews(plannerBase, feedItems);
+    initializeAuthCatalog();
     renderTutorNotes();
     bootstrapApi();
 
