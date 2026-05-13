@@ -107,7 +107,8 @@ public class AcademicDataService {
   }
 
   public DashboardOverview dashboard(String email) {
-    List<CourseEntity> enrolledCourses = enrolledCourseEntities(email);
+    AppUser user = requireUser(email);
+    List<CourseEntity> enrolledCourses = enrolledCourseEntities(user);
     CourseEntity focusCourse = enrolledCourses.stream()
         .findFirst()
         .orElseGet(() -> requireCourseEntity("distributed"));
@@ -122,12 +123,12 @@ public class AcademicDataService {
     );
 
     return new DashboardOverview(
-        requireUser(email).toProfile(),
+        user.toProfile(),
         prediction,
         new GamificationSummary(24, "Senior Scholar", 12450, 15000, 14, 128.5),
         planner(email, 3).tasks(),
-        feed(),
-        dueFlashcards(email).size(),
+        feedPreview(),
+        Math.toIntExact(dueFlashcardCount(email)),
         Math.max(1, enrolledCourses.size())
     );
   }
@@ -138,10 +139,12 @@ public class AcademicDataService {
 
   public ProfileSettings profileSettings(String email) {
     AppUser user = requireUser(email);
+    List<CourseEntity> availableCourses = allCourseEntities();
+    List<CourseEntity> enrolledCourses = enrolledCourseEntities(user, availableCourses);
     return new ProfileSettings(
         user.toProfile(),
-        enrolledCourseEntities(user).stream().map(this::toCoursePrediction).toList(),
-        allCourseEntities().stream().map(this::toCoursePrediction).toList()
+        enrolledCourses.stream().map(this::toCoursePrediction).toList(),
+        availableCourses.stream().map(this::toCoursePrediction).toList()
     );
   }
 
@@ -181,9 +184,12 @@ public class AcademicDataService {
 
     courseEnrollmentRepository.deleteByUser(user);
     courseEnrollmentRepository.flush();
-    requestedIds.forEach(courseId -> courseEnrollmentRepository.save(
-        new CourseEnrollmentEntity(user, byId.get(courseId), Instant.now())
-    ));
+    Instant now = Instant.now();
+    courseEnrollmentRepository.saveAll(
+        requestedIds.stream()
+            .map(courseId -> new CourseEnrollmentEntity(user, byId.get(courseId), now))
+            .toList()
+    );
     return profileSettings(email);
   }
 
@@ -256,10 +262,9 @@ public class AcademicDataService {
   public PlannerResponse planner(String email, int focusHours) {
     int boundedHours = Math.max(1, Math.min(5, focusHours));
     Set<String> enrolledCourseNames = enrolledCourseNames(email);
-    List<StudyTaskEntity> availableTasks = studyTaskRepository.findByUserEmailIgnoreCaseOrderByScheduledTimeAsc(email)
-        .stream()
-        .filter(task -> enrolledCourseNames.isEmpty() || enrolledCourseNames.contains(task.getCourse()))
-        .toList();
+    List<StudyTaskEntity> availableTasks = enrolledCourseNames.isEmpty()
+        ? studyTaskRepository.findByUserEmailIgnoreCaseOrderByScheduledTimeAsc(email)
+        : studyTaskRepository.findByUserEmailIgnoreCaseAndCourseInOrderByScheduledTimeAsc(email, enrolledCourseNames);
     int visibleTasks = Math.min(availableTasks.size(), Math.max(2, boundedHours + 1));
     List<StudyTask> tasks = availableTasks.stream()
         .limit(visibleTasks)
@@ -285,9 +290,10 @@ public class AcademicDataService {
 
   public List<Flashcard> dueFlashcards(String email) {
     Set<String> enrolledCourseNames = enrolledCourseNames(email);
-    return flashcardRepository.findByUserEmailIgnoreCaseOrderByDueInHoursAscIdAsc(email)
-        .stream()
-        .filter(card -> enrolledCourseNames.isEmpty() || enrolledCourseNames.contains(card.getCourse()))
+    List<FlashcardEntity> flashcards = enrolledCourseNames.isEmpty()
+        ? flashcardRepository.findByUserEmailIgnoreCaseOrderByDueInHoursAscIdAsc(email)
+        : flashcardRepository.findByUserEmailIgnoreCaseAndCourseInOrderByDueInHoursAscIdAsc(email, enrolledCourseNames);
+    return flashcards.stream()
         .map(this::toFlashcard)
         .toList();
   }
@@ -313,6 +319,13 @@ public class AcademicDataService {
 
   public List<FeedSignal> feed() {
     return feedSignalRepository.findAllByOrderByCreatedAtDesc()
+        .stream()
+        .map(this::toFeedSignal)
+        .toList();
+  }
+
+  public List<FeedSignal> feedPreview() {
+    return feedSignalRepository.findTop4ByOrderByCreatedAtDesc()
         .stream()
         .map(this::toFeedSignal)
         .toList();
@@ -482,15 +495,19 @@ public class AcademicDataService {
   }
 
   private List<CourseEntity> enrolledCourseEntities(AppUser user) {
+    return enrolledCourseEntities(user, allCourseEntities());
+  }
+
+  private List<CourseEntity> enrolledCourseEntities(AppUser user, List<CourseEntity> fallbackCourses) {
     if (user.getRole() == UserRole.ADMIN) {
-      return allCourseEntities();
+      return fallbackCourses;
     }
     List<CourseEntity> enrolledCourses = courseEnrollmentRepository
         .findByUserEmailIgnoreCaseOrderByCourseDisplayOrderAsc(user.getEmail())
         .stream()
         .map(CourseEnrollmentEntity::getCourse)
         .toList();
-    return enrolledCourses.isEmpty() ? allCourseEntities() : enrolledCourses;
+    return enrolledCourses.isEmpty() ? fallbackCourses : enrolledCourses;
   }
 
   private Set<String> enrolledCourseNames(String email) {
@@ -498,6 +515,13 @@ public class AcademicDataService {
         .stream()
         .map(CourseEntity::getCourseName)
         .collect(Collectors.toSet());
+  }
+
+  private long dueFlashcardCount(String email) {
+    Set<String> enrolledCourseNames = enrolledCourseNames(email);
+    return enrolledCourseNames.isEmpty()
+        ? flashcardRepository.countByUserEmailIgnoreCase(email)
+        : flashcardRepository.countByUserEmailIgnoreCaseAndCourseIn(email, enrolledCourseNames);
   }
 
   private CoursePrediction toCoursePrediction(CourseEntity course) {

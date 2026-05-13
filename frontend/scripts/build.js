@@ -15,10 +15,12 @@ async function build() {
 
   await fs.writeFile(path.join(dist, "index.html"), html);
   await fs.writeFile(path.join(dist, "PredictED.html"), html);
-  const assets = await fs.readdir(path.join(root, "assets"));
+
+  const referencedSvgAssets = new Set(
+    Array.from(html.matchAll(/assets\/([^"')\s?#]+\.svg)/gi), match => match[1])
+  );
   await Promise.all(
-    assets
-      .filter(file => file.toLowerCase().endsWith(".svg"))
+    Array.from(referencedSvgAssets)
       .map(file => fs.copyFile(
         path.join(root, "assets", file),
         path.join(dist, "assets", file)

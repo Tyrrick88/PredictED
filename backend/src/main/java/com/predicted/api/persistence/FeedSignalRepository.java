@@ -7,4 +7,6 @@ import java.util.List;
 public interface FeedSignalRepository extends JpaRepository<FeedSignalEntity, String> {
 
   List<FeedSignalEntity> findAllByOrderByCreatedAtDesc();
+
+  List<FeedSignalEntity> findTop4ByOrderByCreatedAtDesc();
 }
