@@ -15,9 +15,14 @@ async function build() {
 
   await fs.writeFile(path.join(dist, "index.html"), html);
   await fs.writeFile(path.join(dist, "PredictED.html"), html);
-  await fs.copyFile(
-    path.join(root, "assets", "PrdictEDLogo.svg"),
-    path.join(dist, "assets", "PrdictEDLogo.svg")
+  const assets = await fs.readdir(path.join(root, "assets"));
+  await Promise.all(
+    assets
+      .filter(file => file.toLowerCase().endsWith(".svg"))
+      .map(file => fs.copyFile(
+        path.join(root, "assets", file),
+        path.join(dist, "assets", file)
+      ))
   );
 }
 
