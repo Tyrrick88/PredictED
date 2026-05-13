@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
   <title>PredictED | Academic Revision Platform</title>
-  <link rel="icon" type="image/svg+xml" href="assets/PrdictEDLogo.svg" />
+  <link rel="icon" type="image/svg+xml" href="assets/MainPredictedLogo.svg" />
   <link href="assets/app.css" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -42,6 +42,13 @@
     h2 { font-size: 1.05rem; }
     h3 { font-size: 0.95rem; }
     h4 { font-size: 0.875rem; }
+    .font-black { font-weight: 800 !important; }
+    .font-bold { font-weight: 600 !important; }
+    .font-mono.font-bold,
+    .font-mono .font-bold {
+      font-weight: 600 !important;
+    }
+    b, strong { font-weight: 600; }
     .material-symbols-outlined {
       font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
       line-height: 1;
@@ -61,6 +68,83 @@
       background: rgba(255,255,255,0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* ── Floating app header ──────────────────────────── */
+    .app-topbar {
+      position: fixed;
+      top: max(0.75rem, env(safe-area-inset-top));
+      left: clamp(0.75rem, 2vw, 1.25rem);
+      right: clamp(0.75rem, 2vw, 1.25rem);
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 4.25rem;
+      gap: 1rem;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid rgba(214,229,238,0.72);
+      border-radius: 1.25rem;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 4px 18px rgba(7,30,39,0.07), 0 18px 42px rgba(7,30,39,0.08);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+    .header-menu-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.8rem;
+      height: 2.8rem;
+      flex: 0 0 auto;
+      border: 1px solid rgba(214,229,238,0.9);
+      border-radius: 0.9rem;
+      background: rgba(248,250,252,0.92);
+      color: #111a5c;
+      transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+    }
+    .header-menu-button:hover {
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(7,30,39,0.08);
+    }
+    .header-menu-button:active {
+      transform: scale(0.96);
+    }
+    .app-header-logo {
+      display: block;
+      width: clamp(7.25rem, 18vw, 10rem);
+      height: clamp(2.4rem, 4vw, 3rem);
+      object-fit: cover;
+      object-position: center;
+      border-radius: 0.72rem;
+      background: #ffffff;
+      box-shadow: 0 6px 18px rgba(7,30,39,0.06);
+    }
+    .drawer-brand-logo,
+    .auth-brand-logo {
+      display: block;
+      width: 10.5rem;
+      height: 3rem;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 0.72rem;
+      background: #ffffff;
+    }
+    .drawer-brand-logo {
+      width: 11.75rem;
+    }
+    .content-offset {
+      padding-top: calc(5.8rem + env(safe-area-inset-top)) !important;
+    }
+    @media (min-width: 768px) {
+      .app-topbar {
+        min-height: 4.5rem;
+        padding: 0.72rem 1rem;
+        border-radius: 1.1rem;
+      }
+      .content-offset {
+        padding-top: calc(6.35rem + env(safe-area-inset-top)) !important;
+      }
     }
 
     /* ── Brand ───────────────────────────────────────── */
@@ -92,7 +176,7 @@
       display: block;
       font-size: 1rem;
       line-height: 1;
-      font-weight: 900;
+      font-weight: 800;
       letter-spacing: 0;
       color: currentColor;
     }
@@ -154,13 +238,63 @@
     .mobile-drawer.open .drawer-overlay { opacity:1; }
     .drawer-panel {
       position:absolute; inset:0 auto 0 0;
-      width: min(86vw, 300px);
+      width: min(88vw, 340px);
       transform:translateX(-100%);
       transition:transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94);
       overflow-y:auto;
       box-shadow: 6px 0 32px rgba(7,30,39,0.18);
     }
     .mobile-drawer.open .drawer-panel { transform:translateX(0); }
+    .drawer-premium {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border-right: none !important;
+      box-shadow: 8px 0 40px rgba(7,30,39,0.18);
+    }
+    .drawer-avatar-ring {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #111a5c, #1d4ed8);
+      padding: 2px;
+      flex-shrink: 0;
+    }
+    .drawer-avatar-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: contain;
+      background: white;
+    }
+    .drawer-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-height: 3.15rem;
+      padding: 0.7rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 550;
+      color: #2d3e6e;
+      transition: background 0.15s, transform 0.15s;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+    }
+    .drawer-menu-item:hover { background: rgba(17,26,92,0.06); transform: translateX(2px); }
+    .drawer-menu-item:active { transform: scale(0.98); }
+    .drawer-menu-item .icon-wrap {
+      width: 2.1rem;
+      height: 2.1rem;
+      border-radius: 0.55rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .drawer-divider { height: 1px; background: rgba(214,229,238,0.8); margin: 0.5rem 0; }
 
     /* ── Interactive rows ─────────────────────────────── */
     .course-row, .feed-row, .moderation-row {
@@ -177,7 +311,7 @@
     :where(.btn) {
       display:inline-flex; align-items:center; justify-content:center;
       gap:0.4rem; min-height:2.5rem; border-radius:0.625rem;
-      font-weight:700; letter-spacing:0.01em;
+      font-weight:600; letter-spacing:0.01em;
       transition:transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
     }
     :where(.btn):active { transform:scale(0.97); }
@@ -249,7 +383,7 @@
     }
     .segmented button {
       border-radius:0.5rem; padding:0.45rem 0.6rem;
-      font:700 0.72rem/1.1 "JetBrains Mono",monospace; color:#536471; white-space:nowrap;
+      font:600 0.72rem/1.1 "JetBrains Mono",monospace; color:#536471; white-space:nowrap;
       transition: background 0.14s, color 0.14s, box-shadow 0.14s;
     }
     .segmented button.active { background:#ffffff; color:#111a5c; box-shadow:0 3px 10px rgba(7,30,39,0.09); }
@@ -284,9 +418,18 @@
     }
     html.dark .glass,
     html.dark .desktop-header-bar,
-    html.dark .mobile-float-header {
+    html.dark .mobile-float-header,
+    html.dark .app-topbar {
       background: rgba(10,24,33,0.92);
       border-color: #244354;
+    }
+    html.dark .header-menu-button {
+      background: #102432;
+      border-color: #315468;
+      color: #e9f4fb;
+    }
+    html.dark .header-menu-button:hover {
+      background: #183142;
     }
     html.dark .desktop-sidebar {
       background:
@@ -563,7 +706,7 @@
         display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
         padding: 0.7rem 1.4rem;
         background: linear-gradient(135deg, #111a5c 0%, #1d4ed8 100%);
-        color: white; font-weight: 700; font-size: 0.88rem;
+        color: white; font-weight: 600; font-size: 0.88rem;
         border-radius: 0.75rem;
         box-shadow: 0 4px 18px rgba(17,26,92,0.3), 0 1px 4px rgba(17,26,92,0.2);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -576,7 +719,7 @@
         display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
         padding: 0.68rem 1.4rem;
         background: transparent;
-        color: #111a5c; font-weight: 700; font-size: 0.88rem;
+        color: #111a5c; font-weight: 600; font-size: 0.88rem;
         border-radius: 0.75rem;
         border: 1.5px solid #d0daf0;
         transition: background 0.15s ease, box-shadow 0.15s ease;
@@ -589,7 +732,7 @@
       .dash-headline {
         font-size: 1.7rem !important;
         line-height: 1.22 !important;
-        font-weight: 900 !important;
+        font-weight: 800 !important;
         letter-spacing: -0.02em !important;
         color: #0d1b3e !important;
       }
@@ -615,7 +758,7 @@
       .pred-label {
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.65rem;
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #4a6fa5;
@@ -627,7 +770,7 @@
         border-radius: 999px;
         padding: 0.28rem 0.7rem;
         font-family: 'JetBrains Mono', monospace;
-        font-size: 0.68rem; font-weight: 700;
+        font-size: 0.68rem; font-weight: 600;
         color: #1d4ed8;
         box-shadow: 0 2px 8px rgba(29,78,216,0.12);
       }
@@ -684,7 +827,7 @@
         display: flex; align-items: center; gap: 0.75rem;
         padding: 0.7rem 1rem;
         border-radius: 0.75rem;
-        font-size: 0.875rem; font-weight: 600;
+        font-size: 0.875rem; font-weight: 550;
         color: #2d3e6e;
         transition: background 0.15s, transform 0.15s;
         cursor: pointer; border: none; width: 100%; text-align: left;
@@ -708,7 +851,8 @@
     }
 
     @media (max-width: 767px) {
-      html.dark .mobile-float-header .bg-slate-50 {
+      html.dark .mobile-float-header .bg-slate-50,
+      html.dark .app-topbar .bg-slate-50 {
         background: #102432 !important;
         border-color: #315468 !important;
       }
@@ -730,7 +874,7 @@
     <div class="panel w-full max-w-md p-5 shadow-panel">
       <div class="flex items-center justify-between gap-4 border-b border-line pb-4">
         <div class="flex items-center gap-3">
-          <img class="h-12 w-12 rounded-lg border border-line bg-white object-contain p-1" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
+          <img class="auth-brand-logo border border-line p-1" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
           <div>
             <p class="font-mono text-[11px] uppercase text-muted">Account</p>
             <h2 class="text-xl font-black text-navy" id="authTitle">Sign in</h2>
@@ -788,27 +932,21 @@
     </div>
   </div>
 
-  <div class="mobile-drawer md:hidden" id="mobileDrawer" aria-hidden="true">
+  <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
     <button class="drawer-overlay" id="drawerOverlay" aria-label="Close menu"></button>
     <aside class="drawer-panel drawer-premium p-0 flex flex-col">
 
       <!-- Profile header -->
       <div class="px-5 pt-8 pb-5" style="background:linear-gradient(135deg,#111a5c 0%,#1d4ed8 100%)">
         <div class="flex items-center justify-between mb-4">
-          <div class="brand-lockup brand-lockup-inverse">
-            <span class="brand-mark-card"><img alt="PredictED logo" src="assets/PrdictEDLogo.svg" /></span>
-            <span>
-              <span class="brand-name">PredictED</span>
-              <span class="brand-subtitle">Academic AI</span>
-            </span>
-          </div>
+          <img class="drawer-brand-logo p-1.5" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
           <button class="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 text-white transition-colors hover:bg-white/25" id="closeDrawer" aria-label="Close menu">
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
         <div class="flex items-center gap-3 mt-2">
           <div class="drawer-avatar-ring">
-            <img data-profile-avatar alt="Student profile" src="assets/PrdictEDLogo.svg" style="padding:4px;background:#ffffff" />
+            <img data-profile-avatar alt="Student profile" src="assets/MainPredictedLogo.svg" style="padding:4px;background:#ffffff;object-fit:contain" />
           </div>
           <div class="min-w-0">
             <p class="font-bold text-white text-sm truncate" data-profile-name>Sign in to continue</p>
@@ -825,6 +963,16 @@
             <p class="text-white font-black text-base">24 — Scholar</p>
           </div>
         </div>
+      </div>
+
+      <div class="px-3 pt-3">
+        <button class="drawer-menu-item" id="drawerDarkBtn" type="button" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
+          <span class="icon-wrap bg-slate-100 text-slate-600"><span class="material-symbols-outlined text-[20px]" id="darkModeIcon" data-theme-icon>dark_mode</span></span>
+          <span class="flex-1" data-theme-label>Dark Mode</span>
+          <span class="relative inline-flex w-10 h-5 rounded-full transition-colors duration-200 bg-slate-200 cursor-pointer" id="darkToggle">
+            <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200" id="darkToggleThumb"></span>
+          </span>
+        </button>
       </div>
 
       <!-- Nav + utilities -->
@@ -849,15 +997,6 @@
           <span class="icon-wrap bg-amber-50 text-gold"><span class="material-symbols-outlined text-[20px]">notifications</span></span>
           <span class="flex-1">Notifications</span>
           <span class="flex items-center justify-center w-5 h-5 rounded-full bg-coral text-white text-[10px] font-black">3</span>
-        </button>
-
-        <button class="drawer-menu-item" id="drawerDarkBtn" type="button" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
-          <span class="icon-wrap bg-slate-100 text-slate-600"><span class="material-symbols-outlined text-[20px]" id="darkModeIcon" data-theme-icon>dark_mode</span></span>
-          <span class="flex-1" data-theme-label>Dark Mode</span>
-          <!-- Toggle switch -->
-          <span class="relative inline-flex w-10 h-5 rounded-full transition-colors duration-200 bg-slate-200 cursor-pointer" id="darkToggle">
-            <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200" id="darkToggleThumb"></span>
-          </span>
         </button>
 
         <button class="drawer-menu-item" data-action="open-view" data-view="marketplace" type="button">
@@ -888,11 +1027,11 @@
     </aside>
   </div>
 
-  <div class="app-shell md:grid md:grid-cols-[260px_1fr]">
-    <aside class="desktop-sidebar glass fixed left-0 top-0 z-40 hidden h-screen w-[260px] border-r border-line px-3 py-4 md:flex md:flex-col">
+  <div class="app-shell">
+    <aside class="desktop-sidebar glass fixed left-0 top-0 z-40 hidden h-screen w-[260px] border-r border-line px-3 py-4">
       <div class="flex px-1">
         <div class="brand-lockup desktop-brand">
-          <span class="brand-mark-card"><img alt="PredictED logo" src="assets/PrdictEDLogo.svg" /></span>
+          <span class="brand-mark-card"><img alt="PredictED logo" src="assets/MainPredictedLogo.svg" /></span>
           <span class="min-w-0">
             <span class="brand-name">PredictED</span>
             <span class="brand-subtitle">Academic revision</span>
@@ -902,7 +1041,7 @@
       </div>
       <div class="mt-3 rounded-lg border border-line bg-white p-2.5 shadow-soft">
         <div class="flex items-center gap-2.5">
-          <img class="h-9 w-9 rounded-full bg-white object-contain p-0.5" data-profile-avatar alt="Student profile" src="assets/PrdictEDLogo.svg" />
+          <img class="h-9 w-9 rounded-full bg-white object-contain p-0.5" data-profile-avatar alt="Student profile" src="assets/MainPredictedLogo.svg" />
           <div class="min-w-0">
             <p class="truncate text-sm font-bold text-ink" data-profile-name>Sign in</p>
             <p class="font-mono text-[11px] text-muted" data-profile-meta>Student workspace</p>
@@ -933,64 +1072,25 @@
       </div>
     </aside>
 
-    <main class="min-h-screen md:col-start-2">
-      <!-- ── FLOATING MOBILE HEADER ──────────────────────── -->
-      <div class="mobile-float-header md:hidden flex items-center justify-between">
-        <button class="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 text-navy transition-all active:scale-95 hover:bg-slate-100" id="openDrawer" aria-label="Open menu">
+    <main class="min-h-screen">
+      <!-- ── MINIMAL FLOATING HEADER ──────────────────────── -->
+      <header class="app-topbar" aria-label="Primary navigation">
+        <button class="header-menu-button" id="openDrawer" type="button" aria-label="Open menu">
           <span class="material-symbols-outlined text-[22px]">menu</span>
         </button>
-        <div class="brand-lockup">
-          <span class="brand-mark-card"><img alt="PredictED logo" src="assets/PrdictEDLogo.svg" /></span>
-          <span class="brand-name">PredictED</span>
-        </div>
-        <button class="theme-toggle flex items-center justify-center w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 text-navy transition-all active:scale-95 hover:bg-slate-100" data-theme-toggle type="button" aria-label="Toggle dark mode" aria-pressed="false">
-          <span class="material-symbols-outlined text-[21px]" data-theme-icon>dark_mode</span>
-        </button>
+        <span class="sr-only" id="viewEyebrow">Dashboard</span>
+        <span class="sr-only" id="viewTitle">Academic Command Center</span>
+        <img class="app-header-logo" alt="PredictED" src="assets/MainPredictedLogo.svg" />
+      </header>
+      <div class="hidden" aria-hidden="true">
+        <input id="globalSearch" type="search" tabindex="-1" />
+        <button id="accountButton" type="button" tabindex="-1"></button>
+        <span id="accountName">Sign in</span>
+        <button id="signOutButton" class="hidden" type="button" tabindex="-1"></button>
+        <span id="apiStatus"><span class="material-symbols-outlined">sync_problem</span><span id="apiStatusText">Offline demo</span></span>
       </div>
 
-      <!-- ── DESKTOP HEADER ──────────────────────────────── -->
-      <header class="desktop-header-bar glass hidden md:block sticky top-0 z-30 border-b border-line px-6 py-3">
-        <div class="flex items-center justify-between gap-3">
-          <div class="flex min-w-0 items-center gap-3">
-            <div class="min-w-0">
-              <p class="font-mono text-[10px] uppercase tracking-wide text-muted" id="viewEyebrow">Dashboard</p>
-              <h1 class="text-lg font-black tracking-tight text-navy" id="viewTitle">Academic Command Center</h1>
-            </div>
-          </div>
-          <div class="hidden min-w-[260px] max-w-md flex-1 items-center lg:flex">
-            <label class="relative w-full">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-muted">search</span>
-              <input class="w-full rounded-lg border-line bg-white py-2 pl-10 pr-4 text-sm focus:border-cobalt focus:ring-cobalt" id="globalSearch" placeholder="Search courses, notes, lecturers" type="search" />
-            </label>
-          </div>
-          <div class="flex items-center gap-2">
-            <button class="theme-toggle btn btn-ghost h-10 w-10 p-0" data-theme-toggle type="button" aria-label="Toggle dark mode" aria-pressed="false">
-              <span class="material-symbols-outlined text-[19px]" data-theme-icon>dark_mode</span>
-            </button>
-            <button class="btn btn-ghost relative h-10 w-10 p-0" data-action="open-view" data-view="feed" aria-label="Notifications">
-              <span class="material-symbols-outlined">notifications</span>
-              <span class="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-coral"></span>
-            </button>
-            <button class="btn btn-ghost h-10 px-3 text-sm" id="accountButton" type="button">
-              <span class="material-symbols-outlined text-[19px]">account_circle</span>
-              <span class="hidden max-w-[120px] truncate lg:inline" id="accountName">Sign in</span>
-            </button>
-            <button class="btn btn-ghost hidden h-10 w-10 p-0" id="signOutButton" type="button" aria-label="Sign out">
-              <span class="material-symbols-outlined text-[19px]">logout</span>
-            </button>
-            <span class="chip hidden md:inline-flex" id="apiStatus">
-              <span class="material-symbols-outlined text-[16px]">sync_problem</span>
-              <span id="apiStatusText">Offline demo</span>
-            </span>
-            <button class="btn btn-primary hidden px-4 text-sm xl:inline-flex" data-action="open-view" data-view="predictor">
-              <span class="material-symbols-outlined text-[19px]">auto_graph</span>
-              Run Prediction
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <section class="px-4 py-5 mobile-content-offset md:px-6 md:py-7 lg:px-8 md:mobile-content-offset-reset">
+      <section class="content-offset px-4 py-5 md:px-6 md:py-7 lg:px-8">
         <div class="desktop-content-shell mx-auto max-w-[1600px]">
           <section class="view active" id="view-dashboard" data-title="Academic Command Center" data-eyebrow="Dashboard">
 
@@ -2071,11 +2171,22 @@
       const label = document.getElementById("apiStatusText");
       const iconEl = document.querySelector("#apiStatus .material-symbols-outlined");
       const status = document.getElementById("apiStatus");
-      if (!label || !status || !iconEl) return;
-      label.textContent = text;
-      status.classList.remove("text-mint", "text-gold", "text-coral");
-      status.classList.add(state === "online" ? "text-mint" : state === "loading" ? "text-gold" : "text-coral");
-      iconEl.textContent = state === "online" ? "cloud_done" : state === "loading" ? "sync" : "cloud_off";
+      const drawerLabel = document.getElementById("drawerApiText");
+      const drawerIcon = document.getElementById("drawerApiIcon");
+      const iconName = state === "online" ? "cloud_done" : state === "loading" ? "sync" : "cloud_off";
+      const colorClass = state === "online" ? "text-mint" : state === "loading" ? "text-gold" : "text-coral";
+      if (label && status && iconEl) {
+        label.textContent = text;
+        status.classList.remove("text-mint", "text-gold", "text-coral");
+        status.classList.add(colorClass);
+        iconEl.textContent = iconName;
+      }
+      if (drawerLabel && drawerIcon) {
+        drawerLabel.textContent = text;
+        drawerIcon.textContent = iconName;
+        drawerIcon.classList.remove("text-mint", "text-gold", "text-coral");
+        drawerIcon.classList.add(colorClass);
+      }
     }
 
     async function loginWith(email, password) {
