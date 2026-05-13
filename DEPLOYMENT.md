@@ -50,7 +50,7 @@ Create a Vercel project from this repo with:
 The frontend build defaults to the live Railway backend:
 
 ```bash
-https://predicted-production-3c23.up.railway.app
+https://predicted-production-0574.up.railway.app
 ```
 
 If the Railway backend domain changes later, set this Vercel environment variable to override the built-in default:

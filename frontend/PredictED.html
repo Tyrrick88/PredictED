@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="color-scheme" content="light dark" />
   <title>PredictED | Academic Revision Platform</title>
   <link rel="icon" type="image/svg+xml" href="assets/PrdictEDLogo.svg" />
   <link href="assets/app.css" rel="stylesheet" />
@@ -11,57 +10,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-  <script>
-    (() => {
-      try {
-        const storedTheme = localStorage.getItem("predictedTheme");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme = storedTheme || (prefersDark ? "dark" : "light");
-        document.documentElement.classList.toggle("dark", theme === "dark");
-        document.documentElement.classList.toggle("light", theme !== "dark");
-      } catch {
-        document.documentElement.classList.add("light");
-      }
-    })();
-  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    :root { color-scheme: light; --bottom-nav-height: 4.75rem; }
-    html.dark { color-scheme: dark; }
     html { scroll-behavior: smooth; font-size: 15px; }
     body {
       min-height: 100vh;
-      background: #f6fbff;
-      background-image: linear-gradient(180deg, #f6fbff 0%, #edf7fb 100%);
+      background: #f0f7ff;
+      background-image: linear-gradient(160deg, #f0f7ff 0%, #e8f4fb 60%, #edf7f4 100%);
       color: #071e27;
       overflow-x: hidden;
       font-size: 0.9rem;
       line-height: 1.55;
     }
-    /* Tighter heading scale */
-    h1 { font-size: 1.25rem; }
-    h2 { font-size: 1.1rem; }
-    h3 { font-size: 1rem; }
-    h4 { font-size: 0.9rem; }
+    h1 { font-size: 1.2rem; }
+    h2 { font-size: 1.05rem; }
+    h3 { font-size: 0.95rem; }
+    h4 { font-size: 0.875rem; }
     .material-symbols-outlined {
-      display: inline-block;
-      width: 1em;
-      min-width: 1em;
-      overflow: hidden;
-      white-space: nowrap;
-      text-align: center;
-      font-family: "Material Symbols Outlined";
-      font-style: normal;
-      font-weight: normal;
-      font-feature-settings: "liga";
-      -webkit-font-feature-settings: "liga";
       font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
-      letter-spacing: normal;
       line-height: 1;
-      text-transform: none;
-      word-wrap: normal;
-      direction: ltr;
-      -webkit-font-smoothing: antialiased;
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -71,341 +38,470 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    /* ── Layout ───────────────────────────────────────── */
     .app-shell { min-height: 100vh; }
     .glass {
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
+
+    /* ── Cards / Panels ───────────────────────────────── */
     .panel {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid #d6e5ee;
-      border-radius: 0.5rem;
-      box-shadow: 0 6px 20px rgba(7, 30, 39, 0.05);
+      background: #ffffff;
+      border: 1px solid rgba(214,229,238,0.8);
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(7,30,39,0.04), 0 8px 24px rgba(7,30,39,0.05);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
+    .panel:hover { box-shadow: 0 4px 16px rgba(7,30,39,0.07), 0 16px 40px rgba(7,30,39,0.07); }
     .soft-panel {
-      background: rgba(237, 247, 251, 0.9);
-      border: 1px solid #d6e5ee;
-      border-radius: 0.5rem;
+      background: linear-gradient(135deg, #f0f7ff 0%, #edf7fb 100%);
+      border: 1px solid rgba(214,229,238,0.7);
+      border-radius: 0.625rem;
     }
+    .metric-card {
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(7,30,39,0.09); }
+
+    /* ── Views ────────────────────────────────────────── */
     .view { display: none; }
-    .view.active { display: block; }
-    .nav-link { transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease; }
-    .nav-link:hover { transform: translateX(2px); }
+    .view.active { display: block; animation: viewIn 0.22s ease both; }
+    @keyframes viewIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    /* ── Sidebar nav (desktop) ────────────────────────── */
+    .nav-link { transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease; border-radius: 0.625rem; }
+    .nav-link:hover { background: rgba(17,26,92,0.06); transform: translateX(2px); }
     .nav-link.active {
-      background: #111a5c;
+      background: linear-gradient(135deg, #111a5c 0%, #1d4ed8 100%);
       color: #ffffff;
-      box-shadow: 0 8px 20px rgba(17, 26, 92, 0.16);
+      box-shadow: 0 6px 18px rgba(17,26,92,0.22);
     }
     .nav-link.active .material-symbols-outlined {
       font-variation-settings: "FILL" 1, "wght" 650, "GRAD" 0, "opsz" 24;
     }
+
+    /* ── Bottom Nav (mobile) ──────────────────────────── */
     nav[data-nav-container="bottom"] { display: none; }
-    .theme-toggle .material-symbols-outlined {
-      transition: transform 0.18s ease;
-    }
-    .theme-toggle:active .material-symbols-outlined { transform: rotate(-18deg) scale(0.96); }
-    .progress-bar { width: var(--bar, 70%); }
-    .ring-progress { stroke-dashoffset: var(--dash, 88.216); }
-    .mobile-drawer {
-      position: fixed;
-      inset: 0;
-      z-index: 80;
-      pointer-events: none;
-    }
-    .mobile-drawer.open { pointer-events: all; }
-    .drawer-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(7, 30, 39, 0.42);
-      opacity: 0;
-      transition: opacity 0.24s ease;
-    }
-    .mobile-drawer.open .drawer-overlay { opacity: 1; }
+
+    /* ── Drawers ──────────────────────────────────────── */
+    .mobile-drawer { position:fixed; inset:0; z-index:80; pointer-events:none; }
+    .mobile-drawer.open { pointer-events:all; }
+    .drawer-overlay { position:absolute; inset:0; background:rgba(7,30,39,0.45); opacity:0; transition:opacity 0.24s ease; }
+    .mobile-drawer.open .drawer-overlay { opacity:1; }
     .drawer-panel {
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: min(86vw, 320px);
-      transform: translateX(-100%);
-      transition: transform 0.28s ease;
-      overflow-y: auto;
+      position:absolute; inset:0 auto 0 0;
+      width: min(86vw, 300px);
+      transform:translateX(-100%);
+      transition:transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94);
+      overflow-y:auto;
+      box-shadow: 6px 0 32px rgba(7,30,39,0.18);
     }
-    .mobile-drawer.open .drawer-panel { transform: translateX(0); }
+    .mobile-drawer.open .drawer-panel { transform:translateX(0); }
+
+    /* ── Interactive rows ─────────────────────────────── */
     .course-row, .feed-row, .moderation-row {
-      transition: transform 0.18s ease, background 0.18s ease;
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+      border-radius: 0.5rem;
     }
     .course-row:hover, .feed-row:hover, .moderation-row:hover {
       transform: translateY(-1px);
-      background: rgba(237, 247, 251, 0.78);
+      background: rgba(240,247,255,0.9);
+      box-shadow: 0 4px 12px rgba(7,30,39,0.06);
     }
-    :where(.btn) {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      min-height: 2.5rem;
-      border-radius: 0.5rem;
-      font-weight: 700;
-      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+
+    /* ── Buttons ──────────────────────────────────────── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:0.4rem; min-height:2.5rem; border-radius:0.625rem;
+      font-weight:700; letter-spacing:0.01em;
+      transition:transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
     }
-    :where(.btn):active { transform: scale(0.98); }
-    .btn-primary { background: #111a5c; color: #ffffff; }
-    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 10px 24px rgba(29, 78, 216, 0.24); }
-    .btn-ghost { background: rgba(237, 247, 251, 0.78); color: #111a5c; border: 1px solid #d6e5ee; }
-    .btn-ghost:hover { background: #ffffff; box-shadow: 0 8px 18px rgba(7, 30, 39, 0.08); }
-    :where(.chip) {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      border-radius: 999px;
-      border: 1px solid #d6e5ee;
-      background: #ffffff;
-      padding: 0.35rem 0.65rem;
-      font: 600 0.72rem/1.1 "JetBrains Mono", monospace;
-      color: #536471;
-      white-space: nowrap;
+    .btn:active { transform:scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, #111a5c 0%, #1d4ed8 100%);
+      color:#ffffff;
+      box-shadow: 0 4px 14px rgba(17,26,92,0.18);
     }
+    .btn-primary:hover { background: linear-gradient(135deg,#1a2570 0%,#2563eb 100%); box-shadow:0 8px 22px rgba(17,26,92,0.28); }
+    .btn-ghost { background:rgba(237,247,251,0.85); color:#111a5c; border:1px solid #d6e5ee; }
+    .btn-ghost:hover { background:#ffffff; box-shadow:0 6px 16px rgba(7,30,39,0.08); }
+
+    /* ── Chips ────────────────────────────────────────── */
+    .chip {
+      display:inline-flex; align-items:center; gap:0.3rem;
+      border-radius:999px; border:1px solid #d6e5ee; background:#ffffff;
+      padding:0.3rem 0.6rem;
+      font:600 0.7rem/1.1 "JetBrains Mono",monospace; color:#536471;
+      white-space:nowrap;
+    }
+
+    /* ── Segmented control ────────────────────────────── */
     .segmented {
-      display: inline-grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.25rem;
-      border-radius: 0.5rem;
-      border: 1px solid #d6e5ee;
-      background: #edf7fb;
-      padding: 0.25rem;
-      min-width: 0;
+      display:inline-grid; grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:0.2rem; border-radius:0.625rem; border:1px solid #d6e5ee;
+      background:#edf7fb; padding:0.2rem;
     }
     .segmented button {
-      border-radius: 0.375rem;
-      padding: 0.5rem 0.7rem;
-      font: 700 0.75rem/1.1 "JetBrains Mono", monospace;
-      color: #536471;
-      white-space: nowrap;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      border-radius:0.5rem; padding:0.45rem 0.6rem;
+      font:700 0.72rem/1.1 "JetBrains Mono",monospace; color:#536471; white-space:nowrap;
+      transition: background 0.14s, color 0.14s, box-shadow 0.14s;
     }
-    .segmented button.active { background: #ffffff; color: #111a5c; box-shadow: 0 4px 12px rgba(7, 30, 39, 0.08); }
+    .segmented button.active { background:#ffffff; color:#111a5c; box-shadow:0 3px 10px rgba(7,30,39,0.09); }
+
+    /* ── Study tiles ──────────────────────────────────── */
     .study-tile {
-      border-left: 4px solid var(--accent, #1d4ed8);
+      border-left:4px solid var(--accent,#1d4ed8);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .flip-card {
-      perspective: 1200px;
-      min-height: 240px;
-    }
-    .flip-inner {
-      position: relative;
-      min-height: 240px;
-      transform-style: preserve-3d;
-      transition: transform 0.45s ease;
-    }
-    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
-    .flip-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-    .flip-back { transform: rotateY(180deg); }
-    input[type="range"] { accent-color: #111a5c; }
-    .topic-grid { display: grid; grid-template-columns: minmax(0, 1fr) 100px 90px; }
-    .moderation-grid { display: grid; grid-template-columns: minmax(0, 1fr) 130px 120px; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #edf7fb; }
-    ::-webkit-scrollbar-thumb { background: #aac6d5; border-radius: 999px; }
-    html.dark body {
-      background: #07141c;
-      background-image: linear-gradient(180deg, #07141c 0%, #0c1d27 100%);
-      color: #e7f2f6;
-    }
-    html.dark .glass {
-      background: rgba(10, 24, 34, 0.95);
-      border-color: #263d4a;
-    }
-    html.dark .panel {
-      background: rgba(15, 31, 42, 0.96);
-      border-color: #2b4654;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-    }
-    html.dark .soft-panel {
-      background: rgba(13, 34, 47, 0.9);
-      border-color: #2b4654;
-    }
-    html.dark .bg-white:not(img),
-    html.dark .bg-panel {
-      background-color: #132633 !important;
-    }
-    html.dark .bg-wash,
-    html.dark .bg-blue-50,
-    html.dark .bg-emerald-50,
-    html.dark .bg-amber-50,
-    html.dark .bg-rose-50,
-    html.dark .bg-cyan-50 {
-      background-color: #0c1d27 !important;
-    }
-    html.dark .text-ink { color: #e7f2f6 !important; }
-    html.dark .text-muted { color: #9fb6c2 !important; }
-    html.dark .text-navy { color: #dbeafe !important; }
-    html.dark .border-line { border-color: #2b4654 !important; }
-    html.dark .chip {
-      background: #102432;
-      border-color: #2b4654;
-      color: #a9bfca;
-    }
-    html.dark .btn-primary {
-      background: #4f7cff;
-      color: #ffffff;
-    }
-    html.dark .btn-primary:hover {
-      background: #6f93ff;
-      box-shadow: 0 10px 24px rgba(79, 124, 255, 0.24);
-    }
-    html.dark .btn-ghost {
-      background: rgba(17, 36, 48, 0.92);
-      color: #dbeafe;
-      border-color: #2b4654;
-    }
-    html.dark .btn-ghost:hover { background: #183142; }
-    html.dark .segmented {
-      background: #0c1d27;
-      border-color: #2b4654;
-    }
-    html.dark .segmented button { color: #9fb6c2; }
-    html.dark .segmented button.active {
-      background: #1b3546;
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-    }
-    html.dark input,
-    html.dark select,
-    html.dark textarea {
-      background-color: #0c1d27 !important;
-      border-color: #2b4654 !important;
-      color: #e7f2f6 !important;
-    }
-    html.dark input::placeholder,
-    html.dark textarea::placeholder {
-      color: #78909b;
-    }
-    html.dark input[type="range"] { accent-color: #6f93ff; }
-    html.dark ::-webkit-scrollbar-track { background: #0c1d27; }
-    html.dark ::-webkit-scrollbar-thumb { background: #3a5968; }
+    .study-tile:hover { transform: translateX(2px); box-shadow: 0 4px 16px rgba(7,30,39,0.08); }
+
+    /* ── Flashcard ────────────────────────────────────── */
+    .flip-card { perspective:1200px; min-height:200px; }
+    .flip-inner { position:relative; min-height:200px; transform-style:preserve-3d; transition:transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .flip-card.flipped .flip-inner { transform:rotateY(180deg); }
+    .flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+    .flip-back { transform:rotateY(180deg); }
+
+    /* ── Misc ─────────────────────────────────────────── */
+    .progress-bar { width:var(--bar,70%); transition:width 1s cubic-bezier(0.22,1,0.36,1); }
+    .ring-progress { stroke-dashoffset:var(--dash,88.216); transition:stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1); }
+    input[type="range"] { accent-color:#111a5c; }
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:#edf7fb; }
+    ::-webkit-scrollbar-thumb { background:#aac6d5; border-radius:999px; }
+
+    /* ════════════════════════════════════════════════════
+       MOBILE — everything below 768px
+    ════════════════════════════════════════════════════ */
     @media (max-width: 767px) {
-      html { font-size: 14px; }
-      body { min-width: 0; }
-      .app-shell { padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); }
-      header.glass {
-        padding: 0.5rem 0.75rem;
-      }
-      header .btn {
-        min-height: 2.5rem;
-      }
-      .header-actions {
-        flex: 0 0 auto;
-        gap: 0.35rem;
-      }
-      .header-actions .btn {
-        height: 2.5rem;
-        width: 2.5rem;
-        padding: 0;
-      }
-      main > section {
-        padding: 1rem 0.75rem calc(var(--bottom-nav-height) + 1rem);
-      }
-      .panel {
-        border-radius: 0.75rem;
-        box-shadow: 0 6px 18px rgba(7, 30, 39, 0.06);
-      }
-      .btn {
-        min-width: 0;
-        max-width: 100%;
-      }
-      .btn:not(.theme-toggle) {
-        white-space: normal;
-      }
+
+      /* Bottom nav visible */
       nav[data-nav-container="bottom"] {
         display: flex;
         align-items: center;
         justify-content: space-around;
-        gap: 0.25rem;
-        min-height: var(--bottom-nav-height);
-        background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(18px);
+        gap: 0.15rem;
       }
-      html.dark nav[data-nav-container="bottom"] {
-        background: rgba(10, 24, 34, 0.96);
-      }
+
+      /* Bottom nav link styling */
       nav[data-nav-container="bottom"] .nav-link {
-        flex: 1 1 0 !important;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+        padding: 0.5rem 0.25rem;
+        border-radius: 0.75rem;
+        position: relative;
         min-width: 0;
-        max-width: 25%;
-        min-height: 3.35rem;
-        padding: 0.45rem 0.2rem;
+        transform: none !important;
       }
-      nav[data-nav-container="bottom"] .nav-link .material-symbols-outlined {
-        font-size: 1.35rem;
+      nav[data-nav-container="bottom"] .nav-link:hover {
+        background: rgba(17,26,92,0.06);
+        transform: none !important;
       }
-      nav[data-nav-container="bottom"] .nav-link span:not(.material-symbols-outlined) {
-        display: block;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-size: 0.64rem;
+      nav[data-nav-container="bottom"] .nav-link.active {
+        background: rgba(17,26,92,0.08);
+        color: #111a5c;
+        box-shadow: none;
       }
+      nav[data-nav-container="bottom"] .nav-link.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 3px;
+        background: linear-gradient(90deg,#111a5c,#1d4ed8);
+        border-radius: 0 0 4px 4px;
+      }
+      nav[data-nav-container="bottom"] .nav-link.active .material-symbols-outlined {
+        font-variation-settings: "FILL" 1, "wght" 600, "GRAD" 0, "opsz" 24;
+        color: #111a5c;
+      }
+
+      /* Main content clears bottom nav */
+      main { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+
+      /* Content section padding */
+      section.px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+      section.py-5 { padding-top: 1rem !important; }
+
+      /* Segmented full width */
       .segmented { width: 100%; }
-      .segmented button { padding-inline: 0.4rem; }
-      #authGate {
-        align-items: flex-start;
-        padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem max(0.75rem, env(safe-area-inset-bottom));
-      }
-      #authGate .panel {
-        max-height: calc(100svh - 1.5rem);
-        overflow-y: auto;
-        padding: 1rem;
-      }
-      #authForm {
-        gap: 0.65rem;
-      }
-      #chatMessages > div {
-        max-width: 92% !important;
-      }
-      .topic-grid {
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 0.75rem;
-      }
-      .topic-weight,
-      .topic-weight-header {
-        display: none;
-      }
-      .moderation-grid {
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 0.75rem;
-      }
-      .moderation-type,
-      .moderation-type-header {
-        display: none;
-      }
-      .course-row,
-      .moderation-row {
-        align-items: start;
-      }
+      .segmented button { padding-inline: 0.35rem; font-size: 0.68rem; }
+
+      /* Dashboard headline — much smaller on mobile */
+      #dashboardHeadline { font-size: 1.45rem !important; line-height: 1.3 !important; }
+
+      /* Prediction ring — smaller on mobile */
+      .ring-wrap-mobile { width: 8rem !important; height: 8rem !important; margin: 1rem auto !important; }
+      .ring-score-mobile { font-size: 2rem !important; }
+
+      /* Panel internal padding */
+      .panel-mobile-pad { padding: 1rem !important; }
+
+      /* Cards in hero — stack vertically nicely */
+      .hero-image-panel { min-height: 220px !important; }
+
+      /* Metric cards 2-col on mobile */
+      .metric-grid { grid-template-columns: 1fr 1fr !important; }
+
+      /* Task preview full-width tiles */
+      .task-preview-grid { grid-template-columns: 1fr !important; }
+
+      /* Study tile compact on mobile */
+      .study-tile { padding: 0.875rem !important; }
+
+      /* Planner row compact */
+      .planner-row { padding: 0.875rem !important; }
+
+      /* Flip card size */
+      .flip-card, .flip-inner { min-height: 180px !important; }
+
+      /* Feed items */
+      .feed-row { padding: 0.75rem !important; }
+
+      /* Marketplace grid — 1 col on small, 2 col on bigger mobile */
+      .market-grid { grid-template-columns: 1fr !important; }
+
+      /* Profile form grid — stack */
+      .profile-grid { grid-template-columns: 1fr !important; }
     }
-    @media (max-width: 420px) {
-      .chip {
-        max-width: 100%;
-        white-space: normal;
+
+    @media (max-width: 400px) {
+      nav[data-nav-container="bottom"] .nav-link span.font-mono { font-size: 0.6rem; }
+      #dashboardHeadline { font-size: 1.25rem !important; }
+    }
+
+    @media (min-width: 480px) and (max-width: 767px) {
+      .market-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+
+    /* ════════════════════════════════════════════════════
+       PREMIUM MOBILE REDESIGN
+    ════════════════════════════════════════════════════ */
+
+    /* Floating header — mobile only */
+    @media (max-width: 767px) {
+      body { background: #eef3fb; }
+
+      /* Header becomes floating card */
+      .mobile-float-header {
+        position: fixed;
+        top: 0.75rem;
+        left: 0.875rem;
+        right: 0.875rem;
+        z-index: 50;
+        background: rgba(255,255,255,0.96);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 1.125rem;
+        box-shadow: 0 2px 12px rgba(7,30,39,0.06), 0 8px 32px rgba(7,30,39,0.1);
+        border: 1px solid rgba(214,229,238,0.6);
+        padding: 0.875rem 1rem;
       }
-      #dashboardHeadline {
-        font-size: 1.75rem;
-        line-height: 1.12;
+
+      /* Push content below floating header */
+      .mobile-content-offset {
+        padding-top: 5.5rem;
       }
-      #authGate .segmented button {
-        font-size: 0.66rem;
-        padding-inline: 0.25rem;
+
+      /* Floating bottom nav */
+      nav[data-nav-container="bottom"] {
+        left: 0.875rem !important;
+        right: 0.875rem !important;
+        bottom: 0.875rem !important;
+        border-radius: 1.125rem !important;
+        border: 1px solid rgba(214,229,238,0.5) !important;
+        box-shadow: 0 4px 20px rgba(7,30,39,0.1), 0 1px 4px rgba(7,30,39,0.06) !important;
+        padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom)) !important;
       }
+
+      /* Bottom nav active pill indicator */
+      nav[data-nav-container="bottom"] .nav-link.active {
+        background: rgba(17,26,92,0.07) !important;
+        border-radius: 0.75rem !important;
+      }
+      nav[data-nav-container="bottom"] .nav-link.active::before {
+        width: 20px;
+        height: 2.5px;
+      }
+
+      /* Main clears BOTH floating header and floating bottom nav */
+      main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom)) !important; }
+
+      /* Chips — neumorphic pill */
+      .chip-neu {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 999px;
+        background: #f0f5ff;
+        border: 1px solid rgba(214,229,238,0.7);
+        box-shadow: inset 0 1px 2px rgba(255,255,255,0.9), 0 1px 4px rgba(7,30,39,0.06);
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #2d3e6e;
+        white-space: nowrap;
+      }
+      .chip-neu .material-symbols-outlined { font-size: 15px; color: #1d4ed8; }
+
+      /* Pill buttons */
+      .btn-pill-primary {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+        padding: 0.7rem 1.4rem;
+        background: linear-gradient(135deg, #111a5c 0%, #1d4ed8 100%);
+        color: white; font-weight: 700; font-size: 0.88rem;
+        border-radius: 999px;
+        box-shadow: 0 4px 18px rgba(17,26,92,0.3), 0 1px 4px rgba(17,26,92,0.2);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: none; cursor: pointer;
+      }
+      .btn-pill-primary:active { transform: scale(0.97); }
+      .btn-pill-primary:hover { box-shadow: 0 8px 28px rgba(17,26,92,0.38); }
+
+      .btn-pill-ghost {
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+        padding: 0.68rem 1.4rem;
+        background: transparent;
+        color: #111a5c; font-weight: 700; font-size: 0.88rem;
+        border-radius: 999px;
+        border: 1.5px solid #d0daf0;
+        transition: background 0.15s ease, box-shadow 0.15s ease;
+        cursor: pointer;
+      }
+      .btn-pill-ghost:hover { background: rgba(17,26,92,0.04); box-shadow: 0 4px 14px rgba(7,30,39,0.08); }
+      .btn-pill-ghost:active { transform: scale(0.97); }
+
+      /* Dashboard headline — prominent */
+      .dash-headline {
+        font-size: 1.7rem !important;
+        line-height: 1.22 !important;
+        font-weight: 900 !important;
+        letter-spacing: -0.02em !important;
+        color: #0d1b3e !important;
+      }
+      .dash-headline .highlight { color: #1d4ed8; }
+
+      /* Premium prediction card — light style */
+      .pred-card-mobile {
+        background: linear-gradient(135deg, #deeaff 0%, #e8f0ff 40%, #d8edff 100%);
+        border: 1px solid rgba(147,187,255,0.4);
+        border-radius: 1.25rem;
+        padding: 1.25rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .pred-card-mobile::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 140px; height: 140px;
+        background: radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%);
+        border-radius: 50%;
+      }
+      .pred-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #4a6fa5;
+      }
+      .live-badge {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        background: rgba(255,255,255,0.85);
+        border: 1px solid rgba(147,187,255,0.5);
+        border-radius: 999px;
+        padding: 0.28rem 0.7rem;
+        font-size: 0.72rem; font-weight: 700;
+        color: #1d4ed8;
+        box-shadow: 0 2px 8px rgba(29,78,216,0.12);
+      }
+      .live-badge::before {
+        content: '';
+        width: 6px; height: 6px;
+        background: #22c55e;
+        border-radius: 50%;
+        animation: livePulse 2s ease infinite;
+      }
+      @keyframes livePulse {
+        0%,100% { opacity:1; transform:scale(1); }
+        50% { opacity:0.6; transform:scale(1.3); }
+      }
+
+      /* Ring container — light theme */
+      .ring-container-light {
+        position: relative;
+        width: 160px; height: 160px;
+        margin: 1rem auto;
+      }
+      .ring-container-light svg { filter: drop-shadow(0 4px 16px rgba(29,78,216,0.2)); }
+
+      /* Dashboard hero white card */
+      .dash-hero-card {
+        background: #ffffff;
+        border-radius: 1.25rem;
+        border: 1px solid rgba(214,229,238,0.6);
+        box-shadow: 0 2px 8px rgba(7,30,39,0.04), 0 12px 32px rgba(7,30,39,0.06);
+        padding: 1.25rem;
+        margin-bottom: 0.875rem;
+      }
+
+      /* Drawer redesign */
+      .drawer-premium {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        border-right: none !important;
+        box-shadow: 8px 0 40px rgba(7,30,39,0.18);
+      }
+      .drawer-avatar-ring {
+        width: 3rem; height: 3rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #111a5c, #1d4ed8);
+        padding: 2px;
+        flex-shrink: 0;
+      }
+      .drawer-avatar-ring img {
+        width: 100%; height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        background: white;
+      }
+      .drawer-menu-item {
+        display: flex; align-items: center; gap: 0.75rem;
+        padding: 0.7rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.875rem; font-weight: 600;
+        color: #2d3e6e;
+        transition: background 0.15s, transform 0.15s;
+        cursor: pointer; border: none; width: 100%; text-align: left;
+        background: transparent;
+      }
+      .drawer-menu-item:hover { background: rgba(17,26,92,0.06); transform: translateX(2px); }
+      .drawer-menu-item:active { transform: scale(0.98); }
+      .drawer-menu-item .icon-wrap {
+        width: 2.1rem; height: 2.1rem;
+        border-radius: 0.55rem;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem; flex-shrink: 0;
+      }
+      .drawer-divider { height: 1px; background: rgba(214,229,238,0.8); margin: 0.5rem 0; }
+
+      /* Metric cards 2-col on mobile */
+      .metric-grid-mobile { grid-template-columns: 1fr 1fr !important; }
+
+      /* Hide dark desktop header items on mobile */
+      .mobile-hide-header-extras { display: none !important; }
     }
   </style>
 </head>
 <body class="font-sans antialiased">
-  <div class="fixed inset-0 z-[90] hidden items-center justify-center overflow-y-auto bg-ink/45 px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink/45 px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="panel w-full max-w-md p-5 shadow-panel">
       <div class="flex items-center justify-between gap-4 border-b border-line pb-4">
         <div class="flex items-center gap-3">
@@ -469,38 +565,102 @@
 
   <div class="mobile-drawer md:hidden" id="mobileDrawer" aria-hidden="true">
     <button class="drawer-overlay" id="drawerOverlay" aria-label="Close menu"></button>
-    <aside class="drawer-panel glass border-r border-line p-4">
-      <div class="flex items-center justify-between gap-3 border-b border-line pb-4">
-        <div class="flex min-w-0 items-center">
-          <img class="h-12 w-12 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
-          <span class="sr-only">PredictED, University of Nairobi</span>
+    <aside class="drawer-panel drawer-premium p-0 flex flex-col">
+
+      <!-- Profile header -->
+      <div class="px-5 pt-8 pb-5" style="background:linear-gradient(135deg,#111a5c 0%,#1d4ed8 100%)">
+        <div class="flex items-center justify-between mb-4">
+          <img class="h-9 w-auto" alt="PredictED logo" src="assets/MainPredictedLogo.svg" style="filter:brightness(0) invert(1)" />
+          <button class="flex items-center justify-center w-9 h-9 rounded-full bg-white/15 text-white transition-colors hover:bg-white/25" id="closeDrawer" aria-label="Close menu">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
         </div>
-        <button class="btn btn-ghost h-10 w-10 p-0" id="closeDrawer" aria-label="Close menu">
-          <span class="material-symbols-outlined">close</span>
+        <div class="flex items-center gap-3 mt-2">
+          <div class="drawer-avatar-ring">
+            <img data-profile-avatar alt="Student profile" src="assets/MainPredictedLogo.svg" style="padding:4px;background:#1d4ed8" />
+          </div>
+          <div class="min-w-0">
+            <p class="font-bold text-white text-sm truncate" data-profile-name>Sign in to continue</p>
+            <p class="text-white/65 text-xs font-mono" data-profile-meta>Student workspace</p>
+          </div>
+        </div>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <div class="rounded-xl bg-white/10 px-3 py-2">
+            <p class="text-white/60 text-[10px] font-mono uppercase">Streak</p>
+            <p class="text-white font-black text-base">14 days 🔥</p>
+          </div>
+          <div class="rounded-xl bg-white/10 px-3 py-2">
+            <p class="text-white/60 text-[10px] font-mono uppercase">Level</p>
+            <p class="text-white font-black text-base">24 — Scholar</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nav + utilities -->
+      <div class="flex-1 overflow-y-auto px-3 py-4">
+
+        <!-- Main nav -->
+        <p class="px-2 mb-1.5 text-[10px] font-mono font-bold uppercase text-muted tracking-wider">Navigation</p>
+        <nav class="grid gap-0.5" data-nav-container="mobile"></nav>
+
+        <div class="drawer-divider mt-4 mb-3"></div>
+
+        <!-- Utilities -->
+        <p class="px-2 mb-1.5 text-[10px] font-mono font-bold uppercase text-muted tracking-wider">Account</p>
+
+        <button class="drawer-menu-item" id="drawerAccountBtn" type="button">
+          <span class="icon-wrap bg-blue-50 text-cobalt"><span class="material-symbols-outlined text-[20px]">account_circle</span></span>
+          <span class="flex-1">Profile &amp; Settings</span>
+          <span class="material-symbols-outlined text-[16px] text-muted">chevron_right</span>
+        </button>
+
+        <button class="drawer-menu-item" id="drawerNotifBtn" type="button" data-action="open-view" data-view="feed">
+          <span class="icon-wrap bg-amber-50 text-gold"><span class="material-symbols-outlined text-[20px]">notifications</span></span>
+          <span class="flex-1">Notifications</span>
+          <span class="flex items-center justify-center w-5 h-5 rounded-full bg-coral text-white text-[10px] font-black">3</span>
+        </button>
+
+        <button class="drawer-menu-item" id="drawerDarkBtn" type="button">
+          <span class="icon-wrap bg-slate-100 text-slate-600"><span class="material-symbols-outlined text-[20px]" id="darkModeIcon">dark_mode</span></span>
+          <span class="flex-1">Dark Mode</span>
+          <!-- Toggle switch -->
+          <span class="relative inline-flex w-10 h-5 rounded-full transition-colors duration-200 bg-slate-200 cursor-pointer" id="darkToggle">
+            <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200" id="darkToggleThumb"></span>
+          </span>
+        </button>
+
+        <button class="drawer-menu-item" data-action="open-view" data-view="marketplace" type="button">
+          <span class="icon-wrap bg-emerald-50 text-mint"><span class="material-symbols-outlined text-[20px]">storefront</span></span>
+          <span class="flex-1">Marketplace</span>
+        </button>
+
+        <div class="drawer-divider mt-3 mb-3"></div>
+
+        <button class="drawer-menu-item" id="drawerApiStatus" type="button">
+          <span class="icon-wrap bg-blue-50 text-cobalt"><span class="material-symbols-outlined text-[20px]" id="drawerApiIcon">cloud_done</span></span>
+          <span class="flex-1 text-sm" id="drawerApiText">Offline demo</span>
+        </button>
+
+        <button class="drawer-menu-item text-coral" id="drawerSignOut" type="button">
+          <span class="icon-wrap bg-rose-50 text-coral"><span class="material-symbols-outlined text-[20px]">logout</span></span>
+          <span class="flex-1">Sign out</span>
         </button>
       </div>
-      <div class="mt-4 flex items-center gap-3 rounded-lg border border-line bg-white p-3">
-        <img class="h-11 w-11 rounded-full bg-white object-contain p-1" data-profile-avatar alt="Student profile" src="assets/PrdictEDLogo.svg" />
-        <div class="min-w-0">
-          <p class="truncate text-sm font-bold text-ink" data-profile-name>Sign in</p>
-          <p class="font-mono text-[11px] text-muted" data-profile-meta>Student workspace</p>
-        </div>
+
+      <!-- Bottom CTA -->
+      <div class="px-4 pb-6 pt-3 border-t border-line">
+        <button class="btn-pill-primary w-full" data-action="open-view" data-view="predictor" type="button">
+          <span class="material-symbols-outlined text-[19px]">auto_graph</span>
+          Run Prediction
+        </button>
       </div>
-      <button class="theme-toggle btn btn-ghost mt-3 w-full justify-between px-3 text-sm" data-theme-toggle type="button" aria-label="Toggle dark mode" aria-pressed="false">
-        <span class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-[19px]" data-theme-icon>dark_mode</span>
-          <span data-theme-label>Dark mode</span>
-        </span>
-        <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-      </button>
-      <nav class="mt-4 grid gap-1" data-nav-container="mobile"></nav>
     </aside>
   </div>
 
   <div class="app-shell md:grid md:grid-cols-[260px_1fr]">
     <aside class="glass fixed left-0 top-0 z-40 hidden h-screen w-[260px] border-r border-line px-3 py-4 md:flex md:flex-col">
       <div class="flex justify-center px-2">
-        <img class="h-16 w-16 shrink-0 rounded-lg border border-line bg-white object-contain p-1 shadow-soft" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
+        <img class="h-14 w-auto" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
         <span class="sr-only">PredictED AI Academic Revision</span>
       </div>
       <div class="mt-3 rounded-lg border border-line bg-white p-2.5 shadow-soft">
@@ -536,19 +696,22 @@
       </div>
     </aside>
 
-    <main class="min-h-screen pb-24 md:col-start-2 md:pb-0">
-      <header class="glass sticky top-0 z-30 border-b border-line px-4 py-2.5 md:px-6">
+    <main class="min-h-screen md:col-start-2">
+      <!-- ── FLOATING MOBILE HEADER ──────────────────────── -->
+      <div class="mobile-float-header md:hidden flex items-center justify-between">
+        <button class="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 text-navy transition-all active:scale-95 hover:bg-slate-100" id="openDrawer" aria-label="Open menu">
+          <span class="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+        <img class="h-8 w-auto" alt="PredictED" src="assets/MainPredictedLogo.svg" />
+      </div>
+
+      <!-- ── DESKTOP HEADER ──────────────────────────────── -->
+      <header class="glass hidden md:block sticky top-0 z-30 border-b border-line px-6 py-3">
         <div class="flex items-center justify-between gap-3">
           <div class="flex min-w-0 items-center gap-3">
-            <button class="btn btn-ghost h-10 w-10 p-0 md:hidden" id="openDrawer" aria-label="Open menu">
-              <span class="material-symbols-outlined">menu</span>
-            </button>
             <div class="min-w-0">
-              <div class="flex items-center md:hidden">
-                <img class="h-10 w-10 shrink-0 rounded-md border border-line bg-white object-contain p-0.5" alt="PredictED logo" src="assets/PrdictEDLogo.svg" />
-              </div>
-              <p class="hidden font-mono text-[10px] uppercase tracking-wide text-muted md:block" id="viewEyebrow">Dashboard</p>
-              <h1 class="hidden text-lg font-black tracking-tight text-navy md:block" id="viewTitle">Academic Command Center</h1>
+              <p class="font-mono text-[10px] uppercase tracking-wide text-muted" id="viewEyebrow">Dashboard</p>
+              <h1 class="text-lg font-black tracking-tight text-navy" id="viewTitle">Academic Command Center</h1>
             </div>
           </div>
           <div class="hidden min-w-[260px] max-w-md flex-1 items-center lg:flex">
@@ -557,15 +720,12 @@
               <input class="w-full rounded-lg border-line bg-white py-2 pl-10 pr-4 text-sm focus:border-cobalt focus:ring-cobalt" id="globalSearch" placeholder="Search courses, notes, lecturers" type="search" />
             </label>
           </div>
-          <div class="header-actions flex items-center gap-2">
-            <button class="theme-toggle btn btn-ghost h-10 w-10 p-0" data-theme-toggle type="button" aria-label="Toggle dark mode" aria-pressed="false">
-              <span class="material-symbols-outlined text-[19px]" data-theme-icon>dark_mode</span>
-            </button>
+          <div class="flex items-center gap-2">
             <button class="btn btn-ghost relative h-10 w-10 p-0" data-action="open-view" data-view="feed" aria-label="Notifications">
               <span class="material-symbols-outlined">notifications</span>
               <span class="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-coral"></span>
             </button>
-            <button class="btn btn-ghost h-10 w-10 p-0 text-sm md:w-auto md:px-3" id="accountButton" type="button" aria-label="Account">
+            <button class="btn btn-ghost h-10 px-3 text-sm" id="accountButton" type="button">
               <span class="material-symbols-outlined text-[19px]">account_circle</span>
               <span class="hidden max-w-[120px] truncate lg:inline" id="accountName">Sign in</span>
             </button>
@@ -584,9 +744,162 @@
         </div>
       </header>
 
-      <section class="px-4 py-5 md:px-8 md:py-8">
+      <section class="px-4 py-5 mobile-content-offset md:px-8 md:py-8 md:mobile-content-offset-reset">
         <div class="mx-auto max-w-[1440px]">
           <section class="view active" id="view-dashboard" data-title="Academic Command Center" data-eyebrow="Dashboard">
+
+            <!-- ── MOBILE DASHBOARD HERO (replaces old hero on mobile) ── -->
+            <div class="md:hidden">
+
+              <!-- Hero text card -->
+              <div class="dash-hero-card">
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <span class="chip-neu"><span class="material-symbols-outlined">school</span><span id="dashboardUniversityM">University of Nairobi</span></span>
+                  <span class="chip-neu"><span class="material-symbols-outlined">bolt</span>42 revision tests</span>
+                  <span class="chip-neu"><span class="material-symbols-outlined">verified</span>89% certainty</span>
+                </div>
+                <h2 class="dash-headline" id="dashboardHeadlineMobile">Semester 2 final prep is trending to <span class="highlight">B+.</span></h2>
+                <p class="mt-3 text-sm leading-relaxed text-muted" id="dashboardSubcopyM">Vector clocks and Lamport timestamps are driving the risk score. Today's sessions are weighted toward predictive lecturer patterns.</p>
+                <div class="mt-5 flex gap-3">
+                  <button class="btn-pill-primary flex-1" data-action="open-view" data-view="planner" type="button">
+                    <span class="material-symbols-outlined text-[18px]">event_note</span>
+                    Today's Plan
+                  </button>
+                  <button class="btn-pill-ghost flex-1" data-action="open-view" data-view="tutor" type="button">
+                    <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                    Ask AI Tutor
+                  </button>
+                </div>
+              </div>
+
+              <!-- Prediction card — light futuristic -->
+              <div class="pred-card-mobile">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="pred-label">Prediction</span>
+                  <span class="live-badge">Live</span>
+                </div>
+                <div class="ring-container-light">
+                  <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(29,78,216,0.12)" stroke-width="10"></circle>
+                    <circle class="ring-progress" cx="60" cy="60" r="50" fill="none" stroke="#1d4ed8" stroke-linecap="round" stroke-width="10" stroke-dasharray="314.159" stroke-dashoffset="314.159" style="--dash:81.681;transition:stroke-dashoffset 1.4s cubic-bezier(0.22,1,0.36,1)"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-4xl font-black text-navy" id="dashboardPredictionScoreM">74%</span>
+                    <span class="font-mono text-xs text-cobalt font-bold" id="dashboardPredictionGradeM">B+ expected</span>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-2 pt-3 border-t border-blue-100">
+                  <div>
+                    <p class="pred-label">GPA Lift</p>
+                    <p class="text-xl font-black text-navy mt-0.5" id="dashboardGpaLiftM">+0.20</p>
+                  </div>
+                  <div>
+                    <p class="pred-label">Focus Level</p>
+                    <p class="text-xl font-black text-amber-500 mt-0.5" id="dashboardFocusM">High</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mobile metric quick-stats -->
+              <div class="grid grid-cols-2 gap-3 mt-3">
+                <article class="panel p-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-cobalt"><span class="material-symbols-outlined text-[18px]">insights</span></span>
+                    <span class="font-mono text-[10px] text-mint font-bold">+8%</span>
+                  </div>
+                  <p class="font-mono text-[9px] uppercase text-muted">Hot Topics</p>
+                  <p class="text-lg font-black text-navy mt-0.5">12 topics</p>
+                </article>
+                <article class="panel p-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-mint"><span class="material-symbols-outlined text-[18px]">calendar_month</span></span>
+                    <span class="font-mono text-[10px] text-coral font-bold">3 due</span>
+                  </div>
+                  <p class="font-mono text-[9px] uppercase text-muted">Study Plan</p>
+                  <p class="text-lg font-black text-navy mt-0.5">2h 15m</p>
+                </article>
+                <article class="panel p-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-gold"><span class="material-symbols-outlined text-[18px]">workspace_premium</span></span>
+                    <span class="font-mono text-[10px] text-muted font-bold">Lv.24</span>
+                  </div>
+                  <p class="font-mono text-[9px] uppercase text-muted">Scholar XP</p>
+                  <p class="text-lg font-black text-navy mt-0.5">12,450</p>
+                </article>
+                <article class="panel p-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-coral"><span class="material-symbols-outlined text-[18px]">quiz</span></span>
+                    <span class="font-mono text-[10px] text-coral font-bold">due now</span>
+                  </div>
+                  <p class="font-mono text-[9px] uppercase text-muted">Flashcards</p>
+                  <p class="text-lg font-black text-coral mt-0.5" id="dashboardCardsDueM">38 cards</p>
+                </article>
+              </div>
+
+              <!-- Today's sessions — mobile -->
+              <div class="panel mt-3 overflow-hidden">
+                <div class="flex items-center justify-between p-4 border-b border-line">
+                  <div>
+                    <p class="font-mono text-[9px] uppercase text-muted tracking-wide">Priority Queue</p>
+                    <h3 class="font-black text-navy text-sm mt-0.5">Today's high-yield sessions</h3>
+                  </div>
+                  <button class="btn btn-ghost h-8 px-2.5 text-xs" data-action="open-view" data-view="planner">Planner →</button>
+                </div>
+                <div class="p-3 grid gap-2" id="dashboardTaskPreviewM">
+                  <div class="study-tile soft-panel p-3.5" style="--accent:#cf3f4f">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="rounded-full bg-rose-50 px-2 py-0.5 font-mono text-[9px] font-bold text-coral">High Yield</span>
+                      <span class="font-mono text-[10px] text-muted">14:00</span>
+                    </div>
+                    <p class="font-black text-navy text-sm">Distributed Systems</p>
+                    <p class="text-xs text-muted mt-0.5">Lamport timestamps and vector clocks.</p>
+                  </div>
+                  <div class="study-tile soft-panel p-3.5" style="--accent:#1d4ed8">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="rounded-full bg-blue-50 px-2 py-0.5 font-mono text-[9px] font-bold text-cobalt">Revision</span>
+                      <span class="font-mono text-[10px] text-muted">16:30</span>
+                    </div>
+                    <p class="font-black text-navy text-sm">Artificial Intelligence</p>
+                    <p class="text-xs text-muted mt-0.5">Bayesian networks and independence.</p>
+                  </div>
+                  <div class="study-tile soft-panel p-3.5" style="--accent:#0f9fbc">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="rounded-full bg-cyan-50 px-2 py-0.5 font-mono text-[9px] font-bold text-aqua">Lab Prep</span>
+                      <span class="font-mono text-[10px] text-muted">19:00</span>
+                    </div>
+                    <p class="font-black text-navy text-sm">Compiler Construction</p>
+                    <p class="text-xs text-muted mt-0.5">LL(1) parsing table review.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Campus feed preview — mobile -->
+              <div class="panel mt-3 p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-black text-navy text-sm">Campus Signals</h3>
+                  <button class="btn btn-ghost h-8 px-2.5 text-xs" data-action="open-view" data-view="feed">See all →</button>
+                </div>
+                <div class="grid gap-2" id="dashboardFeedPreviewM">
+                  <div class="feed-row flex items-start gap-3 rounded-xl border border-line bg-white p-3">
+                    <span class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-gold flex-shrink-0"><span class="material-symbols-outlined text-[17px]">campaign</span></span>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-ink leading-tight">AI CAT moved to Thursday.</p>
+                      <p class="text-xs text-muted mt-0.5">Class rep update · 18 min ago</p>
+                    </div>
+                  </div>
+                  <div class="feed-row flex items-start gap-3 rounded-xl border border-line bg-white p-3">
+                    <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-cobalt flex-shrink-0"><span class="material-symbols-outlined text-[17px]">description</span></span>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-ink leading-tight">Data Mining past paper uploaded.</p>
+                      <p class="text-xs text-muted mt-0.5">Marketplace · 42 min ago</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /mobile dashboard -->
+
+            <!-- ── DESKTOP DASHBOARD (unchanged) ─────────────────── -->
+            <div class="hidden md:block">
             <div class="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
               <div class="panel overflow-hidden">
                 <div class="grid min-h-[310px] md:grid-cols-[1fr_320px]">
@@ -678,9 +991,9 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div><!-- /desktop dashboard grid -->
 
-            <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="hidden md:grid mt-4 gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <article class="metric-card panel p-4">
                 <div class="flex items-center justify-between">
                   <span class="rounded-lg bg-blue-50 p-2 text-cobalt"><span class="material-symbols-outlined">insights</span></span>
@@ -878,10 +1191,10 @@
                     </div>
                   </div>
                   <div class="mt-4 overflow-hidden rounded-lg border border-line">
-                    <div class="topic-grid bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
+                    <div class="grid grid-cols-[1fr_100px_90px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
                       <span>Topic</span>
                       <span>Likelihood</span>
-                      <span class="topic-weight-header">Weight</span>
+                      <span>Weight</span>
                     </div>
                     <div id="topicMatrix"></div>
                   </div>
@@ -1285,9 +1598,9 @@
                   <span class="chip"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>Admin</span>
                 </div>
                 <div class="mt-5 overflow-hidden rounded-lg border border-line">
-                  <div class="moderation-grid bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
+                  <div class="grid grid-cols-[1fr_130px_120px] bg-wash px-4 py-3 font-mono text-[11px] font-bold uppercase text-muted">
                     <span>Item</span>
-                    <span class="moderation-type-header">Type</span>
+                    <span>Type</span>
                     <span>Status</span>
                   </div>
                   <div id="moderationList"></div>
@@ -1340,7 +1653,7 @@
     </main>
   </div>
 
-  <nav class="glass fixed bottom-0 left-0 right-0 z-30 border-t border-line px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 md:hidden" data-nav-container="bottom"></nav>
+  <nav class="glass fixed bottom-0 left-0 right-0 z-30 border-t border-line px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 md:hidden" data-nav-container="bottom" style="border-top:none;"></nav>
 
   <script>
     const navItems = [
@@ -1517,29 +1830,6 @@
       status.classList.remove("text-mint", "text-gold", "text-coral");
       status.classList.add(state === "online" ? "text-mint" : state === "loading" ? "text-gold" : "text-coral");
       iconEl.textContent = state === "online" ? "cloud_done" : state === "loading" ? "sync" : "cloud_off";
-    }
-
-    function applyTheme(theme, persist = true) {
-      const isDark = theme === "dark";
-      document.documentElement.classList.toggle("dark", isDark);
-      document.documentElement.classList.toggle("light", !isDark);
-      if (persist) {
-        try {
-          localStorage.setItem("predictedTheme", theme);
-        } catch {}
-      }
-      document.querySelectorAll("[data-theme-toggle]").forEach(button => {
-        button.setAttribute("aria-pressed", String(isDark));
-        const iconEl = button.querySelector("[data-theme-icon]");
-        const labelEl = button.querySelector("[data-theme-label]");
-        if (iconEl) iconEl.textContent = isDark ? "light_mode" : "dark_mode";
-        if (labelEl) labelEl.textContent = isDark ? "Light mode" : "Dark mode";
-      });
-    }
-
-    function toggleTheme() {
-      const nextTheme = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      applyTheme(nextTheme);
     }
 
     async function loginWith(email, password) {
@@ -1747,7 +2037,7 @@
     function renderNavigation() {
       document.querySelectorAll("[data-nav-container]").forEach(container => {
         const type = container.dataset.navContainer;
-        const items = type === "bottom" ? navItems.slice(0, 4) : navItems;
+        const items = type === "bottom" ? navItems.slice(0, 5) : navItems;
         container.innerHTML = items.map((item, index) => {
           const base = type === "bottom"
             ? "nav-link flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-2 text-muted"
@@ -1856,10 +2146,10 @@
       }
       document.getElementById("topicMatrix").innerHTML = course.topics.map(topic => {
         const tone = topic[1] >= 85 ? "text-coral" : topic[1] >= 75 ? "text-gold" : "text-aqua";
-        return `<div class="course-row topic-grid items-center border-t border-line px-4 py-3">
+        return `<div class="course-row grid grid-cols-[1fr_100px_90px] items-center border-t border-line px-4 py-3">
           <span class="font-bold text-ink">${escapeHtml(topic[0])}</span>
           <span class="font-mono text-sm font-bold ${tone}">${topic[1]}%</span>
-          <span class="topic-weight font-mono text-xs text-muted">${escapeHtml(topic[2])}</span>
+          <span class="font-mono text-xs text-muted">${escapeHtml(topic[2])}</span>
         </div>`;
       }).join("");
       renderMockList(false);
@@ -2087,9 +2377,9 @@
       }
       document.getElementById("moderationList").innerHTML = moderationItems.map(item => {
         const color = item.status === "Approved" ? "text-mint" : "text-gold";
-        return `<div class="moderation-row moderation-grid items-center border-t border-line px-4 py-3">
+        return `<div class="moderation-row grid grid-cols-[1fr_130px_120px] items-center border-t border-line px-4 py-3">
           <span class="font-bold text-ink">${escapeHtml(item.item)}</span>
-          <span class="moderation-type font-mono text-xs text-muted">${escapeHtml(item.type)}</span>
+          <span class="font-mono text-xs text-muted">${escapeHtml(item.type)}</span>
           <span class="font-mono text-xs font-bold ${color}">${escapeHtml(item.status)}</span>
         </div>`;
       }).join("");
@@ -2502,9 +2792,6 @@
     document.getElementById("openDrawer").addEventListener("click", openDrawer);
     document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
     document.getElementById("drawerOverlay").addEventListener("click", closeDrawer);
-    document.querySelectorAll("[data-theme-toggle]").forEach(button => {
-      button.addEventListener("click", toggleTheme);
-    });
     document.getElementById("accountButton").addEventListener("click", () => {
       if (!authToken) {
         showAuthGate();
@@ -2744,7 +3031,6 @@
       if (match) openView(match.id);
     });
 
-    applyTheme(document.documentElement.classList.contains("dark") ? "dark" : "light", false);
     renderNavigation();
     renderDashboardPreviews(plannerBase, feedItems);
     bootstrapApi();
@@ -2762,6 +3048,43 @@
       window.requestIdleCallback(renderIdleViews, { timeout: 1500 });
     } else {
       window.setTimeout(renderIdleViews, 500);
+    }
+
+    /* ── Dark mode toggle ────────────────────────────── */
+    let darkMode = localStorage.getItem("predictedDark") === "true";
+    function applyDark(on) {
+      document.documentElement.classList.toggle("dark", on);
+      const thumb = document.getElementById("darkToggleThumb");
+      const toggle = document.getElementById("darkToggle");
+      const icon = document.getElementById("darkModeIcon");
+      if (thumb) thumb.style.transform = on ? "translateX(20px)" : "translateX(0)";
+      if (toggle) toggle.style.background = on ? "#111a5c" : "";
+      if (icon) icon.textContent = on ? "light_mode" : "dark_mode";
+      localStorage.setItem("predictedDark", on);
+      darkMode = on;
+    }
+    applyDark(darkMode);
+    document.getElementById("drawerDarkBtn")?.addEventListener("click", () => applyDark(!darkMode));
+
+    /* ── Drawer account button → open auth or profile ── */
+    document.getElementById("drawerAccountBtn")?.addEventListener("click", () => {
+      closeDrawer();
+      if (authToken) { openView("profile"); }
+      else { showAuthGate(); }
+    });
+
+    /* ── Drawer sign out button ─────────────────────── */
+    document.getElementById("drawerSignOut")?.addEventListener("click", () => {
+      closeDrawer();
+      clearSession();
+      showAuthGate("You've been signed out.");
+    });
+
+    /* ── Remove mobile-content-offset on desktop ─────── */
+    if (window.matchMedia("(min-width:768px)").matches) {
+      document.querySelectorAll(".mobile-content-offset").forEach(el => {
+        el.style.paddingTop = "";
+      });
     }
   </script>
 </body>
