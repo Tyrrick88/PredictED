@@ -234,6 +234,36 @@ class PredictEdApiApplicationTests {
   }
 
   @Test
+  void tutorAcceptsMultipartNotesAndUsesThemInFallback() {
+    AuthResponse auth = login("alex@predicted.test", "password");
+    ByteArrayResource notesFile = new ByteArrayResource("""
+        Vector clocks help show causality between distributed events.
+        On receive, merge counters by taking the maximum for each position.
+        """.getBytes(StandardCharsets.UTF_8)) {
+      @Override
+      public String getFilename() {
+        return "vector-clocks.txt";
+      }
+    };
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("prompt", "Explain vector clocks for my exam");
+    body.add("courseId", "distributed");
+    body.add("notes", notesFile);
+
+    ResponseEntity<Map> tutor = restTemplate.exchange(
+        url("/api/tutor/messages"),
+        HttpMethod.POST,
+        authorizedMultipart(auth.token(), body),
+        Map.class
+    );
+
+    assertThat(tutor.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat((String) tutor.getBody().get("answer")).contains("uploaded notes from vector-clocks.txt");
+    assertThat((Iterable<?>) tutor.getBody().get("nextSteps"))
+        .contains("Re-read the matching section in vector-clocks.txt");
+  }
+
+  @Test
   void mockGenerationUsesAiServiceFallback() {
     AuthResponse auth = login("alex@predicted.test", "password");
 

@@ -9,6 +9,7 @@ import com.predicted.api.common.Models.TopicPrediction;
 import com.predicted.api.common.Models.TutorRequest;
 import com.predicted.api.common.Models.TutorResponse;
 import com.predicted.api.common.Models.UserProfile;
+import com.predicted.api.ai.TutorNoteContextService.TutorNoteContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,14 +72,23 @@ public class AcademicAiService {
   }
 
   public TutorResponse tutorReply(TutorRequest request, UserProfile student, CoursePrediction course) {
+    return tutorReply(request, student, course, List.of());
+  }
+
+  public TutorResponse tutorReply(
+      TutorRequest request,
+      UserProfile student,
+      CoursePrediction course,
+      List<TutorNoteContext> notes
+  ) {
     if (openAiEnabled()) {
       try {
-        return openAiTutorReply(request, student, course);
+        return openAiTutorReply(request, student, course, notes);
       } catch (RuntimeException exception) {
         log.warn("OpenAI tutor response failed; using fallback. {}", exception.getMessage());
       }
     }
-    return fallbackTutorReply(request);
+    return fallbackTutorReply(request, notes);
   }
 
   public List<MockQuestion> generateMockQuestions(UserProfile student, CoursePrediction course) {
@@ -95,13 +105,18 @@ public class AcademicAiService {
     return fallbackMockQuestions(course);
   }
 
-  private TutorResponse openAiTutorReply(TutorRequest request, UserProfile student, CoursePrediction course) {
+  private TutorResponse openAiTutorReply(
+      TutorRequest request,
+      UserProfile student,
+      CoursePrediction course,
+      List<TutorNoteContext> notes
+  ) {
     String output = callResponsesApi(Map.of(
         "model", model,
         "store", false,
         "max_output_tokens", 900,
         "instructions", tutorInstructions(),
-        "input", tutorInput(request, student, course),
+        "input", tutorInput(request, student, course, notes),
         "text", Map.of("format", tutorResponseFormat())
     ));
 
@@ -190,8 +205,9 @@ public class AcademicAiService {
     return Optional.empty();
   }
 
-  private TutorResponse fallbackTutorReply(TutorRequest request) {
-    String prompt = request.prompt().toLowerCase();
+  private TutorResponse fallbackTutorReply(TutorRequest request, List<TutorNoteContext> notes) {
+    String prompt = (request.prompt() + "\n" + notes.stream().map(TutorNoteContext::excerpt).collect(Collectors.joining("\n")))
+        .toLowerCase();
     String answer;
     List<String> nextSteps;
     List<String> generatedCards;
@@ -212,6 +228,17 @@ public class AcademicAiService {
       answer = "I would study that with a 20-minute loop: define the concept, solve one lecturer-style example, then turn each mistake into a flashcard.";
       nextSteps = List.of("Pick a course", "Solve one short question", "Review related flashcards");
       generatedCards = List.of("What is the key definition?", "What mistake did I make last time?");
+    }
+
+    if (!notes.isEmpty()) {
+      String filenames = notes.stream()
+          .map(TutorNoteContext::filename)
+          .collect(Collectors.joining(", "));
+      answer = "Using your uploaded notes from " + filenames + ", " + answer;
+      List<String> noteAwareSteps = new ArrayList<>();
+      noteAwareSteps.add("Re-read the matching section in " + notes.get(0).filename());
+      noteAwareSteps.addAll(nextSteps.stream().limit(2).toList());
+      nextSteps = noteAwareSteps;
     }
 
     return new TutorResponse(answer, nextSteps, generatedCards);
@@ -247,6 +274,8 @@ public class AcademicAiService {
     return """
         You are PredictED's academic AI tutor for Kenyan university students.
         Give concise, exam-focused help grounded only in the course context provided.
+        When uploaded study notes are provided, treat them as the student's primary source material.
+        Prefer explaining from those notes first, and clearly mention when the notes do not cover a requested idea.
         Do not claim certainty about lecturer behavior beyond the supplied predictive topics.
         Return valid JSON matching the provided schema.
         """;
@@ -261,13 +290,21 @@ public class AcademicAiService {
         """;
   }
 
-  private String tutorInput(TutorRequest request, UserProfile student, CoursePrediction course) {
+  private String tutorInput(
+      TutorRequest request,
+      UserProfile student,
+      CoursePrediction course,
+      List<TutorNoteContext> notes
+  ) {
     return """
         Student program: %s
         Academic level: %s
         Course: %s
         Lecturer: %s
         High-yield topics:
+        %s
+
+        Uploaded study notes:
         %s
 
         Student question:
@@ -278,6 +315,7 @@ public class AcademicAiService {
         course.courseName(),
         course.lecturer(),
         topicContext(course),
+        noteContext(notes),
         request.prompt()
     );
   }
@@ -310,6 +348,22 @@ public class AcademicAiService {
             topic.recommendedAction()
         ))
         .collect(Collectors.joining("\n"));
+  }
+
+  private String noteContext(List<TutorNoteContext> notes) {
+    if (notes.isEmpty()) {
+      return "No uploaded study notes.";
+    }
+    return notes.stream()
+        .map(note -> """
+            File: %s%s
+            %s
+            """.formatted(
+            note.filename(),
+            note.truncated() ? " (excerpted)" : "",
+            note.excerpt()
+        ))
+        .collect(Collectors.joining("\n\n"));
   }
 
   private Map<String, Object> tutorResponseFormat() {

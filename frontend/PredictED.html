@@ -1675,7 +1675,7 @@
                       <p class="font-mono text-[11px] font-bold uppercase text-muted">Tutor Session</p>
                       <h2 class="mt-1 text-2xl font-black text-navy">Exam-grounded support</h2>
                     </div>
-                    <span class="chip"><span class="material-symbols-outlined text-[16px]">memory</span>Context: 4 courses</span>
+                    <span class="chip" id="tutorContextChip"><span class="material-symbols-outlined text-[16px]">memory</span>Context: 4 courses</span>
                   </div>
                 </div>
                 <div class="flex-1 space-y-4 overflow-y-auto bg-wash/70 p-4 md:p-6" id="chatMessages">
@@ -1697,6 +1697,19 @@
                       <span class="hidden sm:inline">Send</span>
                     </button>
                   </div>
+                  <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <label class="btn btn-ghost h-10 px-3 text-sm" for="tutorNotesInput">
+                      <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                      Attach notes
+                    </label>
+                    <input class="hidden" id="tutorNotesInput" accept=".pdf,.ppt,.pptx,.txt" multiple type="file" />
+                    <button class="btn btn-ghost hidden h-10 px-3 text-sm" id="tutorNotesClear" type="button">
+                      <span class="material-symbols-outlined text-[18px]">close</span>
+                      Clear notes
+                    </button>
+                    <p class="text-xs text-muted" id="tutorNotesStatus">Attach up to 3 PDF, PPT, PPTX, or TXT notes for note-grounded answers.</p>
+                  </div>
+                  <div class="mt-3 hidden flex-wrap gap-2" id="tutorNoteList"></div>
                 </form>
               </section>
 
@@ -1707,6 +1720,16 @@
                     <button class="quick-prompt btn btn-ghost justify-start px-3 text-left text-sm" type="button">Generate a DS mock question</button>
                     <button class="quick-prompt btn btn-ghost justify-start px-3 text-left text-sm" type="button">Quiz me on Bayesian networks</button>
                     <button class="quick-prompt btn btn-ghost justify-start px-3 text-left text-sm" type="button">Summarize LL(1) parsing</button>
+                  </div>
+                </div>
+                <div class="panel p-5">
+                  <p class="font-mono text-[11px] font-bold uppercase text-muted">Study Notes</p>
+                  <p class="mt-4 text-sm text-muted" id="tutorNotesSummary">No notes attached yet.</p>
+                  <div class="mt-4 grid gap-3" id="tutorNotesPanel">
+                    <div class="border-t border-line pt-3">
+                      <p class="font-bold text-ink">Ready for uploads</p>
+                      <p class="text-sm text-muted">Attach revision notes once and the tutor will reuse them on follow-up questions.</p>
+                    </div>
                   </div>
                 </div>
                 <div class="panel p-5">
@@ -2174,12 +2197,14 @@
     let focusHours = 3;
     let cardIndex = 0;
     let remembered = 0;
+    let tutorNotes = [];
     let authToken = sessionStorage.getItem("predictedToken") || "";
     let currentUser = null;
     let profileSettings = null;
     let authMode = "login";
     let apiConnected = false;
     let simulateTimer;
+    const MAX_TUTOR_NOTES = 3;
     const loadedViews = new Set();
     const inFlightViews = new Map();
     const renderedLocalViews = new Set();
@@ -2373,7 +2398,13 @@
       authToken = "";
       currentUser = null;
       profileSettings = null;
+      tutorNotes = [];
       sessionStorage.removeItem("predictedToken");
+      const tutorNotesInput = document.getElementById("tutorNotesInput");
+      if (tutorNotesInput) {
+        tutorNotesInput.value = "";
+      }
+      renderTutorNotes();
       if (updateUi) {
         updateProfile(null);
         document.getElementById("accountName").textContent = "Sign in";
@@ -2730,6 +2761,53 @@
       return value ? `${value} B` : "Marketplace pack";
     }
 
+    function renderTutorNotes() {
+      const list = document.getElementById("tutorNoteList");
+      const clearButton = document.getElementById("tutorNotesClear");
+      const status = document.getElementById("tutorNotesStatus");
+      const summary = document.getElementById("tutorNotesSummary");
+      const panel = document.getElementById("tutorNotesPanel");
+      const contextChip = document.getElementById("tutorContextChip");
+      const courseCount = profileSettings?.enrolledCourses?.length
+        || Object.keys(courseTopics || {}).length
+        || defaultCourseCatalog.length;
+      if (contextChip) {
+        contextChip.innerHTML = `${icon("memory", "text-[16px]")}Context: ${courseCount} courses${tutorNotes.length ? ` · ${tutorNotes.length} note${tutorNotes.length === 1 ? "" : "s"}` : ""}`;
+      }
+      if (!list || !clearButton || !status || !summary || !panel) return;
+
+      clearButton.classList.toggle("hidden", !tutorNotes.length);
+      list.classList.toggle("hidden", !tutorNotes.length);
+
+      if (!tutorNotes.length) {
+        list.innerHTML = "";
+        summary.textContent = "No notes attached yet.";
+        status.textContent = "Attach up to 3 PDF, PPT, PPTX, or TXT notes for note-grounded answers.";
+        panel.innerHTML = `
+          <div class="border-t border-line pt-3">
+            <p class="font-bold text-ink">Ready for uploads</p>
+            <p class="text-sm text-muted">Attach revision notes once and the tutor will reuse them on follow-up questions.</p>
+          </div>`;
+        return;
+      }
+
+      status.textContent = `${tutorNotes.length} attached note${tutorNotes.length === 1 ? "" : "s"} will be sent with each tutor question.`;
+      summary.textContent = `${tutorNotes.length} note${tutorNotes.length === 1 ? "" : "s"} attached for this session.`;
+      list.innerHTML = tutorNotes.map(file => `
+        <span class="chip">
+          ${icon("description", "text-[15px]")}
+          ${escapeHtml(file.name)}
+          · ${escapeHtml(formatBytes(file.size))}
+        </span>
+      `).join("");
+      panel.innerHTML = tutorNotes.map(file => `
+        <div class="border-t border-line pt-3">
+          <p class="font-bold text-ink">${escapeHtml(file.name)}</p>
+          <p class="text-sm text-muted">${escapeHtml(formatBytes(file.size))}</p>
+        </div>
+      `).join("");
+    }
+
     function renderUploadCourseOptions() {
       const select = document.getElementById("noteUploadCourse");
       if (!select) return;
@@ -2826,6 +2904,7 @@
         "profile-course-checkbox"
       );
       renderUploadCourseOptions();
+      renderTutorNotes();
     }
 
     async function loadProfile() {
@@ -2981,6 +3060,8 @@
       const select = document.getElementById("courseSelect");
       if (!courses.length) {
         select.innerHTML = `<option value="">No enrolled courses</option>`;
+        renderUploadCourseOptions();
+        renderTutorNotes();
         renderTopics();
         return;
       }
@@ -2988,6 +3069,7 @@
       select.innerHTML = courses.map(course => `<option value="${escapeHtml(course.courseId)}">${escapeHtml(course.courseName)}</option>`).join("");
       select.value = courseTopics[current] ? current : courses[0]?.courseId || "distributed";
       renderUploadCourseOptions();
+      renderTutorNotes();
       if (activeView === "predictor" || renderedLocalViews.has("predictor")) {
         renderTopics();
         updatePredictor();
@@ -3444,6 +3526,21 @@
       if (apiConnected) loadPlanner().catch(() => setApiStatus("Planner fallback", "offline"));
     });
 
+    document.getElementById("tutorNotesInput").addEventListener("change", event => {
+      const files = Array.from(event.target.files || []);
+      tutorNotes = files.slice(0, MAX_TUTOR_NOTES);
+      renderTutorNotes();
+      if (files.length > MAX_TUTOR_NOTES) {
+        document.getElementById("tutorNotesStatus").textContent = `Only the first ${MAX_TUTOR_NOTES} notes were kept for this session.`;
+      }
+    });
+
+    document.getElementById("tutorNotesClear").addEventListener("click", () => {
+      tutorNotes = [];
+      document.getElementById("tutorNotesInput").value = "";
+      renderTutorNotes();
+    });
+
     document.getElementById("chatForm").addEventListener("submit", async event => {
       event.preventDefault();
       const input = document.getElementById("chatInput");
@@ -3453,17 +3550,25 @@
       input.value = "";
       try {
         if (apiConnected) {
-          const response = await apiRequest("/api/tutor/messages", {
-            method: "POST",
-            body: JSON.stringify({
-              prompt: value,
-              courseId: document.getElementById("courseSelect").value
-            })
-          });
+          const courseId = document.getElementById("courseSelect").value;
+          const body = tutorNotes.length
+            ? (() => {
+              const formData = new FormData();
+              formData.append("prompt", value);
+              if (courseId) formData.append("courseId", courseId);
+              tutorNotes.forEach(file => formData.append("notes", file));
+              return formData;
+            })()
+            : JSON.stringify({ prompt: value, courseId });
+          const response = await apiRequest("/api/tutor/messages", { method: "POST", body });
           appendMessage(`${response.answer} ${response.nextSteps?.length ? "Next: " + response.nextSteps.join(" · ") : ""}`, "assistant");
           return;
         }
       } catch (error) {
+        if (apiConnected && tutorNotes.length) {
+          appendMessage(`I couldn't use those uploaded notes yet. ${error.message}`, "assistant");
+          return;
+        }
         setApiStatus("Tutor fallback", "offline");
       }
       window.setTimeout(() => appendMessage(tutorReply(value), "assistant"), 260);
@@ -3522,6 +3627,7 @@
 
     renderNavigation();
     renderDashboardPreviews(plannerBase, feedItems);
+    renderTutorNotes();
     bootstrapApi();
 
     /* ── Dark mode toggle ────────────────────────────── */

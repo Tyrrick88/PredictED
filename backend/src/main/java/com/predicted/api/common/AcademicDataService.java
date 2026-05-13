@@ -1,6 +1,8 @@
 package com.predicted.api.common;
 
 import com.predicted.api.ai.AcademicAiService;
+import com.predicted.api.ai.TutorNoteContextService;
+import com.predicted.api.ai.TutorNoteContextService.TutorNoteContext;
 import com.predicted.api.common.Models.CoursePrediction;
 import com.predicted.api.common.Models.CreateFeedSignalRequest;
 import com.predicted.api.common.Models.DashboardOverview;
@@ -79,6 +81,7 @@ public class AcademicDataService {
   private final ModerationItemRepository moderationItemRepository;
   private final PaymentAttemptRepository paymentAttemptRepository;
   private final FileStorageService fileStorageService;
+  private final TutorNoteContextService tutorNoteContextService;
 
   public AcademicDataService(
       AcademicAiService academicAiService,
@@ -91,7 +94,8 @@ public class AcademicDataService {
       NotePackRepository notePackRepository,
       ModerationItemRepository moderationItemRepository,
       PaymentAttemptRepository paymentAttemptRepository,
-      FileStorageService fileStorageService
+      FileStorageService fileStorageService,
+      TutorNoteContextService tutorNoteContextService
   ) {
     this.academicAiService = academicAiService;
     this.userRepository = userRepository;
@@ -104,6 +108,7 @@ public class AcademicDataService {
     this.moderationItemRepository = moderationItemRepository;
     this.paymentAttemptRepository = paymentAttemptRepository;
     this.fileStorageService = fileStorageService;
+    this.tutorNoteContextService = tutorNoteContextService;
   }
 
   public DashboardOverview dashboard(String email) {
@@ -283,9 +288,14 @@ public class AcademicDataService {
   }
 
   public TutorResponse tutorReply(String email, TutorRequest request) {
+    return tutorReply(email, request, List.of());
+  }
+
+  public TutorResponse tutorReply(String email, TutorRequest request, List<MultipartFile> notes) {
     UserProfile student = profile(email);
     CoursePrediction course = tutorCourse(email, request.courseId());
-    return academicAiService.tutorReply(request, student, course);
+    List<TutorNoteContext> extractedNotes = tutorNoteContextService.extract(notes);
+    return academicAiService.tutorReply(request, student, course, extractedNotes);
   }
 
   public List<Flashcard> dueFlashcards(String email) {
