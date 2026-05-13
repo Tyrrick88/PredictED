@@ -453,15 +453,15 @@
 
     /* ── Dark mode ────────────────────────────────────── */
     html.dark body {
-      background: #07141c;
-      background-image: linear-gradient(160deg, #07141c 0%, #0c202b 52%, #091a23 100%);
-      color: #e9f4fb;
+      background: #000000;
+      background-image: linear-gradient(160deg, #000000 0%, #050505 52%, #090909 100%);
+      color: #ffffff;
     }
     html.dark #authGate {
       background:
-        radial-gradient(circle at 16% 12%, rgba(91,124,255,0.18), transparent 22rem),
-        radial-gradient(circle at 82% 82%, rgba(20,184,166,0.12), transparent 24rem),
-        linear-gradient(160deg, #07141c 0%, #0c202b 52%, #091a23 100%);
+        radial-gradient(circle at 16% 12%, rgba(255,255,255,0.06), transparent 22rem),
+        radial-gradient(circle at 82% 82%, rgba(255,255,255,0.04), transparent 24rem),
+        linear-gradient(160deg, #000000 0%, #050505 52%, #090909 100%);
     }
     html.dark .app-header-logo,
     html.dark .auth-brand-logo {
@@ -471,28 +471,28 @@
     html.dark .desktop-header-bar,
     html.dark .mobile-float-header,
     html.dark .app-topbar {
-      background: rgba(10,24,33,0.92);
-      border-color: #244354;
+      background: rgba(0,0,0,0.92);
+      border-color: #262626;
     }
     html.dark .header-menu-button {
-      background: #102432;
-      border-color: #315468;
-      color: #e9f4fb;
+      background: #0a0a0a;
+      border-color: #303030;
+      color: #ffffff;
     }
     html.dark .header-menu-button:hover {
-      background: #183142;
+      background: #151515;
     }
     html.dark .desktop-sidebar {
       background:
-        linear-gradient(180deg, rgba(9,22,31,0.98), rgba(8,19,27,0.96)),
-        radial-gradient(circle at 50% 0%, rgba(79,120,255,0.14), transparent 32rem);
+        linear-gradient(180deg, rgba(0,0,0,0.98), rgba(9,9,9,0.96)),
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05), transparent 32rem);
     }
     html.dark .panel,
     html.dark .dash-hero-card,
     html.dark .pred-card-mobile,
     html.dark .drawer-premium {
-      background: #0f1f2a;
-      border-color: #244354;
+      background: #0b0b0b;
+      border-color: #262626;
       box-shadow: 0 10px 32px rgba(0,0,0,0.28);
     }
     html.dark .panel:hover {
@@ -501,78 +501,103 @@
     html.dark .soft-panel,
     html.dark .bg-wash,
     html.dark .bg-wash\/70 {
-      background: #132b38 !important;
-      border-color: #244354;
+      background: #111111 !important;
+      border-color: #262626;
     }
     html.dark .bg-white,
     html.dark input,
     html.dark select,
     html.dark textarea,
     html.dark .segmented button.active {
-      background-color: #102432 !important;
-      color: #e9f4fb;
-      border-color: #315468;
+      background-color: #0d0d0d !important;
+      color: #ffffff;
+      border-color: #303030;
+    }
+    html.dark .bg-navy {
+      background: #000000 !important;
+      color: #ffffff !important;
     }
     html.dark .brand-lockup,
     html.dark .text-navy,
     html.dark .text-ink,
     html.dark .dash-headline {
-      color: #f3f8ff !important;
+      color: #ffffff !important;
     }
     html.dark .text-muted,
     html.dark .brand-subtitle {
-      color: #a7bdca !important;
+      color: #b5b5b5 !important;
     }
     html.dark .border-line,
     html.dark .border-blue-100 {
-      border-color: #244354 !important;
+      border-color: #262626 !important;
     }
     html.dark :where(.chip),
     html.dark .chip-neu,
     html.dark .live-badge {
-      background: #102432;
-      border-color: #315468;
-      color: #b8cbd6;
+      background: #0d0d0d;
+      border-color: #303030;
+      color: #ffffff;
       box-shadow: none;
     }
     html.dark .btn-ghost,
     html.dark .drawer-menu-item,
     html.dark nav[data-nav-container="bottom"] {
-      background: rgba(16,36,50,0.88);
-      color: #dcecff;
-      border-color: #315468;
+      background: rgba(10,10,10,0.88);
+      color: #ffffff;
+      border-color: #303030;
     }
     html.dark .btn-ghost:hover,
     html.dark .drawer-menu-item:hover,
     html.dark .nav-link:hover {
-      background: rgba(36,67,84,0.88);
+      background: rgba(26,26,26,0.88);
     }
     html.dark .nav-link {
-      color: #b8cbd6;
+      color: #d4d4d4;
     }
     html.dark .nav-link.active {
-      color: #ffffff;
-      background: linear-gradient(135deg, #243ad4 0%, #4f78ff 100%);
-      box-shadow: 0 8px 22px rgba(79,120,255,0.22);
+      color: #000000;
+      background: #ffffff;
+      box-shadow: 0 8px 22px rgba(255,255,255,0.12);
     }
     html.dark .segmented {
-      background: #0d1e29;
-      border-color: #315468;
+      background: #080808;
+      border-color: #303030;
     }
     html.dark .segmented button {
-      color: #a7bdca;
+      color: #b5b5b5;
     }
     html.dark .btn-pill-ghost {
-      color: #e9f4fb;
-      border-color: #6a879a;
-      background: rgba(16,36,50,0.55);
+      color: #ffffff;
+      border-color: #404040;
+      background: rgba(10,10,10,0.55);
     }
     html.dark .btn-pill-ghost:hover {
-      background: rgba(36,67,84,0.72);
+      background: rgba(26,26,26,0.72);
     }
-    html.dark ::placeholder { color: #7f98a8; }
-    html.dark ::-webkit-scrollbar-track { background:#0b1b25; }
-    html.dark ::-webkit-scrollbar-thumb { background:#315468; }
+    html.dark .btn-primary {
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #ffffff;
+      box-shadow: 0 8px 22px rgba(255,255,255,0.08);
+    }
+    html.dark .btn-primary:hover {
+      background: #ededed;
+      color: #000000;
+      box-shadow: 0 10px 24px rgba(255,255,255,0.12);
+    }
+    html.dark .ring-progress,
+    html.dark .dash-headline .highlight,
+    html.dark .chip-neu .material-symbols-outlined {
+      stroke: #ffffff !important;
+      color: #ffffff !important;
+    }
+    html.dark input[type="file"]::file-selector-button {
+      background: #ffffff;
+      color: #000000;
+    }
+    html.dark ::placeholder { color: #8c8c8c; }
+    html.dark ::-webkit-scrollbar-track { background:#050505; }
+    html.dark ::-webkit-scrollbar-thumb { background:#3a3a3a; }
 
     /* ════════════════════════════════════════════════════
        MOBILE — everything below 768px
@@ -904,18 +929,18 @@
     @media (max-width: 767px) {
       html.dark .mobile-float-header .bg-slate-50,
       html.dark .app-topbar .bg-slate-50 {
-        background: #102432 !important;
-        border-color: #315468 !important;
+        background: #0a0a0a !important;
+        border-color: #303030 !important;
       }
       html.dark nav[data-nav-container="bottom"] .nav-link.active {
-        background: rgba(79,120,255,0.18) !important;
-        color: #ffffff !important;
+        background: #ffffff !important;
+        color: #000000 !important;
       }
       html.dark nav[data-nav-container="bottom"] .nav-link.active .material-symbols-outlined {
-        color: #ffffff !important;
+        color: #000000 !important;
       }
       html.dark nav[data-nav-container="bottom"] .nav-link.active::before {
-        background: linear-gradient(90deg,#5b7cff,#9db5ff) !important;
+        background: #ffffff !important;
       }
     }
   </style>
