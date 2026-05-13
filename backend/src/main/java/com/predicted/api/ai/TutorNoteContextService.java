@@ -4,9 +4,8 @@ import com.predicted.api.common.BadRequestException;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
 import org.apache.poi.hslf.usermodel.HSLFSlideShow;
-import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
+import org.apache.poi.sl.extractor.SlideShowExtractor;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -114,14 +113,14 @@ public class TutorNoteContextService {
 
   private String extractPpt(MultipartFile file) throws IOException {
     try (HSLFSlideShow slideShow = new HSLFSlideShow(file.getInputStream());
-         PowerPointExtractor extractor = new PowerPointExtractor(slideShow)) {
+         SlideShowExtractor<?, ?> extractor = new SlideShowExtractor<>(slideShow)) {
       return extractor.getText();
     }
   }
 
   private String extractPptx(MultipartFile file) throws IOException {
     try (XMLSlideShow slideShow = new XMLSlideShow(file.getInputStream());
-         XSLFPowerPointExtractor extractor = new XSLFPowerPointExtractor(slideShow)) {
+         SlideShowExtractor<?, ?> extractor = new SlideShowExtractor<>(slideShow)) {
       return extractor.getText();
     }
   }
