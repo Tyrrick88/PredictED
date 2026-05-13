@@ -468,6 +468,7 @@ public class DatabaseSeeder implements ApplicationRunner {
     academicResourceRepository.save(new AcademicResourceEntity(
         certification,
         cpaOne,
+        "usr_admin",
         "CPA formula pack",
         "NOTES",
         "Quick-recall sheet for accounting adjustments and tax computation patterns.",
@@ -482,6 +483,7 @@ public class DatabaseSeeder implements ApplicationRunner {
     academicResourceRepository.save(new AcademicResourceEntity(
         language,
         frenchOne,
+        "usr_admin",
         "French listening playlist",
         "AUDIO",
         "Beginner listening and pronunciation drills.",
@@ -496,6 +498,7 @@ public class DatabaseSeeder implements ApplicationRunner {
     academicResourceRepository.save(new AcademicResourceEntity(
         bootcamp,
         bootcampOne,
+        "usr_admin",
         "Bootcamp capstone rubric",
         "GUIDE",
         "Project quality checklist for frontend/backend delivery and demos.",
@@ -510,6 +513,7 @@ public class DatabaseSeeder implements ApplicationRunner {
     academicResourceRepository.save(new AcademicResourceEntity(
         online,
         onlineOne,
+        "usr_admin",
         "Google DA study map",
         "ROADMAP",
         "Weekly completion guide for self-paced learners balancing work and study.",
