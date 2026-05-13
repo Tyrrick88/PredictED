@@ -64,6 +64,34 @@
 
     /* ── Layout ───────────────────────────────────────── */
     .app-shell { min-height: 100vh; }
+    body.auth-locked {
+      overflow: hidden;
+    }
+    body.auth-locked .app-shell,
+    body.auth-locked .mobile-drawer,
+    body.auth-locked nav[data-nav-container="bottom"] {
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #authGate {
+      align-items: center;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(71,119,255,0.16), transparent 22rem),
+        radial-gradient(circle at 82% 82%, rgba(14,165,137,0.13), transparent 24rem),
+        linear-gradient(160deg, #f0f7ff 0%, #e8f4fb 58%, #edf7f4 100%);
+    }
+    #authGate.hidden {
+      display: none;
+    }
+    .auth-shell {
+      width: 100%;
+      max-width: 28rem;
+    }
+    @media (max-height: 760px) {
+      #authGate {
+        align-items: flex-start;
+      }
+    }
     .glass {
       background: rgba(255,255,255,0.94);
       backdrop-filter: blur(16px);
@@ -132,6 +160,12 @@
     }
     .drawer-brand-logo {
       width: 11.75rem;
+    }
+    .auth-brand-logo-large {
+      width: min(15rem, 72vw);
+      height: 4.4rem;
+      border-radius: 0.9rem;
+      box-shadow: 0 18px 42px rgba(7,30,39,0.1);
     }
     .content-offset {
       padding-top: calc(5.8rem + env(safe-area-inset-top)) !important;
@@ -415,6 +449,12 @@
       background: #07141c;
       background-image: linear-gradient(160deg, #07141c 0%, #0c202b 52%, #091a23 100%);
       color: #e9f4fb;
+    }
+    html.dark #authGate {
+      background:
+        radial-gradient(circle at 16% 12%, rgba(91,124,255,0.18), transparent 22rem),
+        radial-gradient(circle at 82% 82%, rgba(20,184,166,0.12), transparent 24rem),
+        linear-gradient(160deg, #07141c 0%, #0c202b 52%, #091a23 100%);
     }
     html.dark .glass,
     html.dark .desktop-header-bar,
@@ -869,66 +909,69 @@
     }
   </style>
 </head>
-<body class="font-sans antialiased">
-  <div class="fixed inset-0 z-[90] hidden items-center justify-center bg-ink/45 px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <div class="panel w-full max-w-md p-5 shadow-panel">
-      <div class="flex items-center justify-between gap-4 border-b border-line pb-4">
-        <div class="flex items-center gap-3">
-          <img class="auth-brand-logo border border-line p-1" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
-          <div>
-            <p class="font-mono text-[11px] uppercase text-muted">Account</p>
+<body class="auth-locked font-sans antialiased">
+  <div class="fixed inset-0 z-[90] flex justify-center overflow-y-auto px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="auth-shell">
+      <div class="mb-5 flex justify-center">
+        <img class="auth-brand-logo auth-brand-logo-large border border-line p-1.5" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
+      </div>
+      <div class="panel w-full p-5 shadow-panel">
+        <div class="flex items-start justify-between gap-4 border-b border-line pb-4">
+          <div class="min-w-0">
+            <p class="font-mono text-[11px] uppercase text-muted">PredictED access</p>
             <h2 class="text-xl font-black text-navy" id="authTitle">Sign in</h2>
+            <p class="mt-1 text-sm text-muted">Sign in to continue to your workspace.</p>
           </div>
+          <button class="btn btn-ghost h-10 w-10 shrink-0 p-0" id="authOfflineButton" type="button" aria-label="Continue offline">
+            <span class="material-symbols-outlined">cloud_off</span>
+          </button>
         </div>
-        <button class="btn btn-ghost h-10 w-10 p-0" id="authOfflineButton" type="button" aria-label="Continue offline">
-          <span class="material-symbols-outlined">cloud_off</span>
-        </button>
-      </div>
 
-      <div class="mt-4 segmented w-full">
-        <button class="active" id="authLoginTab" type="button">Sign in</button>
-        <button id="authRegisterTab" type="button">Register</button>
-        <button id="authDemoButton" type="button">Demo</button>
-      </div>
+        <div class="mt-4 segmented w-full">
+          <button class="active" id="authLoginTab" type="button">Sign in</button>
+          <button id="authRegisterTab" type="button">Register</button>
+          <button id="authDemoButton" type="button">Demo</button>
+        </div>
 
-      <p class="mt-4 hidden rounded-lg border border-line bg-wash px-3 py-2 text-sm text-muted" id="authMessage"></p>
+        <p class="mt-4 hidden rounded-lg border border-line bg-wash px-3 py-2 text-sm text-muted" id="authMessage"></p>
 
-      <form class="mt-4 grid gap-3" id="authForm">
-        <label class="grid gap-1" data-auth-register>
-          <span class="font-mono text-[11px] font-bold uppercase text-muted">Full name</span>
-          <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authName" autocomplete="name" placeholder="Alex Mwangi" type="text" />
-        </label>
-        <label class="grid gap-1">
-          <span class="font-mono text-[11px] font-bold uppercase text-muted">Email</span>
-          <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authEmail" autocomplete="email" placeholder="you@university.ac.ke" type="email" required />
-        </label>
-        <label class="grid gap-1">
-          <span class="font-mono text-[11px] font-bold uppercase text-muted">Password</span>
-          <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authPassword" autocomplete="current-password" placeholder="Minimum 8 characters" type="password" minlength="8" required />
-        </label>
-        <div class="grid gap-3 md:grid-cols-2" data-auth-register>
-          <label class="grid gap-1">
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">University</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" autocomplete="organization" placeholder="University of Nairobi" type="text" />
+        <form class="mt-4 grid gap-3" id="authForm">
+          <label class="grid gap-1" data-auth-register>
+            <span class="font-mono text-[11px] font-bold uppercase text-muted">Full name</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authName" autocomplete="name" placeholder="Alex Mwangi" type="text" />
           </label>
           <label class="grid gap-1">
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">Program</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" placeholder="BSc. Computer Science" type="text" />
+            <span class="font-mono text-[11px] font-bold uppercase text-muted">Email</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authEmail" autocomplete="email" placeholder="you@university.ac.ke" type="email" required />
           </label>
-        </div>
-        <label class="grid gap-1" data-auth-register>
-          <span class="font-mono text-[11px] font-bold uppercase text-muted">Academic level</span>
-          <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authAcademicLevel" placeholder="Year 3, Semester 2" type="text" />
-        </label>
-        <div class="grid gap-2" data-auth-register>
-          <span class="font-mono text-[11px] font-bold uppercase text-muted">Courses</span>
-          <div class="grid gap-2" id="authCourseList"></div>
-        </div>
-        <button class="btn btn-primary mt-1 h-11 w-full" id="authSubmitButton" type="submit">
-          <span class="material-symbols-outlined text-[19px]">login</span>
-          Sign in
-        </button>
-      </form>
+          <label class="grid gap-1">
+            <span class="font-mono text-[11px] font-bold uppercase text-muted">Password</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authPassword" autocomplete="current-password" placeholder="Minimum 8 characters" type="password" minlength="8" required />
+          </label>
+          <div class="grid gap-3 md:grid-cols-2" data-auth-register>
+            <label class="grid gap-1">
+              <span class="font-mono text-[11px] font-bold uppercase text-muted">University</span>
+              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" autocomplete="organization" placeholder="University of Nairobi" type="text" />
+            </label>
+            <label class="grid gap-1">
+              <span class="font-mono text-[11px] font-bold uppercase text-muted">Program</span>
+              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" placeholder="BSc. Computer Science" type="text" />
+            </label>
+          </div>
+          <label class="grid gap-1" data-auth-register>
+            <span class="font-mono text-[11px] font-bold uppercase text-muted">Academic level</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authAcademicLevel" placeholder="Year 3, Semester 2" type="text" />
+          </label>
+          <div class="grid gap-2" data-auth-register>
+            <span class="font-mono text-[11px] font-bold uppercase text-muted">Courses</span>
+            <div class="grid gap-2" id="authCourseList"></div>
+          </div>
+          <button class="btn btn-primary mt-1 h-11 w-full" id="authSubmitButton" type="submit">
+            <span class="material-symbols-outlined text-[19px]">login</span>
+            Sign in
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -2285,6 +2328,7 @@
 
     function showAuthGate(message = "") {
       const gate = document.getElementById("authGate");
+      document.body.classList.add("auth-locked");
       gate.classList.remove("hidden");
       gate.classList.add("flex");
       setAuthMode(authMode);
@@ -2295,6 +2339,7 @@
       const gate = document.getElementById("authGate");
       gate.classList.add("hidden");
       gate.classList.remove("flex");
+      document.body.classList.remove("auth-locked");
       setAuthMessage("");
     }
 
