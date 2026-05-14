@@ -9,7 +9,7 @@
   <link href="assets/app.css" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:wght@300;400;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   <script>
     (() => {
@@ -28,8 +28,8 @@
     *, *::before, *::after { box-sizing: border-box; }
     :root {
       color-scheme: light;
-      --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+      --font-body: "Inria Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-serif: "Inria Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     html.dark { color-scheme: dark; }
     html {
@@ -53,7 +53,7 @@
     input, select, textarea { font-family: var(--font-body); }
     h1, h2, h3, h4 {
       font-family: var(--font-serif);
-      font-weight: 850;
+      font-weight: 700;
       letter-spacing: 0;
       line-height: 1.12;
     }
@@ -63,10 +63,10 @@
     h4 { font-size: 0.875rem; }
     .font-black {
       font-family: var(--font-serif) !important;
-      font-weight: 850 !important;
+      font-weight: 700 !important;
       letter-spacing: 0 !important;
     }
-    .font-bold { font-weight: 650 !important; }
+    .font-bold { font-weight: 700 !important; }
     .font-mono {
       font-family: var(--font-body) !important;
       letter-spacing: 0 !important;
@@ -78,9 +78,9 @@
     }
     .font-mono.font-bold,
     .font-mono .font-bold {
-      font-weight: 650 !important;
+      font-weight: 700 !important;
     }
-    b, strong { font-weight: 650; }
+    b, strong { font-weight: 700; }
     .brand-name,
     .desktop-hero-title,
     .dash-headline,
@@ -103,7 +103,7 @@
     .metric-card .text-2xl,
     .metric-card .text-xl {
       font-family: var(--font-serif) !important;
-      font-weight: 850 !important;
+      font-weight: 700 !important;
       letter-spacing: 0 !important;
     }
     .material-symbols-outlined {
@@ -132,17 +132,15 @@
     }
     #authGate {
       align-items: center;
-      background:
-        radial-gradient(circle at 16% 12%, rgba(71,119,255,0.16), transparent 22rem),
-        radial-gradient(circle at 82% 82%, rgba(14,165,137,0.13), transparent 24rem),
-        linear-gradient(160deg, #f0f7ff 0%, #e8f4fb 58%, #edf7f4 100%);
+      background: #000000;
+      color: #f7f7f7;
     }
     #authGate.hidden {
       display: none;
     }
     .auth-shell {
       width: 100%;
-      max-width: 28rem;
+      max-width: 23.9rem;
     }
     @media (max-height: 760px) {
       #authGate {
@@ -224,6 +222,249 @@
       width: min(15rem, 72vw);
       height: 4.4rem;
       border-radius: 0;
+    }
+    #authGate .auth-logo-wrap {
+      margin-bottom: 1.8rem;
+    }
+    #authGate .auth-brand-logo {
+      width: min(15.5rem, 70vw);
+      height: 4.35rem;
+      filter: invert(1) hue-rotate(180deg) saturate(1.05);
+    }
+    #authGate .auth-card {
+      width: 100%;
+      padding: clamp(1.6rem, 4vw, 2rem) clamp(1.35rem, 4vw, 1.55rem) clamp(2rem, 5vw, 2.45rem);
+      border: 0;
+      border-radius: 0.35rem;
+      background: #080d11;
+      box-shadow: none;
+      color: #f8fafc;
+      transition: none;
+    }
+    #authGate .auth-card:hover {
+      box-shadow: none;
+      transform: none;
+    }
+    #authGate .auth-card-header {
+      display: block;
+      border: 0;
+      padding: 0;
+    }
+    #authGate .auth-eyebrow,
+    #authGate #authOfflineButton,
+    #authGate #authDemoButton,
+    #authGate #authProgramHint,
+    #authGate #authSubmitButton .material-symbols-outlined {
+      display: none !important;
+    }
+    #authGate .auth-title {
+      color: #ffffff;
+      font-size: clamp(1.85rem, 7vw, 2.1rem);
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    #authGate .auth-subtitle {
+      margin-top: 0.85rem;
+      color: #6b6f75;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    #authGate .auth-segmented {
+      display: grid;
+      width: min(11.35rem, 72%);
+      margin: 1.35rem auto 0;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      padding: 1px;
+      border: 1px solid #555c62;
+      border-radius: 0.45rem;
+      background: linear-gradient(180deg, #62676d 0%, #383d42 100%);
+      overflow: hidden;
+    }
+    #authGate .auth-segmented button {
+      min-height: 1.65rem;
+      border-radius: 0.36rem;
+      padding: 0.3rem 0.65rem;
+      color: #ffffff;
+      font: 400 0.82rem/1 var(--font-body);
+      box-shadow: none;
+    }
+    #authGate .auth-segmented button.active {
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+    #authGate .auth-message {
+      border-color: #222a31;
+      background: #0e141a;
+      color: #b8c0ca;
+    }
+    #authGate .auth-social-panel {
+      margin-top: 1.1rem;
+      display: grid;
+      gap: 1rem;
+    }
+    #authGate .auth-social-label {
+      text-align: center;
+      color: #6b6f75;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    #authGate .social-auth-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    #authGate .social-auth-button {
+      width: 2.45rem;
+      height: 2.45rem;
+      min-height: 2.45rem;
+      padding: 0;
+      border: 1px solid #2c343c;
+      border-radius: 0.55rem;
+      background: #242a30;
+      color: #ffffff;
+      box-shadow: none;
+    }
+    #authGate .social-auth-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: #414b55;
+      box-shadow: none;
+    }
+    #authGate .social-auth-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.9;
+    }
+    #authGate .social-auth-icon {
+      width: 1.55rem;
+      height: 1.55rem;
+      object-fit: contain;
+    }
+    #authGate .social-auth-divider {
+      display: grid;
+      max-width: 17.7rem;
+      margin: 0 auto;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1.75rem;
+      color: #5c6066;
+      font: 700 0.65rem/1 var(--font-body);
+      text-transform: uppercase;
+    }
+    #authGate .social-auth-divider span {
+      height: 2px;
+      background: #000000;
+    }
+    #authGate #authForm {
+      margin-top: 1.45rem;
+      gap: 0.95rem;
+    }
+    #authGate #authForm label,
+    #authGate .auth-course-field {
+      gap: 0.45rem;
+    }
+    #authGate .auth-label {
+      color: #f3f4f6;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    #authGate #authForm input:not([type="checkbox"]) {
+      height: 1.78rem;
+      border: 0;
+      border-radius: 0.2rem;
+      background: #3d4768;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 400;
+      box-shadow: none;
+    }
+    #authGate #authForm input:not([type="checkbox"])::placeholder {
+      color: transparent;
+    }
+    #authGate #authForm input:not([type="checkbox"]):focus {
+      border: 0;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.18);
+    }
+    #authGate .auth-register-split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2.2rem;
+    }
+    #authGate .auth-course-picker {
+      width: fit-content;
+      max-width: 100%;
+    }
+    #authGate .auth-course-picker summary {
+      display: inline-flex;
+      min-height: 1.55rem;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 1rem;
+      border-radius: 0.25rem;
+      background: #f4f4f4;
+      color: #050505;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1;
+      text-transform: uppercase;
+      list-style: none;
+    }
+    #authGate .auth-course-picker summary::-webkit-details-marker {
+      display: none;
+    }
+    #authGate .auth-course-picker[open] summary {
+      margin-bottom: 0.55rem;
+    }
+    #authGate .auth-course-list {
+      width: min(18rem, calc(100vw - 5rem));
+      max-height: 8rem;
+      overflow: auto;
+    }
+    #authGate .auth-course-list label {
+      border-color: #242d36;
+      border-radius: 0.3rem;
+      background: #0e141a;
+      padding: 0.55rem;
+      box-shadow: none;
+    }
+    #authGate .auth-course-list .text-ink {
+      color: #ffffff !important;
+      font-size: 0.82rem;
+      line-height: 1.1;
+    }
+    #authGate .auth-course-list .text-muted {
+      color: #858b94 !important;
+    }
+    #authGate #authSubmitButton {
+      width: min(13.35rem, 100%);
+      min-height: 2.95rem;
+      margin: 1.1rem auto 0;
+      border-radius: 0.28rem;
+      background: #e3e3e3;
+      color: #050505;
+      box-shadow: none;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    #authGate #authSubmitButton:hover {
+      background: #ffffff;
+      color: #050505;
+      box-shadow: none;
+    }
+    @media (max-width: 420px) {
+      #authGate {
+        padding-inline: 1rem;
+      }
+      #authGate .auth-register-split {
+        gap: 1rem;
+      }
     }
     .content-offset {
       padding-top: calc(5.8rem + env(safe-area-inset-top)) !important;
@@ -626,10 +867,7 @@
       color: #ffffff;
     }
     html.dark #authGate {
-      background:
-        radial-gradient(circle at 16% 12%, rgba(255,255,255,0.06), transparent 22rem),
-        radial-gradient(circle at 82% 82%, rgba(255,255,255,0.04), transparent 24rem),
-        linear-gradient(160deg, #000000 0%, #050505 52%, #090909 100%);
+      background: #000000;
     }
     html.dark .app-header-logo,
     html.dark .auth-brand-logo {
@@ -1206,38 +1444,37 @@
 <body class="auth-locked font-sans antialiased">
   <div class="fixed inset-0 z-[90] flex justify-center overflow-y-auto px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="auth-shell">
-      <div class="mb-5 flex justify-center">
+      <div class="auth-logo-wrap flex justify-center">
         <img class="auth-brand-logo auth-brand-logo-large" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
       </div>
-      <div class="panel w-full p-5 shadow-panel">
-        <div class="flex items-start justify-between gap-4 border-b border-line pb-4">
+      <div class="auth-card panel">
+        <div class="auth-card-header">
           <div class="min-w-0">
-            <p class="font-mono text-[11px] uppercase text-muted">PredictED access</p>
-            <h2 class="text-xl font-black text-navy" id="authTitle">Sign in</h2>
-            <p class="mt-1 text-sm text-muted">Sign in to continue to your workspace.</p>
+            <p class="auth-eyebrow font-mono text-[11px] uppercase text-muted">PredictED access</p>
+            <h2 class="auth-title" id="authTitle">Sign in</h2>
+            <p class="auth-subtitle" id="authSubtitle">Sign in to continue to your workspace.</p>
           </div>
           <button class="btn btn-ghost h-10 w-10 shrink-0 p-0" id="authOfflineButton" type="button" aria-label="Continue offline">
             <span class="material-symbols-outlined">cloud_off</span>
           </button>
         </div>
 
-        <div class="mt-4 segmented w-full">
+        <div class="auth-segmented segmented">
           <button class="active" id="authLoginTab" type="button">Sign in</button>
           <button id="authRegisterTab" type="button">Register</button>
           <button id="authDemoButton" type="button">Demo</button>
         </div>
 
-        <p class="mt-4 hidden rounded-lg border border-line bg-wash px-3 py-2 text-sm text-muted" id="authMessage"></p>
+        <p class="auth-message mt-4 hidden rounded-lg border px-3 py-2 text-sm" id="authMessage"></p>
 
-        <div class="mt-4 grid gap-3" id="socialAuthPanel">
-          <div class="grid gap-2 sm:grid-cols-2">
-            <button class="social-auth-button" id="googleAuthButton" type="button">
-              <span class="social-auth-mark google-mark" aria-hidden="true">G</span>
-              <span>Sign in with Google</span>
+        <div class="auth-social-panel" id="socialAuthPanel">
+          <p class="auth-social-label" id="authSocialPrompt">Sign in with</p>
+          <div class="social-auth-actions">
+            <button class="social-auth-button" id="googleAuthButton" type="button" aria-label="Sign in with Google">
+              <img class="social-auth-icon" alt="" src="assets/social/google.png" />
             </button>
-            <button class="social-auth-button" id="appleAuthButton" type="button">
-              <span class="social-auth-mark apple-mark" aria-hidden="true">A</span>
-              <span>Sign in with Apple</span>
+            <button class="social-auth-button" id="appleAuthButton" type="button" aria-label="Sign in with Apple">
+              <img class="social-auth-icon" alt="" src="assets/social/apple-logo.png" />
             </button>
           </div>
           <div class="social-auth-divider" aria-hidden="true">
@@ -1249,37 +1486,40 @@
 
         <form class="mt-4 grid gap-3" id="authForm">
           <label class="grid gap-1" data-auth-register>
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">Full name</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authName" autocomplete="name" placeholder="Alex Mwangi" type="text" />
+            <span class="auth-label font-mono">Full name</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authName" autocomplete="name" type="text" />
           </label>
           <label class="grid gap-1">
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">Email</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authEmail" autocomplete="email" placeholder="you@university.ac.ke" type="email" required />
+            <span class="auth-label font-mono">Email</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authEmail" autocomplete="email" type="email" required />
           </label>
           <label class="grid gap-1">
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">Password</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authPassword" autocomplete="current-password" placeholder="Minimum 10 characters" type="password" minlength="10" required />
+            <span class="auth-label font-mono">Password</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authPassword" autocomplete="current-password" type="password" minlength="10" required />
           </label>
-          <div class="grid gap-3 md:grid-cols-2" data-auth-register>
-            <label class="grid gap-1">
-              <span class="font-mono text-[11px] font-bold uppercase text-muted">University</span>
-              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" list="authUniversityOptions" autocomplete="organization" placeholder="Search your university" type="text" />
-              <datalist id="authUniversityOptions"></datalist>
-            </label>
-            <label class="grid gap-1">
-              <span class="font-mono text-[11px] font-bold uppercase text-muted">Degree course</span>
-              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" list="authProgramOptions" placeholder="Search your degree course" type="text" />
-              <datalist id="authProgramOptions"></datalist>
-              <p class="text-xs text-muted" id="authProgramHint">Search your university first to narrow the degree-course list.</p>
-            </label>
-          </div>
           <label class="grid gap-1" data-auth-register>
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">Academic level</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authAcademicLevel" placeholder="Year 3, Semester 2" type="text" />
+            <span class="auth-label font-mono">Institution</span>
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" list="authUniversityOptions" autocomplete="organization" type="text" />
+            <datalist id="authUniversityOptions"></datalist>
           </label>
-          <div class="grid gap-2" data-auth-register>
-            <span class="font-mono text-[11px] font-bold uppercase text-muted">Courses</span>
-            <div class="grid gap-2" id="authCourseList"></div>
+          <div class="auth-register-split" data-auth-register>
+            <label class="grid gap-1">
+              <span class="auth-label font-mono">Academic level</span>
+              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authAcademicLevel" type="text" />
+            </label>
+            <label class="grid gap-1">
+              <span class="auth-label font-mono">Degree course</span>
+              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" list="authProgramOptions" type="text" />
+              <datalist id="authProgramOptions"></datalist>
+            </label>
+            <p class="text-xs text-muted" id="authProgramHint">Search your university first to narrow the degree-course list.</p>
+          </div>
+          <div class="auth-course-field grid gap-2" data-auth-register>
+            <span class="auth-label font-mono">Courses</span>
+            <details class="auth-course-picker">
+              <summary>Add your units here +</summary>
+              <div class="auth-course-list grid gap-2" id="authCourseList"></div>
+            </details>
           </div>
           <button class="btn btn-primary mt-1 h-11 w-full" id="authSubmitButton" type="submit">
             <span class="material-symbols-outlined text-[19px]">login</span>
@@ -3451,8 +3691,15 @@
     function setAuthMode(mode) {
       authMode = mode;
       const register = mode === "register";
-      document.getElementById("authTitle").textContent = register ? "Create account" : "Sign in";
-      document.getElementById("authSubmitButton").innerHTML = `${icon(register ? "person_add" : "login", "text-[19px]")}${register ? "Create account" : "Sign in"}`;
+      const actionText = register ? "Sign up" : "Sign in";
+      document.getElementById("authTitle").textContent = register ? "Create Account" : "Sign in";
+      document.getElementById("authSubtitle").textContent = register
+        ? "Sign up to continue to your workspace."
+        : "Sign in to continue to your workspace.";
+      document.getElementById("authSocialPrompt").textContent = register ? "Sign up with" : "Sign in with";
+      document.getElementById("googleAuthButton").setAttribute("aria-label", `${actionText} with Google`);
+      document.getElementById("appleAuthButton").setAttribute("aria-label", `${actionText} with Apple`);
+      document.getElementById("authSubmitButton").textContent = register ? "Create your Account" : "Sign in";
       document.getElementById("authPassword").autocomplete = register ? "new-password" : "current-password";
       document.getElementById("authName").required = register;
       document.getElementById("authUniversity").required = register;

@@ -25,15 +25,19 @@ async function build() {
   await fs.writeFile(path.join(dist, "index.html"), html);
   await fs.writeFile(path.join(dist, "PredictED.html"), html);
 
-  const referencedSvgAssets = new Set(
-    Array.from(html.matchAll(/assets\/([^"')\s?#]+\.svg)/gi), match => match[1])
+  const referencedAssets = new Set(
+    Array.from(html.matchAll(/assets\/([^"')\s?#]+\.(?:svg|png))/gi), match => match[1])
   );
   await Promise.all(
-    Array.from(referencedSvgAssets)
-      .map(file => fs.copyFile(
-        path.join(root, "assets", file),
-        path.join(dist, "assets", file)
-      ))
+    Array.from(referencedAssets)
+      .map(async file => {
+        const target = path.join(dist, "assets", file);
+        await fs.mkdir(path.dirname(target), { recursive: true });
+        await fs.copyFile(
+          path.join(root, "assets", file),
+          target
+        );
+      })
   );
 }
 
