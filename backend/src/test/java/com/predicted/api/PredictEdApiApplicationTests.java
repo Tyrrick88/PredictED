@@ -260,7 +260,7 @@ class PredictEdApiApplicationTests {
 
     assertThat(tutor.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat((String) tutor.getBody().get("answer")).contains("uploaded notes from vector-clocks.txt");
-    assertThat((Iterable<?>) tutor.getBody().get("nextSteps"))
+    assertThat(tutor.getBody().get("nextSteps").toString())
         .contains("Re-read the matching section in vector-clocks.txt");
   }
 
@@ -431,19 +431,19 @@ class PredictEdApiApplicationTests {
     assertThat((Iterable<?>) planner.getBody().get("aiRecommendations")).isNotEmpty();
 
     AuthResponse admin = login("admin@predicted.test", "admin123");
-    Map<String, Object> pathPayload = Map.of(
-        "category", "TECH_BOOTCAMP_SHORT_COURSE",
-        "title", "Cloud Engineering Launchpad",
-        "providerName", "Predict.ed Labs",
-        "duration", "16 weeks",
-        "description", "Intensive bootcamp for Linux, cloud deployment, monitoring, and job readiness.",
-        "entryRequirements", "Comfort with basic computing and weekly hands-on labs.",
-        "structureLabel", "Stage 1 to Stage 4",
-        "careerPaths", List.of("Cloud support engineer", "Junior DevOps engineer"),
-        "difficultyLevel", "INTERMEDIATE",
-        "tags", List.of("cloud", "devops", "bootcamp"),
-        "customTrack", true,
-        "active", true
+    Map<String, Object> pathPayload = Map.ofEntries(
+        Map.entry("category", "TECH_BOOTCAMP_SHORT_COURSE"),
+        Map.entry("title", "Cloud Engineering Launchpad"),
+        Map.entry("providerName", "Predict.ed Labs"),
+        Map.entry("duration", "16 weeks"),
+        Map.entry("description", "Intensive bootcamp for Linux, cloud deployment, monitoring, and job readiness."),
+        Map.entry("entryRequirements", "Comfort with basic computing and weekly hands-on labs."),
+        Map.entry("structureLabel", "Stage 1 to Stage 4"),
+        Map.entry("careerPaths", List.of("Cloud support engineer", "Junior DevOps engineer")),
+        Map.entry("difficultyLevel", "INTERMEDIATE"),
+        Map.entry("tags", List.of("cloud", "devops", "bootcamp")),
+        Map.entry("customTrack", true),
+        Map.entry("active", true)
     );
 
     ResponseEntity<Map> createdPath = restTemplate.exchange(

@@ -51,8 +51,8 @@ module.exports = {
         soft: "0 8px 24px rgba(7, 30, 39, 0.06)"
       },
       fontFamily: {
-        sans: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
-        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"]
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       }
     }
   },
