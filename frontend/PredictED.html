@@ -134,6 +134,8 @@
       align-items: center;
       background: #000000;
       color: #f7f7f7;
+      padding-top: clamp(0.9rem, 3vh, 1.5rem);
+      padding-bottom: clamp(0.9rem, 3vh, 1.5rem);
     }
     #authGate.hidden {
       display: none;
@@ -253,7 +255,6 @@
     #authGate .auth-eyebrow,
     #authGate #authOfflineButton,
     #authGate #authDemoButton,
-    #authGate #authProgramHint,
     #authGate #authSubmitButton .material-symbols-outlined {
       display: none !important;
     }
@@ -363,6 +364,10 @@
       margin-top: 1.45rem;
       gap: 0.95rem;
     }
+    #authGate #authForm,
+    #authGate #authForm * {
+      min-width: 0;
+    }
     #authGate #authForm label,
     #authGate .auth-course-field {
       gap: 0.45rem;
@@ -375,6 +380,7 @@
       text-transform: uppercase;
     }
     #authGate #authForm input:not([type="checkbox"]) {
+      width: 100%;
       height: 1.78rem;
       border: 0;
       border-radius: 0.2rem;
@@ -390,11 +396,6 @@
     #authGate #authForm input:not([type="checkbox"]):focus {
       border: 0;
       box-shadow: 0 0 0 2px rgba(255,255,255,0.18);
-    }
-    #authGate .auth-register-split {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 2.2rem;
     }
     #authGate .auth-course-picker {
       width: fit-content;
@@ -458,12 +459,103 @@
       color: #050505;
       box-shadow: none;
     }
+    #authGate[data-mode="register"] {
+      align-items: flex-start;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+    #authGate[data-mode="register"] .auth-shell {
+      max-width: min(18.9rem, calc(100vw - 2rem));
+    }
+    #authGate[data-mode="register"] .auth-logo-wrap {
+      margin-bottom: 0.8rem;
+    }
+    #authGate[data-mode="register"] .auth-brand-logo {
+      width: min(13rem, 62vw);
+      height: 3.1rem;
+    }
+    #authGate[data-mode="register"] .auth-card {
+      padding: 1.15rem 1.05rem 1.35rem;
+    }
+    #authGate[data-mode="register"] .auth-title {
+      font-size: 1.78rem;
+    }
+    #authGate[data-mode="register"] .auth-subtitle {
+      margin-top: 0.55rem;
+      font-size: 0.82rem;
+    }
+    #authGate[data-mode="register"] .auth-segmented {
+      width: min(9rem, 70%);
+      margin-top: 0.95rem;
+    }
+    #authGate[data-mode="register"] .auth-segmented button {
+      min-height: 1.4rem;
+      padding: 0.2rem 0.45rem;
+      font-size: 0.75rem;
+    }
+    #authGate[data-mode="register"] .auth-social-panel {
+      margin-top: 0.85rem;
+      gap: 0.75rem;
+    }
+    #authGate[data-mode="register"] .auth-social-label {
+      font-size: 0.78rem;
+    }
+    #authGate[data-mode="register"] .social-auth-button {
+      width: 2rem;
+      height: 2rem;
+      min-height: 2rem;
+      border-radius: 0.45rem;
+    }
+    #authGate[data-mode="register"] .social-auth-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    #authGate[data-mode="register"] .social-auth-divider {
+      max-width: 15rem;
+      gap: 1.25rem;
+      font-size: 0.58rem;
+    }
+    #authGate[data-mode="register"] #authForm {
+      margin-top: 0.8rem;
+      gap: 0.65rem;
+    }
+    #authGate[data-mode="register"] #authForm label,
+    #authGate[data-mode="register"] .auth-course-field {
+      gap: 0.32rem;
+    }
+    #authGate[data-mode="register"] .auth-label {
+      font-size: 0.72rem;
+    }
+    #authGate[data-mode="register"] #authForm input:not([type="checkbox"]) {
+      min-height: 1.45rem;
+      height: 1.45rem;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.82rem;
+    }
+    #authGate[data-mode="register"] .auth-course-picker {
+      width: 100%;
+    }
+    #authGate[data-mode="register"] .auth-course-picker summary {
+      max-width: 100%;
+      min-height: 1.35rem;
+      padding: 0.22rem 0.8rem;
+      white-space: normal;
+      text-align: center;
+      font-size: 0.68rem;
+    }
+    #authGate[data-mode="register"] .auth-course-list {
+      width: 100%;
+      max-height: 6.5rem;
+    }
+    #authGate[data-mode="register"] #authSubmitButton {
+      width: min(10.75rem, 100%);
+      min-height: 2.35rem;
+      margin-top: 0.85rem;
+      font-size: 0.9rem;
+    }
     @media (max-width: 420px) {
       #authGate {
         padding-inline: 1rem;
-      }
-      #authGate .auth-register-split {
-        gap: 1rem;
       }
     }
     .content-offset {
@@ -1502,18 +1594,6 @@
             <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authUniversity" list="authUniversityOptions" autocomplete="organization" type="text" />
             <datalist id="authUniversityOptions"></datalist>
           </label>
-          <div class="auth-register-split" data-auth-register>
-            <label class="grid gap-1">
-              <span class="auth-label font-mono">Academic level</span>
-              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authAcademicLevel" type="text" />
-            </label>
-            <label class="grid gap-1">
-              <span class="auth-label font-mono">Degree course</span>
-              <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authProgram" list="authProgramOptions" type="text" />
-              <datalist id="authProgramOptions"></datalist>
-            </label>
-            <p class="text-xs text-muted" id="authProgramHint">Search your university first to narrow the degree-course list.</p>
-          </div>
           <div class="auth-course-field grid gap-2" data-auth-register>
             <span class="auth-label font-mono">Courses</span>
             <details class="auth-course-picker">
@@ -3042,9 +3122,10 @@
         programs: ["Communication", "Psychology", "Business", "Theology"]
       }
     ];
-    const allKenyanPrograms = Array.from(new Set(
-      kenyanUniversityCatalog.flatMap(entry => entry.programs)
-    ));
+    const defaultSignupProfile = {
+      program: "Personal study plan",
+      academicLevel: "Getting started"
+    };
 
     let courseTopics = {
       distributed: {
@@ -3642,46 +3723,11 @@
       list.innerHTML = values.map(value => `<option value="${escapeHtml(value)}"></option>`).join("");
     }
 
-    function matchedUniversityCatalog(value) {
-      const normalized = normalizeCatalogValue(value);
-      return kenyanUniversityCatalog.find(entry => normalizeCatalogValue(entry.university) === normalized) || null;
-    }
-
-    function syncAuthProgramOptions({ resetInvalidProgram = true } = {}) {
-      const universityInput = document.getElementById("authUniversity");
-      const programInput = document.getElementById("authProgram");
-      const hint = document.getElementById("authProgramHint");
-      if (!universityInput || !programInput) return;
-
-      const matchedUniversity = matchedUniversityCatalog(universityInput.value);
-      const programs = matchedUniversity?.programs || allKenyanPrograms;
-      populateDatalist("authProgramOptions", programs);
-      programInput.placeholder = matchedUniversity
-        ? `Search ${matchedUniversity.university} degree courses`
-        : "Search your degree course";
-
-      if (
-        resetInvalidProgram
-        && matchedUniversity
-        && programInput.value
-        && !matchedUniversity.programs.some(program => normalizeCatalogValue(program) === normalizeCatalogValue(programInput.value))
-      ) {
-        programInput.value = "";
-      }
-
-      if (hint) {
-        hint.textContent = matchedUniversity
-          ? `${matchedUniversity.programs.length} degree courses available for ${matchedUniversity.university}.`
-          : "Search your university first to narrow the degree-course list.";
-      }
-    }
-
     function initializeAuthCatalog() {
       populateDatalist(
         "authUniversityOptions",
         kenyanUniversityCatalog.map(entry => entry.university)
       );
-      syncAuthProgramOptions({ resetInvalidProgram: false });
     }
 
     function selectedCourseIds(selector) {
@@ -3692,6 +3738,7 @@
       authMode = mode;
       const register = mode === "register";
       const actionText = register ? "Sign up" : "Sign in";
+      document.getElementById("authGate").dataset.mode = mode;
       document.getElementById("authTitle").textContent = register ? "Create Account" : "Sign in";
       document.getElementById("authSubtitle").textContent = register
         ? "Sign up to continue to your workspace."
@@ -3703,8 +3750,6 @@
       document.getElementById("authPassword").autocomplete = register ? "new-password" : "current-password";
       document.getElementById("authName").required = register;
       document.getElementById("authUniversity").required = register;
-      document.getElementById("authProgram").required = register;
-      document.getElementById("authAcademicLevel").required = register;
       document.querySelectorAll("[data-auth-register]").forEach(item => item.classList.toggle("hidden", !register));
       document.getElementById("authLoginTab").classList.toggle("active", !register);
       document.getElementById("authRegisterTab").classList.toggle("active", register);
@@ -5532,9 +5577,6 @@
     document.getElementById("noteUploadForm").addEventListener("submit", uploadNotePack);
     document.getElementById("authLoginTab").addEventListener("click", () => setAuthMode("login"));
     document.getElementById("authRegisterTab").addEventListener("click", () => setAuthMode("register"));
-    document.getElementById("authUniversity").addEventListener("input", () => syncAuthProgramOptions());
-    document.getElementById("authUniversity").addEventListener("change", () => syncAuthProgramOptions());
-    document.getElementById("authProgram").addEventListener("focus", () => syncAuthProgramOptions({ resetInvalidProgram: false }));
     document.getElementById("plannerPathInput").addEventListener("input", () => syncPlannerPathSelection({ preserveInput: true }));
     document.getElementById("plannerPathInput").addEventListener("change", () => syncPlannerPathSelection());
     document.getElementById("plannerAddDeadline").addEventListener("click", () => {
@@ -5636,8 +5678,8 @@
             email,
             password,
             university: document.getElementById("authUniversity").value.trim(),
-            program: document.getElementById("authProgram").value.trim(),
-            academicLevel: document.getElementById("authAcademicLevel").value.trim(),
+            program: defaultSignupProfile.program,
+            academicLevel: defaultSignupProfile.academicLevel,
             courseIds
           });
         } else {
