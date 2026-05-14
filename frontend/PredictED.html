@@ -465,6 +465,53 @@
       --chip-border: #cad5df;
       --chip-text: #526273;
     }
+    .hero-chip-campus {
+      --chip-bg: #eef3ff;
+      --chip-border: #c9d7f2;
+      --chip-text: #111a5c;
+      --chip-icon: #1d4ed8;
+    }
+    .hero-chip-revision {
+      --chip-bg: #eaf8fb;
+      --chip-border: #b9e4ed;
+      --chip-text: #0d6f85;
+      --chip-icon: #0f9fbc;
+    }
+    .hero-chip-certainty {
+      --chip-bg: #edf9f2;
+      --chip-border: #bae6ca;
+      --chip-text: #176c3a;
+      --chip-icon: #16a34a;
+    }
+    .hero-chip-campus,
+    .hero-chip-revision,
+    .hero-chip-certainty {
+      background: var(--chip-bg);
+      border-color: var(--chip-border);
+      color: var(--chip-text);
+    }
+    .hero-chip-campus .material-symbols-outlined,
+    .hero-chip-revision .material-symbols-outlined,
+    .hero-chip-certainty .material-symbols-outlined {
+      color: var(--chip-icon);
+    }
+    .campus-mini-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      flex: 0 0 auto;
+      border-radius: 0.38rem;
+      background: #1d4ed8;
+      color: #ffffff;
+      font-family: var(--font-body);
+      font-size: 0.44rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0;
+      box-shadow: 0 3px 8px rgba(29,78,216,0.18);
+    }
 
     /* ── Theme controls ───────────────────────────────── */
     .theme-toggle .material-symbols-outlined {
@@ -665,6 +712,31 @@
       --chip-bg: rgba(148, 163, 184, 0.13);
       --chip-border: rgba(148, 163, 184, 0.28);
       --chip-text: #f5f5f5;
+    }
+    html.dark .hero-chip-campus {
+      background: #111827;
+      border-color: rgba(96,165,250,0.42);
+      color: #dbeafe;
+    }
+    html.dark .hero-chip-revision {
+      background: #0b2227;
+      border-color: rgba(34,211,238,0.36);
+      color: #cffafe;
+    }
+    html.dark .hero-chip-certainty {
+      background: #0d2417;
+      border-color: rgba(74,222,128,0.34);
+      color: #dcfce7;
+    }
+    html.dark .hero-chip-campus .material-symbols-outlined,
+    html.dark .hero-chip-revision .material-symbols-outlined,
+    html.dark .hero-chip-certainty .material-symbols-outlined {
+      color: inherit !important;
+    }
+    html.dark .campus-mini-logo {
+      background: #dbeafe;
+      color: #111a5c;
+      box-shadow: none;
     }
     html.dark .btn-ghost,
     html.dark .drawer-menu-item,
@@ -902,7 +974,14 @@
         color: #2d3e6e;
         white-space: nowrap;
       }
-      .chip-neu .material-symbols-outlined { font-size: 15px; color: #1d4ed8; }
+      .chip-neu.hero-chip-campus,
+      .chip-neu.hero-chip-revision,
+      .chip-neu.hero-chip-certainty {
+        background: var(--chip-bg);
+        border-color: var(--chip-border);
+        color: var(--chip-text);
+      }
+      .chip-neu .material-symbols-outlined { font-size: 15px; color: var(--chip-icon, #1d4ed8); }
 
       /* Buttons */
       .btn-pill-primary {
@@ -1310,9 +1389,9 @@
               <!-- Hero text card -->
               <div class="dash-hero-card">
                 <div class="flex flex-wrap gap-2 mb-4">
-                  <span class="chip-neu"><span class="material-symbols-outlined">school</span><span id="dashboardUniversityM">University of Nairobi</span></span>
-                  <span class="chip-neu"><span class="material-symbols-outlined">bolt</span>42 revision tests</span>
-                  <span class="chip-neu"><span class="material-symbols-outlined">verified</span>89% certainty</span>
+                  <span class="chip-neu hero-chip-campus"><span class="campus-mini-logo" id="dashboardUniversityLogoM" aria-hidden="true">TUK</span><span id="dashboardUniversityM">Technical University of Kenya</span></span>
+                  <span class="chip-neu hero-chip-revision"><span class="material-symbols-outlined">bolt</span>42 revision tests</span>
+                  <span class="chip-neu hero-chip-certainty"><span class="material-symbols-outlined">verified</span>89% certainty</span>
                 </div>
                 <h2 class="dash-headline" id="dashboardHeadlineMobile">Semester 2 final prep is trending to <span class="highlight">B+.</span></h2>
                 <p class="mt-3 text-sm leading-relaxed text-muted" id="dashboardSubcopyM">Vector clocks and Lamport timestamps are driving the risk score. Today's sessions are weighted toward predictive lecturer patterns.</p>
@@ -1461,9 +1540,9 @@
                 <div class="grid min-h-[310px] md:grid-cols-[minmax(0,1fr)_minmax(280px,320px)] xl:grid-cols-[minmax(0,1fr)_minmax(300px,340px)]">
                   <div class="desktop-hero-copy p-5 md:p-7">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span class="chip chip-violet"><span class="material-symbols-outlined text-[16px]">school</span><span id="dashboardUniversity">University of Nairobi</span></span>
-                      <span class="chip chip-cyan"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
-                      <span class="chip chip-emerald"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
+                      <span class="chip hero-chip-campus"><span class="campus-mini-logo" id="dashboardUniversityLogo" aria-hidden="true">TUK</span><span id="dashboardUniversity">Technical University of Kenya</span></span>
+                      <span class="chip hero-chip-revision"><span class="material-symbols-outlined text-[16px]">bolt</span>42 revision tests</span>
+                      <span class="chip hero-chip-certainty"><span class="material-symbols-outlined text-[16px]">verified</span>89% certainty</span>
                     </div>
                     <h2 class="desktop-hero-title mt-5 max-w-2xl text-3xl font-black tracking-tight text-navy md:text-5xl" id="dashboardHeadline">Semester 2 final prep is trending to B+.</h2>
                     <p class="mt-3 max-w-2xl text-base leading-7 text-muted" id="dashboardSubcopy">Distributed Systems and Compiler Construction are driving the risk score. The next three sessions are weighted toward past-paper patterns from lecturer history.</p>
@@ -2806,6 +2885,32 @@
     function formatDifficulty(value = "") {
       const normalized = String(value || "").toLowerCase().replaceAll("_", " ");
       return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "Flexible";
+    }
+
+    function campusAcronym(value = "") {
+      const stopWords = new Set(["and", "for", "of", "the"]);
+      const letters = String(value || "")
+        .replace(/[^a-zA-Z0-9 ]/g, " ")
+        .split(/\s+/)
+        .filter(word => word && !stopWords.has(word.toLowerCase()))
+        .map(word => word[0])
+        .join("")
+        .slice(0, 3)
+        .toUpperCase();
+      return letters || "TUK";
+    }
+
+    function syncDashboardUniversity(value = "Technical University of Kenya") {
+      const university = value || "Technical University of Kenya";
+      [
+        ["dashboardUniversity", "dashboardUniversityLogo"],
+        ["dashboardUniversityM", "dashboardUniversityLogoM"]
+      ].forEach(([textId, logoId]) => {
+        const text = document.getElementById(textId);
+        const logo = document.getElementById(logoId);
+        if (text) text.textContent = university;
+        if (logo) logo.textContent = campusAcronym(university);
+      });
     }
 
     const chipTonePalette = ["chip-blue", "chip-cyan", "chip-violet", "chip-emerald", "chip-amber", "chip-rose"];
@@ -4185,7 +4290,7 @@
       currentUser = data.student;
       const prediction = data.prediction;
       const gamification = data.gamification;
-      document.getElementById("dashboardUniversity").textContent = data.student.university;
+      syncDashboardUniversity(data.student.university);
       document.getElementById("dashboardHeadline").textContent = `Semester 2 final prep is trending to ${prediction.grade}.`;
       document.getElementById("dashboardSubcopy").textContent = `${prediction.focusAreas.slice(0, 2).join(" and ")} are driving the risk score. Today's sessions are weighted toward predictive lecturer patterns.`;
       document.getElementById("dashboardPredictionScore").textContent = `${prediction.score}%`;
