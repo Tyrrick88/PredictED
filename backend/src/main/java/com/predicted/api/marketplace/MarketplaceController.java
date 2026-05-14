@@ -65,6 +65,7 @@ public class MarketplaceController {
             .filename(file.filename(), StandardCharsets.UTF_8)
             .build()
             .toString())
+        .header("X-Content-Type-Options", "nosniff")
         .body(file.resource());
   }
 

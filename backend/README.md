@@ -20,7 +20,10 @@ DEBUG=false \
 mvn spring-boot:run
 ```
 
-## Seed users
+## Local seed users
+
+Local development seeds demo users by default. The `postgres` profile disables these accounts unless
+`PREDICTED_SEED_DEMO_USERS_ENABLED=true` is set explicitly.
 
 | Role | Email | Password |
 | --- | --- | --- |
@@ -170,7 +173,11 @@ SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/predicted \
 SPRING_DATASOURCE_USERNAME=predicted \
 SPRING_DATASOURCE_PASSWORD='replace-with-production-db-password' \
 JWT_SECRET='replace-with-a-long-production-secret' \
+JWT_EXPIRATION_MINUTES=60 \
 CORS_ALLOWED_ORIGIN_PATTERNS='https://predict-ed.vercel.app' \
+PREDICTED_SEED_DEMO_USERS_ENABLED=false \
+PREDICTED_BOOTSTRAP_ADMIN_EMAIL='admin@example.com' \
+PREDICTED_BOOTSTRAP_ADMIN_PASSWORD='replace-with-a-strong-admin-password-14-plus-chars' \
 mvn spring-boot:run
 ```
 
@@ -179,5 +186,6 @@ Production defaults:
 - `JPA_DDL_AUTO=validate`
 - `FLYWAY_ENABLED=true`
 - `FLYWAY_BASELINE_ON_MIGRATE=false`
+- wildcard CORS, placeholder JWT secrets, enabled H2 console, disabled rate limiting, and demo users fail startup
 
 For a new production database, leave baseline disabled so Flyway creates the full schema from `V1__initial_schema.sql`. Only set `FLYWAY_BASELINE_ON_MIGRATE=true` when connecting to an existing schema you have already inspected.

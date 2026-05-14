@@ -35,7 +35,11 @@ import static org.assertj.core.api.Assertions.assertThat;
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
         "spring.datasource.url=jdbc:h2:mem:predicted-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "predicted.security.rate-limit.auth-per-minute=1000",
+        "predicted.security.rate-limit.uploads-per-minute=1000",
+        "predicted.security.rate-limit.ai-per-minute=1000",
+        "predicted.security.rate-limit.api-per-minute=1000"
     }
 )
 class PredictEdApiApplicationTests {
@@ -55,6 +59,26 @@ class PredictEdApiApplicationTests {
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).containsEntry("status", "UP");
+    assertThat(response.getHeaders().getFirst("X-Content-Type-Options")).isEqualTo("nosniff");
+    assertThat(response.getHeaders().getFirst("Referrer-Policy")).isEqualTo("no-referrer");
+    assertThat(response.getHeaders().getFirst("Permissions-Policy")).contains("camera=()");
+  }
+
+  @Test
+  void corsPreflightAllowsConfiguredFrontendOrigin() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.add(HttpHeaders.ORIGIN, "http://localhost:4173");
+    headers.add(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET");
+
+    ResponseEntity<String> response = restTemplate.exchange(
+        url("/api/dashboard/overview"),
+        HttpMethod.OPTIONS,
+        new HttpEntity<>(headers),
+        String.class
+    );
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getHeaders().getAccessControlAllowOrigin()).isEqualTo("http://localhost:4173");
   }
 
   @Test
@@ -284,7 +308,8 @@ class PredictEdApiApplicationTests {
   @Test
   void studentCanUploadAndDownloadNotePack() {
     AuthResponse auth = login("alex@predicted.test", "password");
-    ByteArrayResource file = new ByteArrayResource("Vector clocks notes".getBytes(StandardCharsets.UTF_8)) {
+    byte[] pdfBytes = "%PDF-1.4\nVector clocks notes\n%%EOF".getBytes(StandardCharsets.UTF_8);
+    ByteArrayResource file = new ByteArrayResource(pdfBytes) {
       @Override
       public String getFilename() {
         return "vector-clocks.pdf";
@@ -308,7 +333,7 @@ class PredictEdApiApplicationTests {
     assertThat(upload.getBody()).containsEntry("courseId", "distributed");
     assertThat(upload.getBody()).containsEntry("downloadable", true);
     assertThat(upload.getBody()).containsEntry("originalFilename", "vector-clocks.pdf");
-    assertThat(((Number) upload.getBody().get("sizeBytes")).longValue()).isEqualTo("Vector clocks notes".length());
+    assertThat(((Number) upload.getBody().get("sizeBytes")).longValue()).isEqualTo(pdfBytes.length);
 
     ResponseEntity<byte[]> download = restTemplate.exchange(
         url((String) upload.getBody().get("downloadUrl")),
@@ -324,11 +349,37 @@ class PredictEdApiApplicationTests {
     );
 
     assertThat(download.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(new String(download.getBody(), StandardCharsets.UTF_8)).isEqualTo("Vector clocks notes");
+    assertThat(download.getBody()).isEqualTo(pdfBytes);
     assertThat(download.getHeaders().getContentDisposition().getFilename()).isEqualTo("vector-clocks.pdf");
     assertThat(notes.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(List.of(notes.getBody()))
         .anySatisfy(note -> assertThat(note).containsEntry("id", upload.getBody().get("id")));
+  }
+
+  @Test
+  void uploadRejectsFileContentThatDoesNotMatchExtension() {
+    AuthResponse auth = login("alex@predicted.test", "password");
+    ByteArrayResource file = new ByteArrayResource("not really a pdf".getBytes(StandardCharsets.UTF_8)) {
+      @Override
+      public String getFilename() {
+        return "fake.pdf";
+      }
+    };
+    MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+    body.add("title", "Fake PDF");
+    body.add("courseId", "distributed");
+    body.add("priceKes", "0");
+    body.add("file", file);
+
+    ResponseEntity<Map> upload = restTemplate.exchange(
+        url("/api/marketplace/notes"),
+        HttpMethod.POST,
+        authorizedMultipart(auth.token(), body),
+        Map.class
+    );
+
+    assertThat(upload.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(upload.getBody()).containsEntry("code", "BAD_REQUEST");
   }
 
   @Test

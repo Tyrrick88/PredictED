@@ -5,13 +5,16 @@ const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
 const defaultApiBase = "https://predicted-production-3c23.up.railway.app";
 const apiBase = (process.env.PREDICTED_API_BASE || defaultApiBase).replace(/\/+$/, "");
+const demoLoginEnabled = String(process.env.PREDICTED_DEMO_LOGIN_ENABLED || "false").toLowerCase() === "true";
 
 async function build() {
   await fs.rm(dist, { recursive: true, force: true });
   await fs.mkdir(path.join(dist, "assets"), { recursive: true });
 
   const source = await fs.readFile(path.join(root, "PredictED.html"), "utf8");
-  const html = source.replaceAll('"__PREDICTED_API_BASE__"', JSON.stringify(apiBase));
+  const html = source
+    .replaceAll('"__PREDICTED_API_BASE__"', JSON.stringify(apiBase))
+    .replaceAll('"__PREDICTED_DEMO_LOGIN_ENABLED__"', JSON.stringify(demoLoginEnabled));
 
   await fs.writeFile(path.join(dist, "index.html"), html);
   await fs.writeFile(path.join(dist, "PredictED.html"), html);

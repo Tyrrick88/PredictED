@@ -11,6 +11,7 @@ import com.predicted.api.common.Models.ModerationItem;
 import com.predicted.api.upload.DownloadedFile;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -144,7 +146,11 @@ public class AdminController {
         .contentType(MediaType.parseMediaType(
             file.contentType() == null ? MediaType.APPLICATION_OCTET_STREAM_VALUE : file.contentType()
         ))
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.filename() + "\"")
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+            .filename(file.filename(), StandardCharsets.UTF_8)
+            .build()
+            .toString())
+        .header("X-Content-Type-Options", "nosniff")
         .contentLength(file.sizeBytes())
         .body(file.resource());
   }

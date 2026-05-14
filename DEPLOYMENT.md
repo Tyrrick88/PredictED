@@ -16,8 +16,19 @@ Open the backend service, not the PostgreSQL service, then go to Variables. If R
 ```bash
 SPRING_PROFILES_ACTIVE=postgres
 PORT=8080
+PREDICTED_SECURITY_PRODUCTION=true
 JWT_SECRET=replace-with-64-plus-random-characters
+JWT_EXPIRATION_MINUTES=60
 CORS_ALLOWED_ORIGIN_PATTERNS=https://predict-ed.vercel.app
+PREDICTED_SEED_DEMO_USERS_ENABLED=false
+PREDICTED_BOOTSTRAP_ADMIN_EMAIL=admin@example.com
+PREDICTED_BOOTSTRAP_ADMIN_PASSWORD=replace-with-a-strong-admin-password-14-plus-chars
+PREDICTED_BOOTSTRAP_ADMIN_NAME=PredictED Admin
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_AUTH_PER_MINUTE=8
+RATE_LIMIT_UPLOADS_PER_MINUTE=12
+RATE_LIMIT_AI_PER_MINUTE=30
+RATE_LIMIT_API_PER_MINUTE=240
 AI_PROVIDER=fallback
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4o
@@ -57,6 +68,7 @@ If the Railway backend domain changes later, set this Vercel environment variabl
 
 ```bash
 PREDICTED_API_BASE=https://your-new-backend.up.railway.app
+PREDICTED_DEMO_LOGIN_ENABLED=false
 ```
 
 Redeploy Vercel after changing the variable.
@@ -64,6 +76,8 @@ Redeploy Vercel after changing the variable.
 ## Smoke Test
 
 1. Open the Vercel URL.
-2. Sign in with `alex@predicted.test` / `password`.
-3. Confirm dashboard, courses, tutor fallback, marketplace uploads, downloads, and admin login work.
-4. Sign in with `admin@predicted.test` / `admin123` to check moderation.
+2. Register a student account with a strong password.
+3. Confirm dashboard, courses, tutor fallback, marketplace uploads, and downloads work.
+4. Sign in with the `PREDICTED_BOOTSTRAP_ADMIN_EMAIL` account to check moderation and admin catalog tools.
+
+Production startup intentionally fails if CORS is wildcarded, the JWT secret is a placeholder or shorter than 64 characters, the H2 console is enabled, rate limiting is disabled, or demo users are enabled.

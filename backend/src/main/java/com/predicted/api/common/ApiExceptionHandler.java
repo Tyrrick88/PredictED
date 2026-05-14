@@ -31,6 +31,13 @@ public class ApiExceptionHandler {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(error("CONFLICT", exception.getMessage()));
   }
 
+  @ExceptionHandler(TooManyRequestsException.class)
+  public ResponseEntity<Map<String, Object>> tooManyRequests(TooManyRequestsException exception) {
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+        .header("Retry-After", String.valueOf(exception.getRetryAfterSeconds()))
+        .body(error("RATE_LIMITED", exception.getMessage()));
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<String, Object>> validation(MethodArgumentNotValidException exception) {
     String fields = exception.getBindingResult()

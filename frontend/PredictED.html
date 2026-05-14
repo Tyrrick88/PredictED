@@ -570,10 +570,9 @@
 
     /* ── Study tiles ──────────────────────────────────── */
     .study-tile {
-      border-left:4px solid var(--accent,#1d4ed8);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .study-tile:hover { transform: translateX(2px); box-shadow: 0 4px 16px rgba(7,30,39,0.08); }
+    .study-tile:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(7,30,39,0.08); }
 
     /* ── Flashcard ────────────────────────────────────── */
     .flip-card { perspective:1200px; min-height:200px; }
@@ -1189,7 +1188,7 @@
           </label>
           <label class="grid gap-1">
             <span class="font-mono text-[11px] font-bold uppercase text-muted">Password</span>
-            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authPassword" autocomplete="current-password" placeholder="Minimum 8 characters" type="password" minlength="8" required />
+            <input class="rounded-lg border-line bg-white text-sm focus:border-cobalt focus:ring-cobalt" id="authPassword" autocomplete="current-password" placeholder="Minimum 10 characters" type="password" minlength="10" required />
           </label>
           <div class="grid gap-3 md:grid-cols-2" data-auth-register>
             <label class="grid gap-1">
@@ -1481,7 +1480,7 @@
                   <button class="btn btn-ghost h-8 px-2.5 text-xs" data-action="open-view" data-view="planner">Planner →</button>
                 </div>
                 <div class="p-3 grid gap-2" id="dashboardTaskPreviewM">
-                  <div class="study-tile soft-panel p-3.5" style="--accent:#cf3f4f">
+                  <div class="study-tile soft-panel p-3.5">
                     <div class="flex items-center justify-between mb-2">
                       <span class="rounded-full bg-rose-50 px-2 py-0.5 font-mono text-[9px] font-bold text-coral">High Yield</span>
                       <span class="font-mono text-[10px] text-muted">14:00</span>
@@ -1489,7 +1488,7 @@
                     <p class="font-black text-navy text-sm">Distributed Systems</p>
                     <p class="text-xs text-muted mt-0.5">Lamport timestamps and vector clocks.</p>
                   </div>
-                  <div class="study-tile soft-panel p-3.5" style="--accent:#1d4ed8">
+                  <div class="study-tile soft-panel p-3.5">
                     <div class="flex items-center justify-between mb-2">
                       <span class="rounded-full bg-blue-50 px-2 py-0.5 font-mono text-[9px] font-bold text-cobalt">Revision</span>
                       <span class="font-mono text-[10px] text-muted">16:30</span>
@@ -1497,7 +1496,7 @@
                     <p class="font-black text-navy text-sm">Artificial Intelligence</p>
                     <p class="text-xs text-muted mt-0.5">Bayesian networks and independence.</p>
                   </div>
-                  <div class="study-tile soft-panel p-3.5" style="--accent:#0f9fbc">
+                  <div class="study-tile soft-panel p-3.5">
                     <div class="flex items-center justify-between mb-2">
                       <span class="rounded-full bg-cyan-50 px-2 py-0.5 font-mono text-[9px] font-bold text-aqua">Lab Prep</span>
                       <span class="font-mono text-[10px] text-muted">19:00</span>
@@ -1676,7 +1675,7 @@
                   </button>
                 </div>
                 <div class="mt-4 grid gap-3 md:grid-cols-3" id="dashboardTaskPreview">
-                  <div class="study-tile soft-panel p-4" style="--accent:#cf3f4f">
+                  <div class="study-tile soft-panel p-4">
                     <div class="flex items-center justify-between gap-2">
                       <span class="rounded-full bg-rose-50 px-2 py-1 font-mono text-[10px] font-bold text-coral">High Yield</span>
                       <span class="font-mono text-[10px] text-muted">14:00</span>
@@ -1684,7 +1683,7 @@
                     <h4 class="mt-3 font-black text-navy">Distributed Systems</h4>
                     <p class="mt-1 text-sm text-muted">Lamport timestamps and vector clocks.</p>
                   </div>
-                  <div class="study-tile soft-panel p-4" style="--accent:#1d4ed8">
+                  <div class="study-tile soft-panel p-4">
                     <div class="flex items-center justify-between gap-2">
                       <span class="rounded-full bg-blue-50 px-2 py-1 font-mono text-[10px] font-bold text-cobalt">Revision</span>
                       <span class="font-mono text-[10px] text-muted">16:30</span>
@@ -1692,7 +1691,7 @@
                     <h4 class="mt-3 font-black text-navy">Artificial Intelligence</h4>
                     <p class="mt-1 text-sm text-muted">Bayesian networks and independence.</p>
                   </div>
-                  <div class="study-tile soft-panel p-4" style="--accent:#0f9fbc">
+                  <div class="study-tile soft-panel p-4">
                     <div class="flex items-center justify-between gap-2">
                       <span class="rounded-full bg-cyan-50 px-2 py-1 font-mono text-[10px] font-bold text-aqua">Lab Prep</span>
                       <span class="font-mono text-[10px] text-muted">19:00</span>
@@ -2777,10 +2776,10 @@
     };
 
     const defaultPlannerBase = [
-      { time: "14:00", tag: "High Yield", course: "Distributed Systems", task: "Practice vector clocks with 3-process timelines.", accent: "#cf3f4f", minutes: 35 },
-      { time: "16:30", tag: "Revision", course: "Artificial Intelligence", task: "Drill Bayesian independence and d-separation.", accent: "#1d4ed8", minutes: 45 },
-      { time: "19:00", tag: "Lab Prep", course: "Compiler Construction", task: "Build LL(1) table from grammar exercises.", accent: "#0f9fbc", minutes: 55 },
-      { time: "21:00", tag: "Flashcards", course: "Data Mining", task: "Review association rule confidence and lift.", accent: "#c97800", minutes: 25 }
+      { time: "14:00", tag: "High Yield", course: "Distributed Systems", task: "Practice vector clocks with 3-process timelines.", minutes: 35 },
+      { time: "16:30", tag: "Revision", course: "Artificial Intelligence", task: "Drill Bayesian independence and d-separation.", minutes: 45 },
+      { time: "19:00", tag: "Lab Prep", course: "Compiler Construction", task: "Build LL(1) table from grammar exercises.", minutes: 55 },
+      { time: "21:00", tag: "Flashcards", course: "Data Mining", task: "Review association rule confidence and lift.", minutes: 25 }
     ];
     let plannerBase = defaultPlannerBase.map(item => ({ ...item }));
 
@@ -2838,6 +2837,7 @@
     const viewEyebrow = document.getElementById("viewEyebrow");
     const circumference = 339.292;
     const BUILD_API_BASE = "__PREDICTED_API_BASE__";
+    const BUILD_DEMO_LOGIN_ENABLED = "__PREDICTED_DEMO_LOGIN_ENABLED__";
     const API_BASE = configuredApiBase();
     let activeView = "dashboard";
     let focusHours = 3;
@@ -2850,6 +2850,7 @@
     let selectedAdminPathId = "";
     let selectedAdminModuleId = "";
     let authToken = sessionStorage.getItem("predictedToken") || "";
+    let authTokenExpiresAt = sessionStorage.getItem("predictedTokenExpiresAt") || "";
     let currentUser = null;
     let profileSettings = null;
     let authMode = "login";
@@ -3012,6 +3013,16 @@
         || buildValue
         || localFallback
       ).replace(/\/+$/, "");
+    }
+
+    function demoLoginEnabled() {
+      if (BUILD_DEMO_LOGIN_ENABLED === true || BUILD_DEMO_LOGIN_ENABLED === "true") return true;
+      if (BUILD_DEMO_LOGIN_ENABLED === false || BUILD_DEMO_LOGIN_ENABLED === "false") return false;
+      return ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+    }
+
+    function tokenExpired() {
+      return Boolean(authTokenExpiresAt) && Date.parse(authTokenExpiresAt) <= Date.now();
     }
 
     function apiUrl(path) {
@@ -3214,9 +3225,15 @@
 
     function setSession(auth) {
       authToken = auth.token;
+      authTokenExpiresAt = auth.expiresAt || "";
       currentUser = auth.user;
       profileSettings = null;
       sessionStorage.setItem("predictedToken", authToken);
+      if (authTokenExpiresAt) {
+        sessionStorage.setItem("predictedTokenExpiresAt", authTokenExpiresAt);
+      } else {
+        sessionStorage.removeItem("predictedTokenExpiresAt");
+      }
       updateProfile(auth.user);
       renderProfile({ profile: auth.user, enrolledCourses: [], availableCourses: defaultCourseCatalog });
       document.getElementById("accountName").textContent = auth.user?.name || "Account";
@@ -3237,6 +3254,8 @@
       loadedViews.clear();
       inFlightViews.clear();
       sessionStorage.removeItem("predictedToken");
+      sessionStorage.removeItem("predictedTokenExpiresAt");
+      authTokenExpiresAt = "";
       const tutorNotesInput = document.getElementById("tutorNotesInput");
       if (tutorNotesInput) {
         tutorNotesInput.value = "";
@@ -3256,6 +3275,10 @@
     }
 
     async function apiRequest(path, options = {}, token = authToken) {
+      if (token && token === authToken && tokenExpired()) {
+        clearSession();
+        throw new Error("Session expired. Sign in again.");
+      }
       const headers = new Headers(options.headers || {});
       if (!headers.has("Content-Type") && options.body && !(options.body instanceof FormData)) {
         headers.set("Content-Type", "application/json");
@@ -3593,13 +3616,6 @@
         tag: session.tag || (session.priority === "CRITICAL" ? "Urgent" : "Coach"),
         course: session.course || data?.learningPathTitle || "Study session",
         task: session.title || session.description || "Adaptive revision block",
-        accent: session.priority === "CRITICAL"
-          ? "#cf3f4f"
-          : session.priority === "HIGH"
-            ? "#1d4ed8"
-            : session.priority === "MEDIUM"
-              ? "#0f9fbc"
-              : "#c97800",
         minutes: session.minutes || 45,
         completed: Boolean(session.completed)
       }));
@@ -4257,7 +4273,7 @@
       const taskPreview = document.getElementById("dashboardTaskPreview");
       if (taskPreview) {
         taskPreview.innerHTML = tasks.slice(0, 3).map(task => `
-          <div class="study-tile soft-panel p-4" style="--accent:${escapeHtml(task.accent || "#1d4ed8")}">
+          <div class="study-tile soft-panel p-4">
             <div class="flex items-center justify-between gap-2">
               <span class="rounded-full bg-wash px-2 py-1 font-mono text-[10px] font-bold text-muted">${escapeHtml(task.tag)}</span>
               <span class="font-mono text-[10px] text-muted">${escapeHtml(formatTime(task.time))}</span>
@@ -4314,7 +4330,6 @@
         tag: task.tag,
         course: task.course,
         task: task.description || task.title,
-        accent: task.accent,
         minutes: task.minutes,
         completed: task.completed
       };
@@ -4868,6 +4883,10 @@
         return;
       }
       setApiStatus("Connecting API", "loading");
+      if (authToken && tokenExpired()) {
+        clearSession(false);
+        authToken = "";
+      }
       if (!authToken) {
         apiConnected = false;
         setApiStatus("Sign in required", "offline");
@@ -5064,19 +5083,24 @@
       setApiStatus("Offline demo", "offline");
       renderDashboardPreviews(plannerBase, feedItems);
     });
-    document.getElementById("authDemoButton").addEventListener("click", async () => {
-      setAuthBusy(true);
-      setAuthMessage("Opening demo account...");
-      try {
-        const auth = await loginWith("alex@predicted.test", "password");
-        await finishAuthentication(auth);
-      } catch (error) {
-        setAuthMessage(error.message, "error");
-        setApiStatus("Demo unavailable", "offline");
-      } finally {
-        setAuthBusy(false);
-      }
-    });
+    const authDemoButton = document.getElementById("authDemoButton");
+    if (demoLoginEnabled()) {
+      authDemoButton.addEventListener("click", async () => {
+        setAuthBusy(true);
+        setAuthMessage("Opening demo account...");
+        try {
+          const auth = await loginWith("alex@predicted.test", "password");
+          await finishAuthentication(auth);
+        } catch (error) {
+          setAuthMessage(error.message, "error");
+          setApiStatus("Demo unavailable", "offline");
+        } finally {
+          setAuthBusy(false);
+        }
+      });
+    } else {
+      authDemoButton.classList.add("hidden");
+    }
     document.getElementById("authForm").addEventListener("submit", async event => {
       event.preventDefault();
       setAuthBusy(true);

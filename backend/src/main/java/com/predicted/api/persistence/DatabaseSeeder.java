@@ -1,5 +1,6 @@
 package com.predicted.api.persistence;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalTime;
+import java.util.regex.Pattern;
 
 @Component
 public class DatabaseSeeder implements ApplicationRunner {
@@ -24,6 +26,11 @@ public class DatabaseSeeder implements ApplicationRunner {
   private final AcademicModuleRepository academicModuleRepository;
   private final AcademicResourceRepository academicResourceRepository;
   private final PasswordEncoder passwordEncoder;
+  private final boolean demoUsersEnabled;
+  private final String bootstrapAdminEmail;
+  private final String bootstrapAdminPassword;
+  private final String bootstrapAdminName;
+  private static final Pattern STRONG_PASSWORD = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d).{14,72}$");
 
   public DatabaseSeeder(
       AppUserRepository userRepository,
@@ -37,7 +44,11 @@ public class DatabaseSeeder implements ApplicationRunner {
       AcademicPathRepository academicPathRepository,
       AcademicModuleRepository academicModuleRepository,
       AcademicResourceRepository academicResourceRepository,
-      PasswordEncoder passwordEncoder
+      PasswordEncoder passwordEncoder,
+      @Value("${predicted.seed.demo-users-enabled:true}") boolean demoUsersEnabled,
+      @Value("${predicted.bootstrap-admin.email:}") String bootstrapAdminEmail,
+      @Value("${predicted.bootstrap-admin.password:}") String bootstrapAdminPassword,
+      @Value("${predicted.bootstrap-admin.name:PredictED Admin}") String bootstrapAdminName
   ) {
     this.userRepository = userRepository;
     this.courseRepository = courseRepository;
@@ -51,45 +62,54 @@ public class DatabaseSeeder implements ApplicationRunner {
     this.academicModuleRepository = academicModuleRepository;
     this.academicResourceRepository = academicResourceRepository;
     this.passwordEncoder = passwordEncoder;
+    this.demoUsersEnabled = demoUsersEnabled;
+    this.bootstrapAdminEmail = bootstrapAdminEmail;
+    this.bootstrapAdminPassword = bootstrapAdminPassword;
+    this.bootstrapAdminName = bootstrapAdminName;
   }
 
   @Override
   @Transactional
   public void run(ApplicationArguments args) {
-    AppUser student = seedUser(
-        "usr_alex",
-        "Alex Mwangi",
-        "alex@predicted.test",
-        "password",
-        "University of Nairobi",
-        "BSc. Computer Science",
-        "Year 3, Semester 2",
-        UserRole.STUDENT
-    );
-    seedUser(
-        "usr_admin",
-        "Grace Wanjiku",
-        "admin@predicted.test",
-        "admin123",
-        "predictED Operations",
-        "Platform Administration",
-        "Admin",
-        UserRole.ADMIN
-    );
+    AppUser student = null;
+    if (demoUsersEnabled) {
+      student = seedUser(
+          "usr_alex",
+          "Alex Mwangi",
+          "alex@predicted.test",
+          "password",
+          "University of Nairobi",
+          "BSc. Computer Science",
+          "Year 3, Semester 2",
+          UserRole.STUDENT
+      );
+      seedUser(
+          "usr_admin",
+          "Grace Wanjiku",
+          "admin@predicted.test",
+          "admin123",
+          "predictED Operations",
+          "Platform Administration",
+          "Admin",
+          UserRole.ADMIN
+      );
+    } else {
+      seedBootstrapAdmin();
+    }
 
     if (courseRepository.count() == 0) {
       seedCourses();
     }
-    if (courseEnrollmentRepository.countByUserEmailIgnoreCase(student.getEmail()) == 0) {
+    if (student != null && courseEnrollmentRepository.countByUserEmailIgnoreCase(student.getEmail()) == 0) {
       seedEnrollments(student);
     }
-    if (studyTaskRepository.count() == 0) {
+    if (student != null && studyTaskRepository.count() == 0) {
       seedTasks(student);
     }
-    if (flashcardRepository.count() == 0) {
+    if (student != null && flashcardRepository.count() == 0) {
       seedFlashcards(student);
     }
-    if (feedSignalRepository.count() == 0) {
+    if (student != null && feedSignalRepository.count() == 0) {
       seedFeed(student);
     }
     if (notePackRepository.count() == 0) {
@@ -124,6 +144,27 @@ public class DatabaseSeeder implements ApplicationRunner {
             academicLevel,
             role
         )));
+  }
+
+  private void seedBootstrapAdmin() {
+    if (bootstrapAdminEmail.isBlank() && bootstrapAdminPassword.isBlank()) {
+      return;
+    }
+    if (bootstrapAdminEmail.isBlank() || !STRONG_PASSWORD.matcher(bootstrapAdminPassword).matches()) {
+      throw new IllegalStateException(
+          "Bootstrap admin requires PREDICTED_BOOTSTRAP_ADMIN_EMAIL and a 14-72 character password with letters and numbers."
+      );
+    }
+    seedUser(
+        "usr_bootstrap_admin",
+        bootstrapAdminName,
+        bootstrapAdminEmail,
+        bootstrapAdminPassword,
+        "predictED Operations",
+        "Platform Administration",
+        "Admin",
+        UserRole.ADMIN
+    );
   }
 
   private void seedCourses() {

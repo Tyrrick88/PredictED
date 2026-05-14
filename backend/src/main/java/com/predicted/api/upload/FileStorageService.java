@@ -129,6 +129,52 @@ public class FileStorageService {
     if (!ALLOWED_EXTENSIONS.contains(extension)) {
       throw new BadRequestException("Upload a PDF, Word, PowerPoint, text, or image file.");
     }
+    validateFileSignature(file, extension);
+  }
+
+  private void validateFileSignature(MultipartFile file, String extension) {
+    try (InputStream inputStream = file.getInputStream()) {
+      byte[] header = inputStream.readNBytes(512);
+      boolean valid = switch (extension) {
+        case ".pdf" -> startsWith(header, "%PDF".getBytes());
+        case ".png" -> startsWith(header, new byte[] {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A});
+        case ".jpg", ".jpeg" -> startsWith(header, new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF});
+        case ".docx", ".pptx" -> startsWith(header, new byte[] {0x50, 0x4B, 0x03, 0x04})
+            || startsWith(header, new byte[] {0x50, 0x4B, 0x05, 0x06})
+            || startsWith(header, new byte[] {0x50, 0x4B, 0x07, 0x08});
+        case ".doc", ".ppt" -> startsWith(header, new byte[] {
+            (byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0, (byte) 0xA1, (byte) 0xB1, 0x1A, (byte) 0xE1
+        });
+        case ".txt" -> isLikelyText(header);
+        default -> false;
+      };
+      if (!valid) {
+        throw new BadRequestException("Uploaded file content does not match its extension.");
+      }
+    } catch (IOException exception) {
+      throw new BadRequestException("Could not inspect uploaded file.", exception);
+    }
+  }
+
+  private boolean startsWith(byte[] value, byte[] expectedPrefix) {
+    if (value.length < expectedPrefix.length) {
+      return false;
+    }
+    for (int index = 0; index < expectedPrefix.length; index++) {
+      if (value[index] != expectedPrefix[index]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean isLikelyText(byte[] value) {
+    for (byte item : value) {
+      if (item == 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private String safeOriginalFilename(MultipartFile file) {

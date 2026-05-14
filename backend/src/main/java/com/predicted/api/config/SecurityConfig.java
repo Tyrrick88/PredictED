@@ -2,6 +2,7 @@ package com.predicted.api.config;
 
 import com.predicted.api.auth.JwtAuthenticationFilter;
 import com.predicted.api.persistence.AppUserRepository;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -35,26 +37,71 @@ import java.util.List;
 public class SecurityConfig {
 
   @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
+  SecurityFilterChain securityFilterChain(
+      HttpSecurity http,
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      RateLimitFilter rateLimitFilter,
+      @Value("${spring.h2.console.enabled:false}") boolean h2ConsoleEnabled
+  )
       throws Exception {
     return http
         .csrf(AbstractHttpConfigurer::disable)
         .cors(Customizer.withDefaults())
-        .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
+        .headers(headers -> {
+          String contentSecurityPolicy = h2ConsoleEnabled
+              ? "default-src 'self' 'unsafe-inline' data:; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"
+              : "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'";
+          headers
+              .contentSecurityPolicy(csp -> csp.policyDirectives(
+                  contentSecurityPolicy
+              ))
+              .contentTypeOptions(Customizer.withDefaults())
+              .httpStrictTransportSecurity(hsts -> hsts
+                  .includeSubDomains(true)
+                  .preload(true)
+                  .maxAgeInSeconds(31_536_000)
+              )
+              .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+              .permissionsPolicyHeader(permissions -> permissions.policy(
+                  "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+              ));
+          if (h2ConsoleEnabled) {
+            headers.frameOptions(frameOptions -> frameOptions.sameOrigin());
+          } else {
+            headers.frameOptions(frameOptions -> frameOptions.deny());
+          }
+        })
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
+        .authorizeHttpRequests(auth -> {
+          auth.requestMatchers(
                 "/api/auth/login",
                 "/api/auth/register",
                 "/api/health",
-                "/actuator/health",
-                "/h2-console/**"
-            ).permitAll()
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .anyRequest().authenticated()
-        )
+                "/actuator/health"
+            ).permitAll();
+          if (h2ConsoleEnabled) {
+            auth.requestMatchers("/h2-console/**").permitAll();
+          }
+          auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+              .anyRequest().authenticated();
+        })
+        .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
+  }
+
+  @Bean
+  FilterRegistrationBean<JwtAuthenticationFilter> jwtFilterRegistration(JwtAuthenticationFilter filter) {
+    FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
+    registration.setEnabled(false);
+    return registration;
+  }
+
+  @Bean
+  FilterRegistrationBean<RateLimitFilter> rateLimitFilterRegistration(RateLimitFilter filter) {
+    FilterRegistrationBean<RateLimitFilter> registration = new FilterRegistrationBean<>(filter);
+    registration.setEnabled(false);
+    return registration;
   }
 
   @Bean
