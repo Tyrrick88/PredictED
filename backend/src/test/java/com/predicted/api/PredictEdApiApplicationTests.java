@@ -3,6 +3,7 @@ package com.predicted.api;
 import com.predicted.api.auth.AuthRequest;
 import com.predicted.api.auth.AuthResponse;
 import com.predicted.api.auth.RegisterRequest;
+import com.predicted.api.auth.SocialAuthRequest;
 import com.predicted.api.common.Models.MpesaPaymentRequest;
 import com.predicted.api.common.Models.PredictionInput;
 import com.predicted.api.common.Models.TutorRequest;
@@ -131,6 +132,26 @@ class PredictEdApiApplicationTests {
     assertThat(student).containsEntry("name", "Nia Kamau");
     assertThat((Iterable<?>) dashboard.getBody().get("tasks")).hasSize(3);
     assertThat(dashboard.getBody()).containsEntry("flashcardsDue", 3);
+  }
+
+  @Test
+  void socialAuthProviderStatusIsPublicAndDisabledByDefault() {
+    ResponseEntity<Map> providers = restTemplate.getForEntity(
+        url("/api/auth/social/providers"),
+        Map.class
+    );
+    ResponseEntity<Map> login = restTemplate.postForEntity(
+        url("/api/auth/social"),
+        new SocialAuthRequest("google", "not-a-token", null),
+        Map.class
+    );
+
+    assertThat(providers.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(providers.getBody()).containsEntry("google", false);
+    assertThat(providers.getBody()).containsEntry("apple", false);
+    assertThat(login.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(login.getBody()).containsEntry("code", "BAD_REQUEST");
+    assertThat((String) login.getBody().get("message")).contains("Google sign-in is not configured");
   }
 
   @Test

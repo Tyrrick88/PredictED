@@ -112,7 +112,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
   private Limit limitFor(HttpServletRequest request) {
     String path = request.getRequestURI();
     String method = request.getMethod();
-    if (path.equals("/api/auth/login") || path.equals("/api/auth/register")) {
+    if (path.equals("/api/auth/login") || path.equals("/api/auth/register") || path.equals("/api/auth/social")) {
       return new Limit("auth", authRequestsPerMinute);
     }
     if (HttpMethod.POST.matches(method) && (path.equals("/api/marketplace/notes") || path.contains("/resources"))) {

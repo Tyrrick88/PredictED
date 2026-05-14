@@ -20,6 +20,8 @@ PREDICTED_SECURITY_PRODUCTION=true
 JWT_SECRET=replace-with-64-plus-random-characters
 JWT_EXPIRATION_MINUTES=60
 CORS_ALLOWED_ORIGIN_PATTERNS=https://predict-ed.vercel.app
+GOOGLE_OAUTH_CLIENT_ID=
+APPLE_OAUTH_CLIENT_ID=
 PREDICTED_SEED_DEMO_USERS_ENABLED=false
 PREDICTED_BOOTSTRAP_ADMIN_EMAIL=admin@example.com
 PREDICTED_BOOTSTRAP_ADMIN_PASSWORD=replace-with-a-strong-admin-password-14-plus-chars
@@ -69,9 +71,17 @@ If the Railway backend domain changes later, set this Vercel environment variabl
 ```bash
 PREDICTED_API_BASE=https://your-new-backend.up.railway.app
 PREDICTED_DEMO_LOGIN_ENABLED=false
+PREDICTED_GOOGLE_CLIENT_ID=
+PREDICTED_APPLE_CLIENT_ID=
+PREDICTED_APPLE_REDIRECT_URI=https://predict-ed.vercel.app
 ```
 
 Redeploy Vercel after changing the variable.
+
+For social sign-in, use the same Google OAuth web client ID in both `GOOGLE_OAUTH_CLIENT_ID`
+on Railway and `PREDICTED_GOOGLE_CLIENT_ID` on Vercel. For Apple, use the Services ID as
+`APPLE_OAUTH_CLIENT_ID` and `PREDICTED_APPLE_CLIENT_ID`, and register the Vercel URL as the
+Apple return URL.
 
 ## Smoke Test
 

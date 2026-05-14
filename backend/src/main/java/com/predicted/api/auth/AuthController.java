@@ -25,17 +25,20 @@ public class AuthController {
   private final JwtService jwtService;
   private final AppUserRepository userRepository;
   private final UserRegistrationService userRegistrationService;
+  private final SocialAuthService socialAuthService;
 
   public AuthController(
       AuthenticationManager authenticationManager,
       JwtService jwtService,
       AppUserRepository userRepository,
-      UserRegistrationService userRegistrationService
+      UserRegistrationService userRegistrationService,
+      SocialAuthService socialAuthService
   ) {
     this.authenticationManager = authenticationManager;
     this.jwtService = jwtService;
     this.userRepository = userRepository;
     this.userRegistrationService = userRegistrationService;
+    this.socialAuthService = socialAuthService;
   }
 
   @PostMapping("/login")
@@ -50,11 +53,18 @@ public class AuthController {
   @PostMapping("/register")
   public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
     AppUser user = userRegistrationService.register(request);
-    UserDetails userDetails = User.withUsername(user.getEmail())
-        .password(user.getPasswordHash())
-        .roles(user.getRole().name())
-        .build();
-    return issueToken(userDetails, user.toProfile());
+    return issueToken(userDetails(user), user.toProfile());
+  }
+
+  @GetMapping("/social/providers")
+  public SocialAuthProvidersResponse socialProviders() {
+    return socialAuthService.providers();
+  }
+
+  @PostMapping("/social")
+  public AuthResponse social(@Valid @RequestBody SocialAuthRequest request) {
+    AppUser user = socialAuthService.authenticate(request);
+    return issueToken(userDetails(user), user.toProfile());
   }
 
   @GetMapping("/me")
@@ -76,5 +86,12 @@ public class AuthController {
         issuedToken.expiresAt(),
         profile
     );
+  }
+
+  private UserDetails userDetails(AppUser user) {
+    return User.withUsername(user.getEmail())
+        .password(user.getPasswordHash())
+        .roles(user.getRole().name())
+        .build();
   }
 }

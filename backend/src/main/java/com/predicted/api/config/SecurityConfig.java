@@ -76,6 +76,8 @@ public class SecurityConfig {
           auth.requestMatchers(
                 "/api/auth/login",
                 "/api/auth/register",
+                "/api/auth/social",
+                "/api/auth/social/providers",
                 "/api/health",
                 "/actuator/health"
             ).permitAll();

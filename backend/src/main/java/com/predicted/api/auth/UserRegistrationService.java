@@ -83,6 +83,45 @@ public class UserRegistrationService {
     }
   }
 
+  @Transactional
+  public AppUser findOrCreateSocialUser(String email, String name) {
+    String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+    return userRepository.findByEmailIgnoreCase(normalizedEmail)
+        .orElseGet(() -> createSocialUser(normalizedEmail, name));
+  }
+
+  private AppUser createSocialUser(String email, String name) {
+    AppUser user = new AppUser(
+        "usr_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12),
+        clean(name, "PredictED Student", 120),
+        email,
+        passwordEncoder.encode(UUID.randomUUID() + ":" + UUID.randomUUID()),
+        "Academic workspace",
+        "Personal study plan",
+        "Getting started",
+        UserRole.STUDENT
+    );
+
+    try {
+      AppUser saved = userRepository.saveAndFlush(user);
+      List<String> courseIds = selectedCourseIds(null);
+      enroll(saved, courseIds);
+      seedStarterTasks(saved, courseIds);
+      seedStarterFlashcards(saved, courseIds);
+      return saved;
+    } catch (DataIntegrityViolationException exception) {
+      throw new ConflictException("An account already exists for " + email + ".");
+    }
+  }
+
+  private String clean(String value, String fallback, int maxLength) {
+    String clean = value == null ? "" : value.trim().replaceAll("\\s+", " ");
+    if (clean.isBlank()) {
+      clean = fallback;
+    }
+    return clean.length() <= maxLength ? clean : clean.substring(0, maxLength).trim();
+  }
+
   private List<String> selectedCourseIds(List<String> requestedCourseIds) {
     List<String> ids = requestedCourseIds == null || requestedCourseIds.isEmpty()
         ? List.of("distributed", "ai", "compiler")

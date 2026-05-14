@@ -416,6 +416,36 @@
     .btn-primary:hover { background: linear-gradient(135deg,#1a2570 0%,#2563eb 100%); box-shadow:0 8px 22px rgba(17,26,92,0.28); }
     .btn-ghost { background:rgba(237,247,251,0.85); color:#111a5c; border:1px solid #d6e5ee; }
     .btn-ghost:hover { background:#ffffff; box-shadow:0 6px 16px rgba(7,30,39,0.08); }
+    .social-auth-button {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:0.45rem; min-height:2.75rem; border-radius:0.75rem;
+      border:1px solid #d6e5ee; background:#ffffff; color:#111a5c;
+      font:700 0.86rem/1.1 var(--font-serif);
+      box-shadow:0 4px 14px rgba(7,30,39,0.06);
+      transition:transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+    }
+    .social-auth-button:hover:not(:disabled) {
+      transform:translateY(-1px);
+      border-color:#bcd0df;
+      box-shadow:0 8px 20px rgba(7,30,39,0.1);
+    }
+    .social-auth-button:active:not(:disabled) { transform:scale(0.98); }
+    .social-auth-button:disabled { cursor:not-allowed; opacity:0.5; box-shadow:none; }
+    .social-auth-mark {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:1.35rem; height:1.35rem; border-radius:999px;
+      font-family:var(--font-body); font-size:0.78rem; font-weight:800;
+    }
+    .google-mark { border:1px solid #dbeafe; background:#f8fbff; color:#1a73e8; }
+    .apple-mark { border:1px solid #e5e7eb; background:#f8fafc; color:#111827; }
+    .social-auth-divider {
+      display:flex; align-items:center; gap:0.65rem;
+      color:#718096; font:650 0.68rem/1 var(--font-body);
+      text-transform:uppercase;
+    }
+    .social-auth-divider span {
+      flex:1; height:1px; background:#dbe7ef;
+    }
 
     /* ── Chips ────────────────────────────────────────── */
     :where(.chip) {
@@ -782,6 +812,28 @@
       background: #ededed;
       color: #000000;
       box-shadow: 0 10px 24px rgba(255,255,255,0.12);
+    }
+    html.dark .social-auth-button {
+      background: #080808;
+      border-color: #303030;
+      color: #ffffff;
+      box-shadow: none;
+    }
+    html.dark .social-auth-button:hover:not(:disabled) {
+      border-color: #4a4a4a;
+      box-shadow: 0 8px 18px rgba(255,255,255,0.06);
+    }
+    html.dark .google-mark,
+    html.dark .apple-mark {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #111a5c;
+    }
+    html.dark .social-auth-divider {
+      color: #b5b5b5;
+    }
+    html.dark .social-auth-divider span {
+      background: #303030;
     }
     html.dark .ring-progress,
     html.dark .dash-headline .highlight,
@@ -1176,6 +1228,24 @@
         </div>
 
         <p class="mt-4 hidden rounded-lg border border-line bg-wash px-3 py-2 text-sm text-muted" id="authMessage"></p>
+
+        <div class="mt-4 grid gap-3" id="socialAuthPanel">
+          <div class="grid gap-2 sm:grid-cols-2">
+            <button class="social-auth-button" id="googleAuthButton" type="button">
+              <span class="social-auth-mark google-mark" aria-hidden="true">G</span>
+              <span>Sign in with Google</span>
+            </button>
+            <button class="social-auth-button" id="appleAuthButton" type="button">
+              <span class="social-auth-mark apple-mark" aria-hidden="true">A</span>
+              <span>Sign in with Apple</span>
+            </button>
+          </div>
+          <div class="social-auth-divider" aria-hidden="true">
+            <span></span>
+            <strong>or</strong>
+            <span></span>
+          </div>
+        </div>
 
         <form class="mt-4 grid gap-3" id="authForm">
           <label class="grid gap-1" data-auth-register>
@@ -2838,7 +2908,13 @@
     const circumference = 339.292;
     const BUILD_API_BASE = "__PREDICTED_API_BASE__";
     const BUILD_DEMO_LOGIN_ENABLED = "__PREDICTED_DEMO_LOGIN_ENABLED__";
+    const BUILD_GOOGLE_CLIENT_ID = "__PREDICTED_GOOGLE_CLIENT_ID__";
+    const BUILD_APPLE_CLIENT_ID = "__PREDICTED_APPLE_CLIENT_ID__";
+    const BUILD_APPLE_REDIRECT_URI = "__PREDICTED_APPLE_REDIRECT_URI__";
     const API_BASE = configuredApiBase();
+    const GOOGLE_CLIENT_ID = configuredBuildValue(BUILD_GOOGLE_CLIENT_ID);
+    const APPLE_CLIENT_ID = configuredBuildValue(BUILD_APPLE_CLIENT_ID);
+    const APPLE_REDIRECT_URI = configuredBuildValue(BUILD_APPLE_REDIRECT_URI) || window.location.origin;
     let activeView = "dashboard";
     let focusHours = 3;
     let cardIndex = 0;
@@ -2854,6 +2930,7 @@
     let currentUser = null;
     let profileSettings = null;
     let authMode = "login";
+    let socialAuthProviderStatus = { google: Boolean(GOOGLE_CLIENT_ID), apple: Boolean(APPLE_CLIENT_ID) };
     let apiConnected = false;
     let simulateTimer;
     const MAX_TUTOR_NOTES = 3;
@@ -3002,8 +3079,13 @@
       plannerBase = defaultPlannerBase.map(item => ({ ...item }));
     }
 
+    function configuredBuildValue(value) {
+      if (typeof value !== "string" || value.startsWith("__")) return "";
+      return value.trim();
+    }
+
     function configuredApiBase() {
-      const buildValue = BUILD_API_BASE.startsWith("__") ? "" : BUILD_API_BASE;
+      const buildValue = configuredBuildValue(BUILD_API_BASE);
       const localFallback = ["localhost", "127.0.0.1", ""].includes(window.location.hostname)
         ? "http://localhost:8080"
         : "";
@@ -3076,6 +3158,193 @@
         throw new Error(await apiErrorMessage(response, `Registration failed with ${response.status}`));
       }
       return response.json();
+    }
+
+    async function socialAuthWith(provider, idToken, name = "") {
+      return apiRequest("/api/auth/social", {
+        method: "POST",
+        body: JSON.stringify({ provider, idToken, name })
+      }, "");
+    }
+
+    async function loadSocialProviderStatus() {
+      if (!API_BASE) {
+        socialAuthProviderStatus = { google: false, apple: false };
+        updateSocialAuthButtons();
+        return;
+      }
+      try {
+        const providers = await apiRequest("/api/auth/social/providers", {}, "");
+        socialAuthProviderStatus = {
+          google: Boolean(providers?.google),
+          apple: Boolean(providers?.apple)
+        };
+      } catch {
+        socialAuthProviderStatus = { google: false, apple: false };
+      }
+      updateSocialAuthButtons();
+    }
+
+    function loadScript(src, id) {
+      return new Promise((resolve, reject) => {
+        const existing = document.getElementById(id);
+        if (existing) {
+          existing.addEventListener("load", resolve, { once: true });
+          existing.addEventListener("error", reject, { once: true });
+          if (existing.dataset.loaded === "true") resolve();
+          return;
+        }
+        const script = document.createElement("script");
+        script.id = id;
+        script.src = src;
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          script.dataset.loaded = "true";
+          resolve();
+        };
+        script.onerror = () => reject(new Error("Could not load sign-in provider."));
+        document.head.appendChild(script);
+      });
+    }
+
+    function socialClientConfigured(provider) {
+      return provider === "google" ? Boolean(GOOGLE_CLIENT_ID) : Boolean(APPLE_CLIENT_ID);
+    }
+
+    function socialProviderReady(provider) {
+      return Boolean(API_BASE && socialClientConfigured(provider) && socialAuthProviderStatus[provider]);
+    }
+
+    function updateSocialAuthButtons(busy = false) {
+      [
+        ["google", "googleAuthButton", "Google", "PREDICTED_GOOGLE_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_ID"],
+        ["apple", "appleAuthButton", "Apple", "PREDICTED_APPLE_CLIENT_ID", "APPLE_OAUTH_CLIENT_ID"]
+      ].forEach(([provider, buttonId, label, frontendEnv, backendEnv]) => {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        const frontendReady = socialClientConfigured(provider);
+        const backendReady = socialAuthProviderStatus[provider];
+        button.disabled = busy || !API_BASE || !frontendReady || !backendReady;
+        button.title = !API_BASE
+          ? "Backend API URL is not configured."
+          : !frontendReady
+            ? `Set ${frontendEnv} in the frontend deployment.`
+            : !backendReady
+              ? `Set ${backendEnv} in the backend deployment.`
+              : `Sign in with ${label}`;
+      });
+    }
+
+    async function initializeGoogleAuth() {
+      const button = document.getElementById("googleAuthButton");
+      if (!button || !GOOGLE_CLIENT_ID) return;
+      try {
+        await loadScript("https://accounts.google.com/gsi/client", "google-identity-sdk");
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: async response => {
+            if (!response?.credential) {
+              setAuthMessage("Google did not return a sign-in token.", "error");
+              setAuthBusy(false);
+              return;
+            }
+            setAuthBusy(true);
+            setAuthMessage("Signing in with Google...");
+            try {
+              const auth = await socialAuthWith("google", response.credential);
+              await finishAuthentication(auth);
+            } catch (error) {
+              setAuthMessage(error.message, "error");
+              setApiStatus("Auth failed", "offline");
+            } finally {
+              setAuthBusy(false);
+            }
+          }
+        });
+        button.addEventListener("click", () => {
+          if (!socialProviderReady("google")) {
+            setAuthMessage(button.title || "Google sign-in is not configured.", "error");
+            return;
+          }
+          setAuthBusy(true);
+          setAuthMessage("Opening Google sign-in...");
+          window.google.accounts.id.prompt(notification => {
+            if (
+              notification.isNotDisplayed()
+              || notification.isSkippedMoment()
+              || notification.isDismissedMoment()
+            ) {
+              setAuthBusy(false);
+              setAuthMessage("Google sign-in could not open. Check browser pop-up and cookie settings.", "error");
+            }
+          });
+        });
+      } catch (error) {
+        button.disabled = true;
+        button.title = error.message;
+      }
+    }
+
+    async function initializeAppleAuth() {
+      const button = document.getElementById("appleAuthButton");
+      if (!button || !APPLE_CLIENT_ID) return;
+      try {
+        await loadScript(
+          "https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js",
+          "apple-identity-sdk"
+        );
+        window.AppleID.auth.init({
+          clientId: APPLE_CLIENT_ID,
+          scope: "name email",
+          redirectURI: APPLE_REDIRECT_URI,
+          usePopup: true
+        });
+        button.addEventListener("click", async () => {
+          if (!socialProviderReady("apple")) {
+            setAuthMessage(button.title || "Apple sign-in is not configured.", "error");
+            return;
+          }
+          setAuthBusy(true);
+          setAuthMessage("Opening Apple sign-in...");
+          try {
+            const response = await window.AppleID.auth.signIn();
+            const idToken = response?.authorization?.id_token;
+            if (!idToken) {
+              throw new Error("Apple did not return a sign-in token.");
+            }
+            const auth = await socialAuthWith("apple", idToken, appleDisplayName(response));
+            await finishAuthentication(auth);
+          } catch (error) {
+            if (error?.error !== "popup_closed_by_user") {
+              setAuthMessage(error.message || "Apple sign-in failed.", "error");
+              setApiStatus("Auth failed", "offline");
+            } else {
+              setAuthMessage("");
+            }
+          } finally {
+            setAuthBusy(false);
+          }
+        });
+      } catch (error) {
+        button.disabled = true;
+        button.title = error.message;
+      }
+    }
+
+    function appleDisplayName(response) {
+      const name = response?.user?.name || {};
+      return [name.firstName, name.lastName].filter(Boolean).join(" ");
+    }
+
+    async function initializeSocialAuth() {
+      updateSocialAuthButtons();
+      await Promise.allSettled([
+        loadSocialProviderStatus(),
+        initializeGoogleAuth(),
+        initializeAppleAuth()
+      ]);
+      updateSocialAuthButtons();
     }
 
     async function apiErrorMessage(response, fallback) {
@@ -3221,6 +3490,7 @@
       const button = document.getElementById("authSubmitButton");
       button.disabled = busy;
       button.classList.toggle("opacity-70", busy);
+      updateSocialAuthButtons(busy);
     }
 
     function setSession(auth) {
@@ -5311,6 +5581,7 @@
     renderNavigation();
     renderDashboardPreviews(plannerBase, feedItems);
     initializeAuthCatalog();
+    initializeSocialAuth();
     populatePlannerPathOptions();
     renderPlannerDeadlineRows([]);
     renderPlanner();

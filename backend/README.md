@@ -79,6 +79,7 @@ For split hosting:
 - Deploy the frontend to Vercel from the `frontend` root. The build defaults to `https://predicted-production-0574.up.railway.app`; set `PREDICTED_API_BASE` in Vercel only if the Railway backend URL changes.
 - Set `CORS_ALLOWED_ORIGIN_PATTERNS` in Railway to `https://predict-ed.vercel.app`.
 - Add Railway variables on the backend service Variables tab. The root `.env.example` is safe to import or paste into the raw editor.
+- To enable Google or Apple sign-in, set `GOOGLE_OAUTH_CLIENT_ID` / `APPLE_OAUTH_CLIENT_ID` on Railway and the matching `PREDICTED_GOOGLE_CLIENT_ID` / `PREDICTED_APPLE_CLIENT_ID` values on Vercel.
 
 ## File uploads
 
@@ -175,6 +176,8 @@ SPRING_DATASOURCE_PASSWORD='replace-with-production-db-password' \
 JWT_SECRET='replace-with-a-long-production-secret' \
 JWT_EXPIRATION_MINUTES=60 \
 CORS_ALLOWED_ORIGIN_PATTERNS='https://predict-ed.vercel.app' \
+GOOGLE_OAUTH_CLIENT_ID='' \
+APPLE_OAUTH_CLIENT_ID='' \
 PREDICTED_SEED_DEMO_USERS_ENABLED=false \
 PREDICTED_BOOTSTRAP_ADMIN_EMAIL='admin@example.com' \
 PREDICTED_BOOTSTRAP_ADMIN_PASSWORD='replace-with-a-strong-admin-password-14-plus-chars' \
