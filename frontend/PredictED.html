@@ -178,7 +178,7 @@
     #authGate .auth-brand-logo {
       width: min(14rem, 70vw);
       height: auto;
-      filter: brightness(0) invert(1) drop-shadow(0 0 20px rgba(29,78,216,0.5));
+      filter: drop-shadow(0 0 20px rgba(29,78,216,0.28));
     }
     .auth-tagline {
       font-family: 'JetBrains Mono', monospace;
@@ -1003,8 +1003,7 @@
     html.dark #authGate {
       background: #000000;
     }
-    html.dark .app-header-logo,
-    html.dark .auth-brand-logo {
+    html.dark .app-header-logo {
       filter: invert(1) hue-rotate(180deg) saturate(1.05) drop-shadow(0 4px 10px rgba(0,0,0,0.2));
     }
     html.dark .glass,
@@ -1579,7 +1578,7 @@
   <div class="fixed inset-0 z-[90] flex justify-center overflow-y-auto px-4 py-6" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="auth-shell">
       <div class="auth-logo-wrap flex flex-col justify-center items-center">
-        <img class="auth-brand-logo" alt="PredictED logo" src="assets/MainPredictedLogo.svg" />
+        <img class="auth-brand-logo" alt="PredictED logo" src="assets/MainPredictedLogoAuth.svg" />
         <span class="auth-tagline">AI-powered academic intelligence</span>
       </div>
       <div class="auth-card panel">
